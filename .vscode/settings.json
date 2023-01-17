@@ -6,5 +6,12 @@
     "editor.bracketPairColorization.enabled": true,
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
-    "editor.wordWrap": "on"
+    "editor.wordWrap": "on",
+    "debug.javascript.codelens.npmScripts": "never",
+    
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    }
+
+
 }
