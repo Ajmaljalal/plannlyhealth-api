@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
-    "test": "jest --coverage"
+    "test": "jest --watchAll"
   },
   "author": "Ajmal jalal",
   "license": "ISC",
