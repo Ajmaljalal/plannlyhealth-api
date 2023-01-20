@@ -1,18 +1,11 @@
 
-const AWS = require('aws-sdk');
-
-const configs = {
-    accessKeyId: 'YOUR_ACCESS_KEY',
-    secretAccessKey: 'YOUR_SECRET_KEY',
-    region: 'REGION'
-}
+import AWS, {DynamoDB} from 'aws-sdk';
 
 AWS.config.update({
-  accessKeyId: 'YOUR_ACCESS_KEY',
-  secretAccessKey: 'YOUR_SECRET_KEY',
-  region: 'REGION'
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_KEY,
+  region: process.env.AWS_REGION
 });
 
-const dynamodb = new AWS.DynamoDB().documentClient();
-
-module.exports = dynamodb;
+const dynamodb = new DynamoDB();
+export default dynamodb;
