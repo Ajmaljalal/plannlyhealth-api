@@ -27,6 +27,11 @@ app.use((req, res, next) => {
 });
 
 // Routes go here 
+app.use('/', (req, res) => {
+    res.status(200).json({
+        SUCCESS: 'Plannly api is up and running!'
+    });
+})
 app.use('/api/users', userRoutes);
 
 // Error handling for any other routes that are not defined
