@@ -4,8 +4,9 @@
   "description": "plannly api that connects to plannly UI",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec ts-node src/index.ts",
+    "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
+    "start": "node index.js",
     "test": "jest --watchAll"
   },
   "author": "Ajmal jalal",
