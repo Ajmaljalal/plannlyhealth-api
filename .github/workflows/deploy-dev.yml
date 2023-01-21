@@ -28,7 +28,7 @@ jobs:
         run: npm run build
 
       - name: Generate deployment package
-        run: zip -r deploy.zip dist package.json package-lock.json
+        run: zip -r deploy.zip dist Procfile package.json
       - name: Get timestamp
         uses: gerred/actions/current-time@master
         id: current-time

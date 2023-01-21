@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "plannly api that connects to plannly UI",
   "main": "index.js",
-  "engines": {
-  "node": "16.x"
-},
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
