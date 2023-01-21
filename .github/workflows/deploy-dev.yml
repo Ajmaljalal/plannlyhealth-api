@@ -1,4 +1,4 @@
-name: Plannly App Deploy
+name: Plannly App Deploy - Development
 on:
   push:
     branches:
@@ -24,6 +24,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Installing NPM
         run: npm ci
+      - name: Run tests
+        run: npm test
       - name: Building application
         run: npm run build
 
