@@ -21,7 +21,7 @@ jobs:
     - name: Zip application
       run: zip -r app.zip dist
     - name: Deploy to Elastic Beanstalk
-      uses: aws-actions/elasticbeanstalk-deploy-action@v20
+      uses: einaregilsson/beanstalk-deploy@v20
       with:
         access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
