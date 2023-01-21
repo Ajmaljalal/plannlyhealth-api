@@ -7,7 +7,8 @@
     "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "jest --watchAll"
+    "test": "jest",
+    "test:local": "jest --watchAll"
   },
   "author": "Ajmal jalal",
   "license": "ISC",
