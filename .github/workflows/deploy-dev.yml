@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [19.x]
+        node-version: [16.x]
     steps:
       - uses: actions/checkout@v2
       - name: Cache node modules
@@ -23,12 +23,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Installing NPM
-        run: npm install
+        run: npm ci
       - name: Building application
         run: npm run build
 
       - name: Generate deployment package
-        run: zip -r deploy.zip * -x "**node_modules**"
+        run: zip -r deploy.zip dist
       - name: Get timestamp
         uses: gerred/actions/current-time@master
         id: current-time
