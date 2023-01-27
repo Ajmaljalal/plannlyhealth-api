@@ -2,6 +2,8 @@ import express from 'express';
 import morgan from 'morgan';
 import config from './configs/base';
 import userRoutes from './routes/user';
+import companyRoutes from './routes/company';
+
 
 const NAMESPACE = 'Server';
 const app = express();
@@ -26,13 +28,17 @@ app.use((req, res, next) => {
     next();
 });
 
+
 // Routes go here 
+app.use('/api/users', userRoutes);
+app.use('/api/companies', companyRoutes);
+
+
 app.use('/', (req, res) => {
     res.status(200).json({
         SUCCESS: 'Plannly api is up and running!'
     });
 })
-app.use('/api/users', userRoutes);
 
 // Error handling for any other routes that are not defined
 app.use((req, res, next) => {
@@ -43,4 +49,6 @@ app.use((req, res, next) => {
 });
 
 
-app.listen(config.server.port, () => {console.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`)});
+app.listen(config.server.port, () => {
+    console.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`)
+});
