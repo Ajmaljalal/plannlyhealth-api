@@ -2,7 +2,7 @@
     "cSpell.words": [
         "plannly"
     ],
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "vscode.typescript-language-features",
     "editor.bracketPairColorization.enabled": true,
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
@@ -11,6 +11,9 @@
     
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
     }
 
 
