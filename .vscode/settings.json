@@ -14,7 +14,13 @@
     },
     "[typescript]": {
         "editor.defaultFormatter": "vscode.typescript-language-features"
-    }
-
+    },
+    "editor.tabSize": 2,
+    // This one forces the tab to be **space**
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": true,
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
 
 }

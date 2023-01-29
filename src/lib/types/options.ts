@@ -1,95 +1,95 @@
-export enum AddOns  {
-    'HRIS Integration',
-    'Slack Integration',
-    'Single Sign-On (SSO)',
-    'Domain Whitelisting',
-    'Dedicated Wellness Coordinator',
-    'Broker (partner) Portal',
+export enum AddOns {
+  'HRIS Integration',
+  'Slack Integration',
+  'Single Sign-On (SSO)',
+  'Domain Whitelisting',
+  'Dedicated Wellness Coordinator',
+  'Broker (partner) Portal',
 }
 
 export enum Frequency {
-    'One Time',
-    Monthly,
-    Quarterly,
-    Yearly
+  'One Time',
+  Monthly,
+  Quarterly,
+  Yearly
 }
 
 export enum Options {
-    Activate,
-    Deactivate,
-    Edit
+  Activate,
+  Deactivate,
+  Edit
 }
 
 export enum ProgramModel {
-    Allotment,
-    Allowance,
-    'Both Programs'
+  Allotment,
+  Allowance,
+  'Both Programs'
 }
 
 export enum ClaimStatus {
-    Requested,
-    Approved,
-    Rejected
+  Requested,
+  Approved,
+  Rejected
 }
 
 export enum Department {
-    Sales,
-    Marketing,
-    Finance,
-    Operations,
-    'Human Resources',
-    IT,
-    Support,
+  Sales,
+  Marketing,
+  Finance,
+  Operations,
+  'Human Resources',
+  IT,
+  Support,
 }
 
 export enum NotificationType {
-    'Claim Status',
-    Comment,
+  'Claim Status',
+  Comment,
 }
 
 export enum OptionsClaim {
-    Approve,
-    'Approve All',
-    Decline,
-    Delete,
-    Details,
-    Edit
+  Approve,
+  'Approve All',
+  Decline,
+  Delete,
+  Details,
+  Edit
 }
 
 export enum OptionsComment {
-    Delete,
-    Edit
+  Delete,
+  Edit
 }
 
 export enum PaymentSchedule {
-    Annually,
-    Monthly,
+  Annually,
+  Monthly,
 }
 
 export enum RefundStatus {
-    Failed,
-    Success,
+  Failed,
+  Success,
 }
 
 export enum Role {
-    Admin,
-    Finance,
-    Standard,
-    Owner,
-    'Super Admin',
+  Admin,
+  Finance,
+  Standard,
+  Owner,
+  'Super Admin',
 }
 
 export enum UserAccountStatus {
-    Active,
-    Invited,
-    Deactivated,
+  Active,
+  Invited,
+  Deactivated,
 }
 
 
 export enum SubscriptionStatus {
-    Pending,
-    Approved,
-    Rejected
+  Pending,
+  Approved,
+  Rejected
 }
 
 

@@ -1,7 +1,6 @@
 import express from 'express';
 import morgan from 'morgan';
 import config from './configs/base';
-import userRoutes from './routes/user';
 import companyRoutes from './routes/company';
 
 
@@ -18,37 +17,37 @@ app.use(express.json());
 
 // Rules of our API 
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
 
-    if (req.method == 'OPTIONS') {
-        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
-        return res.status(200).json({});
-    }
-    next();
+  if (req.method == 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+    return res.status(200).json({});
+  }
+  next();
 });
 
 
 // Routes go here 
-app.use('/api/users', userRoutes);
+// app.use('/api/users', userRoutes);
 app.use('/api/companies', companyRoutes);
 
 
 app.use('/', (req, res) => {
-    res.status(200).json({
-        SUCCESS: 'Plannly api is up and running!'
-    });
+  res.status(200).json({
+    SUCCESS: 'Plannly api is up and running!'
+  });
 })
 
 // Error handling for any other routes that are not defined
 app.use((req, res, next) => {
-    const error = new Error('Not found');
-    res.status(404).json({
-        message: error.message
-    });
+  const error = new Error('Not found');
+  res.status(404).json({
+    message: error.message
+  });
 });
 
 
 app.listen(config.server.port, () => {
-    console.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`)
+  console.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`)
 });
