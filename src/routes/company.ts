@@ -1,4 +1,3 @@
-// create a post route for company
 import { Router } from 'express';
 import { createNewCompany, deleteCompany, getAllCompanies, getCompanyById, updateCompany } from '../controllers/company';
 

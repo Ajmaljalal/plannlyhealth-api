@@ -7,6 +7,7 @@ import {
 } from '../services/user';
 import { Request, Response } from 'express';
 import { User } from '../lib/types/user';
+import { Role } from '../lib/enums';
 
 
 export async function createUser(req: Request, res: Response) {
@@ -79,37 +80,33 @@ export async function updateUser(req: Request, res: Response) {
 
 export async function deleteUser(req: Request, res: Response) {
   // check if user exists
-  const user: any = await getUserByIdService(req.params.id);
-  if (user.Item) {
-    // check if current user is the owner of the user
-    // @ts-ignore
-    const currentUser: any = {};
-    // @ts-ignore
-    currentUser?.role = 'owner';
-    // @ts-ignore
-    currentUser?.id = user.Item.owner
-    const userId: string = user.Item.id;
-    const userOwner: string = user.Item.owner;
-    if (currentUser?.role === 'owner' && currentUser?.id === userOwner) {
-      const response: any = await deleteUserService(userId);
-      if (response.code) {
-        return res.status(response.statusCode).json({
-          message: response.message,
-          code: response.code
-        });
-      } else {
-        return res.status(200).json(response);
-      }
-    } else {
-      return res.status(403).json({
-        message: 'You are not authorized to delete this user.',
-        code: 'Unauthorized'
-      });
-    }
-  } else {
+  const userId = req.params.id;
+  const userToDelete: any = await getUserByIdService(req.params.id);
+  if (userToDelete.Item) {
     return res.status(404).json({
       message: 'User not found.',
       code: 'UserNotFound'
     });
   }
+  // check if current user is the owner of the user
+  // @ts-ignore
+  const authorizedUser: User = req?.user;
+  const ownerId: string = authorizedUser?.id;
+  if (authorizedUser?.role === Role.Owner && userToDelete?.owner === ownerId) {
+    const response: any = await deleteUserService(userId);
+    if (response.code) {
+      return res.status(response.statusCode).json({
+        message: response.message,
+        code: response.code
+      });
+    } else {
+      return res.status(200).json(response);
+    }
+  } else {
+    return res.status(403).json({
+      message: 'You are not authorized to delete this user.',
+      code: 'Unauthorized'
+    });
+  }
+
 }
