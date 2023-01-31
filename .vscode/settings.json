@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
+        "onboarded",
         "plannly"
     ],
     "editor.defaultFormatter": "vscode.typescript-language-features",
@@ -8,7 +9,6 @@
     "editor.formatOnPaste": true,
     "editor.wordWrap": "on",
     "debug.javascript.codelens.npmScripts": "never",
-    
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
     },
@@ -22,5 +22,4 @@
     "[jsonc]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
-
 }

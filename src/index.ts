@@ -2,6 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import config from './configs/base';
 import companyRoutes from './routes/company';
+import userRoutes from './routes/user';
 
 
 const NAMESPACE = 'Server';
@@ -29,7 +30,7 @@ app.use((req, res, next) => {
 
 
 // Routes go here 
-// app.use('/api/users', userRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/companies', companyRoutes);
 
 

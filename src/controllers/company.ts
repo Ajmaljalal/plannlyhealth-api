@@ -1,13 +1,19 @@
 
 import { Request, Response } from 'express';
 import { Company } from '../models/company';
-import { createCompanyService, deleteCompanyService, getAllCompaniesService, getCompanyByIdService, updateCompanyService } from '../services/company';
+import {
+  createCompanyService,
+  deleteCompanyService,
+  getAllCompaniesService,
+  getCompanyByIdService,
+  updateCompanyService,
+} from '../services/company';
 
 export async function createNewCompany(req: Request, res: Response) {
   const company: Company = req.body;
 
   // validate the request body before creating a new company
-  if (!company.name.trim() || !company.logo.trim() || !company.website.trim() || !company.company_size.trim()) {
+  if (!company.name?.trim() || !company.logo?.trim() || !company.website?.trim() || !company.company_size?.trim()) {
     return res.status(400).json({
       message: 'Missing required fields. Please provide name, logo, website and company size.',
       code: 'MissingRequiredFields'
