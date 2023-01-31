@@ -1,7 +1,7 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
-import { User } from "../models/user";
 import { v4 as uuid } from 'uuid';
 import db from "../configs/dynamodb";
+import { User } from "../lib/types/user";
 
 const TABLE_NAME = `users_${process.env.DYNAMODB_TABLE_ENV}`;
 

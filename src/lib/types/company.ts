@@ -1,4 +1,4 @@
-import { ProgramModel, SubscriptionStatus } from "../lib/enums"
+import { ProgramModel, SubscriptionStatus } from "../enums"
 
 export interface Company {
   type?: 'Company'

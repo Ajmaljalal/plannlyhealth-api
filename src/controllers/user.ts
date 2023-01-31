@@ -6,7 +6,7 @@ import {
   deleteUserService,
 } from '../services/user';
 import { Request, Response } from 'express';
-import { User } from "../models/user";
+import { User } from '../lib/types/user';
 
 
 export async function createUser(req: Request, res: Response) {

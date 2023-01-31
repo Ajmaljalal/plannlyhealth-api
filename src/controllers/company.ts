@@ -1,6 +1,6 @@
 
 import { Request, Response } from 'express';
-import { Company } from '../models/company';
+import { Company } from '../lib/types/company';
 import {
   createCompanyService,
   deleteCompanyService,

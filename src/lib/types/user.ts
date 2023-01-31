@@ -1,5 +1,4 @@
-import { Role } from "aws-sdk/clients/budgets";
-import { Department } from "../lib/enums";
+import { Department, Role } from "../enums";
 
 export interface User {
   type: 'User';
