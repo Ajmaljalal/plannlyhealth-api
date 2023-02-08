@@ -4,6 +4,7 @@ import config from './configs/base';
 import companyRoutes from './routes/company';
 import userRoutes from './routes/user';
 import benefitsProgramsRoutes from './routes/benefits-programs';
+import programBalanceRoutes from './routes/program-balance';
 
 
 const NAMESPACE = 'Server';
@@ -31,6 +32,7 @@ app.use((req, res, next) => {
 app.use('/api/users', userRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/benefits-programs', benefitsProgramsRoutes);
+app.use('/api/program-balance', programBalanceRoutes);
 
 // Error handling for any other routes that are not defined
 app.use((req, res, next) => {

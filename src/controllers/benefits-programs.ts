@@ -130,7 +130,7 @@ export async function updateBenefitsProgram(req: Request, res: Response) {
   const authorizedUser: User = req?.user;
   if (authorizedUser?.id !== program.Item.owner && (authorizedUser?.role !== Role.Admin || authorizedUser?.role !== Role.Owner)) {
     return res.status(403).json({
-      message: 'You are not authorized to delete this program',
+      message: 'You are not authorized to perform this action',
       code: "UNAUTHORIZED"
     });
   }
