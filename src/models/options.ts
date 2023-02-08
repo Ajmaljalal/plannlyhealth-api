@@ -17,3 +17,7 @@ export const OptionsClaimSchema = Joi.string().valid('Approve', 'Approve All', '
 export const OptionsCommentSchema = Joi.string().valid('Delete', 'Edit').required();
 
 export const PaymentScheduleSchema = Joi.string().valid('Annually', 'Monthly').required();
+
+export const RefundStatusSchema = Joi.string().valid('Failed', 'Success').required();
+
+export const QuestionTypeSchema = Joi.string().valid('Single Select', 'Multi Select').required();
