@@ -36,6 +36,43 @@ export const getClaimByIdService = async (claimId: string) => {
   }
 }
 
+
+export const getClaimByStatusService = async (status: string) => {
+  const params: DocumentClient.QueryInput = {
+    TableName: TABLE_NAME,
+    IndexName: 'status-index',
+    KeyConditionExpression: 'status = :status',
+    ExpressionAttributeValues: {
+      ':status': status
+    }
+  };
+  try {
+    const result = db.query(params).promise();
+    return result
+  } catch (err) {
+    return err;
+  }
+}
+
+
+export const getClaimByUserIdService = async (userId: string) => {
+  const params: DocumentClient.QueryInput = {
+    TableName: TABLE_NAME,
+    IndexName: 'user_id-index',
+    KeyConditionExpression: 'user_id = :user_id',
+    ExpressionAttributeValues: {
+      ':user_id': userId
+    }
+  };
+  try {
+    const result = db.query(params).promise();
+    return result
+  } catch (err) {
+    return err;
+  }
+}
+
+
 export const getClaimByCompanyIdService = async (companyId: string) => {
   const params: DocumentClient.QueryInput = {
     TableName: TABLE_NAME,
