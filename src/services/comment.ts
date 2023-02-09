@@ -36,7 +36,7 @@ export const getCommentByIdService = async (commentId: string) => {
   }
 }
 
-export const getCommentByClaimIdService = async (claimId: string) => {
+export const getCommentsByClaimIdService = async (claimId: string) => {
   const params: DocumentClient.QueryInput = {
     TableName: TABLE_NAME,
     IndexName: 'claim_id-index',
@@ -53,7 +53,24 @@ export const getCommentByClaimIdService = async (claimId: string) => {
   }
 }
 
-export const getAllCommentService = async () => {
+export const getCommentsByAuthorService = async (author: string) => {
+  const params: DocumentClient.QueryInput = {
+    TableName: TABLE_NAME,
+    IndexName: 'author-index',
+    KeyConditionExpression: 'author = :author',
+    ExpressionAttributeValues: {
+      ':author': author
+    }
+  };
+  try {
+    const result = db.query(params).promise();
+    return result
+  } catch (err) {
+    return err;
+  }
+}
+
+export const getAllCommentsService = async () => {
   const params: DocumentClient.ScanInput = {
     TableName: TABLE_NAME
   };
