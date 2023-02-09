@@ -198,3 +198,6 @@ export async function deleteBenefitsProgram(req: Request, res: Response) {
     return res.status(200).json(response);
   }
 }
+
+
+// create all of the above functions for the deals controller

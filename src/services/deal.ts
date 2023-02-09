@@ -37,7 +37,7 @@ export const getDealByIdService = async (dealId: string) => {
 }
 
 
-export const getAllDealService = async () => {
+export const getAllDealsService = async () => {
   const params: DocumentClient.ScanInput = {
     TableName: TABLE_NAME
   };
@@ -48,7 +48,6 @@ export const getAllDealService = async () => {
     return err;
   }
 }
-
 
 export const updateDealService = async (dealId: string, updates: Deal) => {
   // Create UpdateExpression and ExpressionAttributeValues based on the updates provided
@@ -76,6 +75,21 @@ export const updateDealService = async (dealId: string, updates: Deal) => {
   };
   try {
     const result = await db.update(params).promise();
+    return result
+  } catch (err) {
+    return err;
+  }
+}
+
+export const deleteDealService = async (dealId: string) => {
+  const params: DocumentClient.DeleteItemInput = {
+    TableName: TABLE_NAME,
+    Key: {
+      id: dealId
+    }
+  };
+  try {
+    const result = await db.delete(params).promise();
     return result
   } catch (err) {
     return err;
