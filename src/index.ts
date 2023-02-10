@@ -4,6 +4,10 @@ import config from './configs/base';
 import companyRoutes from './routes/company';
 import userRoutes from './routes/user';
 import benefitsProgramsRoutes from './routes/benefits-programs';
+import programBalanceRoutes from './routes/program-balance';
+import claimsRoutes from './routes/claims';
+import commentsRoutes from './routes/comments';
+import dealsRoutes from './routes/deals';
 
 
 const NAMESPACE = 'Server';
@@ -31,6 +35,10 @@ app.use((req, res, next) => {
 app.use('/api/users', userRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/benefits-programs', benefitsProgramsRoutes);
+app.use('/api/program-balance', programBalanceRoutes);
+app.use('/api/claims', claimsRoutes);
+app.use('/api/comments', commentsRoutes);
+app.use('api/deals', dealsRoutes);
 
 // Error handling for any other routes that are not defined
 app.use((req, res, next) => {
@@ -42,5 +50,5 @@ app.use((req, res, next) => {
 
 
 app.listen(config.server.port, () => {
-  console.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`)
+  console.info(NAMESPACE, `is running on ${config.server.hostname}:${config.server.port}`)
 });

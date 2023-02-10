@@ -1,19 +1,23 @@
 import Joi from 'joi';
 
-export const FrequencySchema = Joi.string().valid('One Time', 'Monthly', 'Quarterly', 'Yearly').required();
+export const FrequencySchema = Joi.string().valid('one time', 'monthly', 'quarterly', 'yearly').required();
 
-export const OptionsSchema = Joi.string().valid('Activate', 'Deactivate', 'Edit').required();
+export const OptionsSchema = Joi.string().valid('activate', 'deactivate', 'edit').required();
 
-export const ProgramModelSchema = Joi.string().valid('Allotment', 'Allowance', 'Both Programs').required();
+export const ProgramModelSchema = Joi.string().valid('allotment', 'allowance', 'both programs').required();
 
-export const ClaimStatusSchema = Joi.string().valid('Requested', 'Approved', 'Rejected').required();
+export const ClaimStatusSchema = Joi.string().valid('requested', 'approved', 'rejected').required();
 
-export const DepartmentSchema = Joi.string().valid('Sales', 'Marketing', 'Finance', 'Operations', 'Human Resources', 'IT', 'Support').required();
+export const DepartmentSchema = Joi.string().valid('sales', 'marketing', 'finance', 'operations', 'human resources', 'IT', 'support').required();
 
-export const NotificationTypeSchema = Joi.string().valid('Claim Status', 'Comment').required();
+export const NotificationTypeSchema = Joi.string().valid('claim status', 'comment').required();
 
-export const OptionsClaimSchema = Joi.string().valid('Approve', 'Approve All', 'Decline', 'Delete', 'Details', 'Edit').required();
+export const OptionsClaimSchema = Joi.string().valid('approve', 'approve all', 'decline', 'delete', 'details', 'edit').required();
 
-export const OptionsCommentSchema = Joi.string().valid('Delete', 'Edit').required();
+export const OptionsCommentSchema = Joi.string().valid('delete', 'edit').required();
 
-export const PaymentScheduleSchema = Joi.string().valid('Annually', 'Monthly').required();
+export const PaymentScheduleSchema = Joi.string().valid('annually', 'monthly').required();
+
+export const RefundStatusSchema = Joi.string().valid('failed', 'success');
+
+export const QuestionTypeSchema = Joi.string().valid('single Select', 'multi select').required();

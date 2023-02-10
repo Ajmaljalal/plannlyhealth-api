@@ -16,7 +16,7 @@ import {
 export async function createNewBenefitsProgram(req: Request, res: Response) {
   const benefitsProgram: BenefitsProgram = req.body;
 
-  // check if the request body is empty
+  // 1. check if the request body is empty
   if (!Object.keys(benefitsProgram).length) {
     return res.status(400).json({
       message: 'Request body is empty',
@@ -24,15 +24,14 @@ export async function createNewBenefitsProgram(req: Request, res: Response) {
     });
   }
 
-  // add is_active, is_deleted, is_template, create_date and modified_date to the benefitsProgram object if they are not present
-  // default values are false for is_active, is_deleted and is_template
+  // 2. add default values to the benefitsProgram object if they are not present
   benefitsProgram.is_active = benefitsProgram.is_active || false;
   benefitsProgram.is_deleted = benefitsProgram.is_deleted || false;
   benefitsProgram.is_template = benefitsProgram.is_template || false;
   benefitsProgram.created_date = benefitsProgram.created_date || Date();
   benefitsProgram.modified_date = benefitsProgram.modified_date || Date();
 
-  // validate the request body before creating a new company using the benefitsProgramsSchema
+  // 3. validate the request body before creating a new company using the benefitsProgramsSchema
   const { error } = BenefitsProgramsSchema.validate(benefitsProgram);
   if (error) {
     return res.status(400).json({
@@ -41,16 +40,17 @@ export async function createNewBenefitsProgram(req: Request, res: Response) {
     });
   }
 
-  // call the createBenefitsProgramService to create a new benefits program
+  // 4. call the createBenefitsProgramService to create a new benefits program
   const response: any = await createBenefitsProgramService(benefitsProgram);
 
-  // check if the response is an error
+  // 5. check if the response is an error
   if (response.code) {
     return res.status(response.statusCode).json({
       message: response.message,
       code: response.code
     });
   }
+  // 6. if the response is not an error, send the benefits program
   else {
     return res.status(201).json(response);
   }
@@ -58,18 +58,19 @@ export async function createNewBenefitsProgram(req: Request, res: Response) {
 }
 
 export async function getBenefitsProgramById(req: Request, res: Response) {
-  // get the benefits program id from the request params
+  // 1. get the benefits program id from the request params
   const benefitsProgramId: string = req.params.id;
 
-  // call the getBenefitsProgramByIdService to get the benefits program by id
+  // 2. call the getBenefitsProgramByIdService to get the benefits program by id
   const response: any = await getBenefitsProgramByIdService(benefitsProgramId);
-  // check if the response is an error
+  // 3. check if the response is an error
   if (response.code) {
     return res.status(response.statusCode).json({
       message: response.message,
       code: response.code
     });
   }
+  // 4. if the response is not an error, send the benefits program
   else {
     return res.status(200).json(response.Item);
   }
@@ -78,30 +79,32 @@ export async function getBenefitsProgramById(req: Request, res: Response) {
 export async function getBenefitsProgramsByCompanyId(req: Request, res: Response) {
   const companyId: string = req.params.companyId;
 
-  // call the getBenefitsProgramsByCompanyIdService to get the benefits programs by company id
+  // 1. call the getBenefitsProgramsByCompanyIdService to get the benefits programs by company id
   const response: any = await getBenefitsProgramsByCompanyIdService(companyId);
-  // check if the response is an error
+  // 2. check if the response is an error
   if (response.code) {
     return res.status(response.statusCode).json({
       message: response.message,
       code: response.code
     });
   }
+  // 3. if the response is not an error, send the benefits program
   else {
     return res.status(200).json(response.Items);
   }
 }
 
 export async function getAllBenefitsPrograms(req: Request, res: Response) {
-  // call the getAllBenefitsProgramsService to get all the benefits programs
+  // 1. call the getAllBenefitsProgramsService to get all the benefits programs
   const response: any = await getAllBenefitsProgramsService();
-  // check if the response is an error
+  // 2. check if the response is an error
   if (response.code) {
     return res.status(response.statusCode).json({
       message: response.message,
       code: response.code
     });
   }
+  // 3. if the response is not an error, send the benefits program
   else {
     return res.status(200).json(response.Items);
   }
@@ -110,14 +113,14 @@ export async function getAllBenefitsPrograms(req: Request, res: Response) {
 export async function updateBenefitsProgram(req: Request, res: Response) {
   const benefitsProgramId: string = req.params.id;
   const benefitsProgram: BenefitsProgram = req.body;
-  // check if the request body is empty
+  // 1. check if the request body is empty
   if (!Object.keys(benefitsProgram).length) {
     return res.status(400).json({
       message: 'Request body is empty',
       code: 'EMPTY_REQUEST_BODY'
     });
   }
-  // check if the program exists
+  // 2. check if the program exists
   const program: any = await getBenefitsProgramByIdService(benefitsProgramId);
   if (!program.Item) {
     return res.status(404).json({
@@ -125,22 +128,21 @@ export async function updateBenefitsProgram(req: Request, res: Response) {
       code: "PROGRAM_DOES_NOT_EXIST"
     });
   }
-  // check if current user is the owner of the program
+  // 3. check if current user is the owner of the program
   // @ts-ignore
   const authorizedUser: User = req?.user;
   if (authorizedUser?.id !== program.Item.owner && (authorizedUser?.role !== Role.Admin || authorizedUser?.role !== Role.Owner)) {
     return res.status(403).json({
-      message: 'You are not authorized to delete this program',
+      message: 'You are not authorized to perform this action',
       code: "UNAUTHORIZED"
     });
   }
-  // add is_active, is_deleted, is_template and modified_date to the benefitsProgram object if they are not present
-  // default values are false for is_active, is_deleted and is_template
+  // 4. add is_active, is_deleted, is_template and modified_date to the benefitsProgram object if they are not present
   benefitsProgram.is_active = benefitsProgram.is_active || false;
   benefitsProgram.is_deleted = benefitsProgram.is_deleted || false;
   benefitsProgram.is_template = benefitsProgram.is_template || false;
   benefitsProgram.modified_date = benefitsProgram.modified_date || Date();
-  // validate the request body before creating a new company using the benefitsProgramsSchema
+  // 5. validate the request body before creating a new company using the benefitsProgramsSchema
   const { error } = BenefitsProgramsSchema.validate(benefitsProgram, { allowUnknown: true });
   if (error) {
     return res.status(400).json({
@@ -148,15 +150,16 @@ export async function updateBenefitsProgram(req: Request, res: Response) {
       code: 'INVALID_REQUEST_BODY'
     });
   }
-  // call the updateBenefitsProgramService to update the benefits program
+  // 6. call the updateBenefitsProgramService to update the benefits program
   const response: any = await updateBenefitsProgramService(benefitsProgramId, benefitsProgram);
-  // check if the response is an error
+  // 7. check if the response is an error
   if (response.code) {
     return res.status(response.statusCode).json({
       message: response.message,
       code: response.code
     });
   }
+  // 8. if the response is not an error, send the benefits program
   else {
     return res.status(200).json(response.Attributes);
   }
@@ -164,7 +167,7 @@ export async function updateBenefitsProgram(req: Request, res: Response) {
 
 export async function deleteBenefitsProgram(req: Request, res: Response) {
   const benefitsProgramId: string = req.params.id;
-  // check if the program exists
+  // 1. check if the program exists
   const program: any = await getBenefitsProgramByIdService(benefitsProgramId);
   if (!program.Item) {
     return res.status(404).json({
@@ -172,7 +175,7 @@ export async function deleteBenefitsProgram(req: Request, res: Response) {
       code: "PROGRAM_DOES_NOT_EXIST"
     });
   }
-  // check if current user is the owner of the program
+  // 2. check if current user is the owner of the program
   // @ts-ignore
   const authorizedUser: User = req?.user;
   if (authorizedUser?.id !== program.Item.owner && (authorizedUser?.role !== Role.Admin || authorizedUser?.role !== Role.Owner)) {
@@ -181,16 +184,20 @@ export async function deleteBenefitsProgram(req: Request, res: Response) {
       code: "UNAUTHORIZED"
     });
   }
-  // call the deleteBenefitsProgramService to delete the benefits program
+  // 3. call the deleteBenefitsProgramService to delete the benefits program
   const response: any = await deleteBenefitsProgramService(benefitsProgramId);
-  // check if the response is an error
+  // 4. check if the response is an error
   if (response.code) {
     return res.status(response.statusCode).json({
       message: response.message,
       code: response.code
     });
   }
+  // 5. if the response is not an error, send the benefits program
   else {
     return res.status(200).json(response);
   }
 }
+
+
+// create all of the above functions for the deals controller
