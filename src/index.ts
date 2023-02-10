@@ -4,7 +4,7 @@ import config from './configs/base';
 import companyRoutes from './routes/company';
 import userRoutes from './routes/user';
 import benefitsProgramsRoutes from './routes/benefits-programs';
-import programBalanceRoutes from './routes/program-balance';
+import programBalanceRoutes from './routes/program-balances';
 import claimsRoutes from './routes/claims';
 import commentsRoutes from './routes/comments';
 import dealsRoutes from './routes/deals';
