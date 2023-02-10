@@ -15,7 +15,7 @@ export const createClaim = async (req: Request, res: Response) => {
     });
   }
 
-  // 2. add create_date and modified_date to the object if they are not present
+  // 2. add required modifications to the claim
   claim.id = uuid()
   claim.created_date = claim.created_date || Date();
   claim.modified_date = claim.modified_date || Date();
@@ -259,8 +259,8 @@ export const updateClaim = async (req: Request, res: Response) => {
     // }
 
     // 6. add required modifications to the claim object
-    delete claim.id;
-    delete claimExists.Item.id;
+    delete claim.id; // this is because the id is not allowed to be updated
+    delete claimExists.Item.id; // this is because the id is not allowed to be updated
     claim.modified_date = claim.modified_date || Date();
     const claimToUpdate = { ...claimExists.Item, ...claim };
 
