@@ -1,6 +1,6 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import db from "../configs/dynamodb";
-import { v4 as uuid } from 'uuid';
+import { ClaimStatus } from "../lib/enums";
 import { Claim } from "../models/claim";
 
 const TABLE_NAME = `claims_${process.env.DYNAMODB_TABLE_ENV}`;
@@ -8,10 +8,7 @@ const TABLE_NAME = `claims_${process.env.DYNAMODB_TABLE_ENV}`;
 export const createClaimService = async (claim: Claim) => {
   const params: DocumentClient.PutItemInput = {
     TableName: TABLE_NAME,
-    Item: {
-      ...claim,
-      id: uuid()
-    }
+    Item: claim
   };
   try {
     const result = await db.put(params).promise();
@@ -36,14 +33,13 @@ export const getClaimByIdService = async (claimId: string) => {
   }
 }
 
-
-export const getClaimByStatusService = async (status: string) => {
+export const getClaimByStatusService = async (claimStatus: ClaimStatus) => {
   const params: DocumentClient.QueryInput = {
     TableName: TABLE_NAME,
-    IndexName: 'status-index',
-    KeyConditionExpression: 'status = :status',
+    IndexName: 'claim_status-index',
+    KeyConditionExpression: 'claim_status = :claim_status',
     ExpressionAttributeValues: {
-      ':status': status
+      ':claim_status': claimStatus
     }
   };
   try {
@@ -54,14 +50,16 @@ export const getClaimByStatusService = async (status: string) => {
   }
 }
 
-
-export const getClaimByUserIdService = async (userId: string) => {
+export const getClaimsByOwnerService = async (ownerId: string) => {
   const params: DocumentClient.QueryInput = {
     TableName: TABLE_NAME,
-    IndexName: 'user_id-index',
-    KeyConditionExpression: 'user_id = :user_id',
+    IndexName: 'owner-index',
+    ExpressionAttributeNames: {
+      '#owner': 'owner'
+    },
+    KeyConditionExpression: '#owner = :owner',
     ExpressionAttributeValues: {
-      ':user_id': userId
+      ':owner': ownerId
     }
   };
   try {
@@ -71,7 +69,6 @@ export const getClaimByUserIdService = async (userId: string) => {
     return err;
   }
 }
-
 
 export const getClaimByCompanyIdService = async (companyId: string) => {
   const params: DocumentClient.QueryInput = {

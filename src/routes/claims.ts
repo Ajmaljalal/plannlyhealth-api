@@ -7,7 +7,7 @@ import {
   getClaimById,
   getClaimsByCompanyId,
   getClaimsByStatus,
-  getClaimsByUserId,
+  getClaimsByOwner,
   updateClaim,
 } from '../controllers/claims';
 
@@ -16,7 +16,7 @@ const router = Router();
 router.get('/', getAllClaims);
 router.get('/:id', getClaimById);
 router.get('/company/:id', getClaimsByCompanyId);
-router.get('/user/:id', getClaimsByUserId);
+router.get('/owner/:id', getClaimsByOwner);
 router.get('/status/:status', getClaimsByStatus);
 router.post('/', createClaim);
 router.put('/:id', updateClaim);

@@ -27,9 +27,9 @@ export enum ProgramModel {
 }
 
 export enum ClaimStatus {
-  Requested,
-  Approved,
-  Rejected
+  requested,
+  approved,
+  rejected
 }
 
 export enum Department {
