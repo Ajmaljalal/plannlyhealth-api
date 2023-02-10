@@ -1,14 +1,25 @@
 import Joi from "joi";
 
-export const commentSchema = Joi.object({
+export const CreateCommentSchema = Joi.object({
   id: Joi.string().required(),
   author: Joi.string().required(),
   text: Joi.string().required(),
   claim_id: Joi.string().required(),
   owner: Joi.string().required(),
   created_date: Joi.date().required(),
+  modified_date: Joi.date(),
+  slug: Joi.string(),
+});
+
+export const UpdateCommentSchema = Joi.object({
+  id: Joi.string(),
+  author: Joi.string(),
+  text: Joi.string(),
+  claim_id: Joi.string(),
+  owner: Joi.string(),
+  created_date: Joi.date(),
   modified_date: Joi.date().required(),
-  slug: Joi.string().required(),
+  slug: Joi.string(),
 });
 
 export interface Comment {

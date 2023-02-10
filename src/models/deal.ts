@@ -1,27 +1,51 @@
 import Joi from "joi";
 
-export const dealSchema = Joi.object({
+export const CreateDealSchema = Joi.object({
   id: Joi.string().required(),
   bg_photo: Joi.string().required(),
   call_to_action: Joi.string().required(),
-  category: Joi.string().required(),
-  category_name: Joi.string().required(),
+  category: Joi.string(),
+  category_name: Joi.string(),
   city: Joi.array().items(Joi.string()).required(),
   description: Joi.string().required(),
-  discount: Joi.string().required(),
-  how_to_get: Joi.string().required(),
+  discount: Joi.string(),
+  how_to_get: Joi.string(),
   link: Joi.string().required(),
   logo: Joi.string().required(),
-  order: Joi.number().required(),
+  order: Joi.number(),
   price: Joi.string().required(),
-  recommended: Joi.boolean().required(),
+  recommended: Joi.boolean(),
   relates_to_program: Joi.string().required(),
-  tags: Joi.array().items(Joi.string()).required(),
+  tags: Joi.array().items(Joi.string()),
   title: Joi.string().required(),
-  owner: Joi.string().required(),
+  owner: Joi.string(),
   created_date: Joi.date().required(),
   modified_date: Joi.date().required(),
-  slug: Joi.string().required(),
+  slug: Joi.string(),
+});
+
+export const UpdateDealSchema = Joi.object({
+  id: Joi.string(),
+  bg_photo: Joi.string(),
+  call_to_action: Joi.string(),
+  category: Joi.string(),
+  category_name: Joi.string(),
+  city: Joi.array().items(Joi.string()),
+  description: Joi.string(),
+  discount: Joi.string(),
+  how_to_get: Joi.string(),
+  link: Joi.string(),
+  logo: Joi.string(),
+  order: Joi.number(),
+  price: Joi.string(),
+  recommended: Joi.boolean(),
+  relates_to_program: Joi.string(),
+  tags: Joi.array().items(Joi.string()),
+  title: Joi.string(),
+  owner: Joi.string(),
+  created_date: Joi.date(),
+  modified_date: Joi.date().required(),
+  slug: Joi.string(),
 });
 
 export interface Deal {
@@ -47,5 +71,3 @@ export interface Deal {
   modified_date: Date;
   slug: string;
 }
-
-

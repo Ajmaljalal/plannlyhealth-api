@@ -38,7 +38,7 @@ app.use('/api/benefits-programs', benefitsProgramsRoutes);
 app.use('/api/program-balance', programBalanceRoutes);
 app.use('/api/claims', claimsRoutes);
 app.use('/api/comments', commentsRoutes);
-app.use('api/deals', dealsRoutes);
+app.use('/api/deals', dealsRoutes);
 
 // Error handling for any other routes that are not defined
 app.use((req, res, next) => {

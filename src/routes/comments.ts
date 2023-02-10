@@ -3,6 +3,7 @@ import { Router } from 'express';
 import {
   createComment,
   getCommentById,
+  getAllComments,
   getCommentsByAuthor,
   getCommentsByClaimId,
   updateComment,
@@ -12,6 +13,7 @@ import {
 const router = Router();
 
 router.post('/', createComment);
+router.get('/', getAllComments);
 router.get('/:id', getCommentById);
 router.get('/author/:id', getCommentsByAuthor);
 router.get('/claim/:id', getCommentsByClaimId);

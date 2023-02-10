@@ -1,6 +1,5 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import db from "../configs/dynamodb";
-import { v4 as uuid } from 'uuid';
 import { Comment } from "../models/comment";
 
 const TABLE_NAME = `comments_${process.env.DYNAMODB_TABLE_ENV}`;
@@ -8,10 +7,7 @@ const TABLE_NAME = `comments_${process.env.DYNAMODB_TABLE_ENV}`;
 export const createCommentService = async (comment: Comment) => {
   const params: DocumentClient.PutItemInput = {
     TableName: TABLE_NAME,
-    Item: {
-      ...comment,
-      id: uuid()
-    }
+    Item: comment
   };
   try {
     const result = await db.put(params).promise();
