@@ -3,15 +3,12 @@ import { ProgramBalance } from "../models/program-balance";
 import db from "../configs/dynamodb";
 import { v4 as uuid } from 'uuid';
 
-const TABLE_NAME = `program-balance_${process.env.DYNAMODB_TABLE_ENV}`;
+const TABLE_NAME = `program-balances_${process.env.DYNAMODB_TABLE_ENV}`;
 
 export const createProgramBalanceService = async (programBalance: ProgramBalance) => {
   const params: DocumentClient.PutItemInput = {
     TableName: TABLE_NAME,
-    Item: {
-      ...programBalance,
-      id: uuid()
-    }
+    Item: programBalance
   };
   try {
     const result = await db.put(params).promise();
@@ -36,13 +33,13 @@ export const getProgramBalanceByIdService = async (programBalanceId: string) => 
   }
 }
 
-export const getProgramBalanceByProgramIdService = async (programId: string) => {
+export const getProgramBalancesByProgramIdService = async (programId: string) => {
   const params: DocumentClient.QueryInput = {
     TableName: TABLE_NAME,
-    IndexName: 'benefit_program-index',
-    KeyConditionExpression: 'benefit_program = :benefit_program',
+    IndexName: 'benefit_program_id-index',
+    KeyConditionExpression: 'benefit_program_id = :benefit_program_id',
     ExpressionAttributeValues: {
-      ':benefit_program': programId
+      ':benefit_program_id': programId
     }
   };
   try {
@@ -53,8 +50,7 @@ export const getProgramBalanceByProgramIdService = async (programId: string) => 
   }
 }
 
-
-export const getProgramBalanceByCompanyIdService = async (companyId: string) => {
+export const getProgramBalancesByCompanyIdService = async (companyId: string) => {
   const params: DocumentClient.QueryInput = {
     TableName: TABLE_NAME,
     IndexName: 'company_id-index',
@@ -71,7 +67,24 @@ export const getProgramBalanceByCompanyIdService = async (companyId: string) => 
   }
 }
 
-export const getAllProgramBalanceService = async () => {
+export const getProgramBalancesByBeneficiaryService = async (beneficiaryId: string) => {
+  const params: DocumentClient.QueryInput = {
+    TableName: TABLE_NAME,
+    IndexName: 'beneficiary_id-index',
+    KeyConditionExpression: 'beneficiary_id = :beneficiary_id',
+    ExpressionAttributeValues: {
+      ':beneficiary_id': beneficiaryId
+    }
+  };
+  try {
+    const result = db.query(params).promise();
+    return result
+  } catch (err) {
+    return err;
+  }
+}
+
+export const getAllProgramBalancesService = async () => {
   const params: DocumentClient.ScanInput = {
     TableName: TABLE_NAME
   };
