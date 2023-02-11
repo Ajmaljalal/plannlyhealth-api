@@ -8,9 +8,8 @@ import programBalanceRoutes from './routes/program-balances';
 import claimsRoutes from './routes/claims';
 import commentsRoutes from './routes/comments';
 import dealsRoutes from './routes/deals';
+import documentsRoutes from './routes/documents';
 
-
-const NAMESPACE = 'Server';
 const app = express();
 
 app.use(morgan('dev'));
@@ -35,10 +34,11 @@ app.use((req, res, next) => {
 app.use('/api/users', userRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/benefits-programs', benefitsProgramsRoutes);
-app.use('/api/program-balance', programBalanceRoutes);
+app.use('/api/program-balances', programBalanceRoutes);
 app.use('/api/claims', claimsRoutes);
 app.use('/api/comments', commentsRoutes);
 app.use('/api/deals', dealsRoutes);
+app.use('/api/documents', documentsRoutes);
 
 // Error handling for any other routes that are not defined
 app.use((req, res, next) => {
@@ -50,5 +50,5 @@ app.use((req, res, next) => {
 
 
 app.listen(config.server.port, () => {
-  console.info(NAMESPACE, `is running on ${config.server.hostname}:${config.server.port}`)
+  console.info(`Server listening on ${config.server.hostname}:${config.server.port}`)
 });

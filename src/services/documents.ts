@@ -1,13 +1,13 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
-import { ProgramBalance } from "../models/program-balance";
+import { Document } from "../models/document";
 import db from "../configs/dynamodb";
 
-const TABLE_NAME = `program-balances_${process.env.DYNAMODB_TABLE_ENV}`;
+const TABLE_NAME = `documents_${process.env.DYNAMODB_TABLE_ENV}`;
 
-export const createProgramBalanceService = async (programBalance: ProgramBalance) => {
+export const createDocumentService = async (document: Document) => {
   const params: DocumentClient.PutItemInput = {
     TableName: TABLE_NAME,
-    Item: programBalance
+    Item: document
   };
   try {
     const result = await db.put(params).promise();
@@ -17,11 +17,11 @@ export const createProgramBalanceService = async (programBalance: ProgramBalance
   }
 }
 
-export const getProgramBalanceByIdService = async (programBalanceId: string) => {
-  const params: DocumentClient.GetItemInput = {
+export const getDocumentByIdService = async (documentId: string) => {
+  const params = {
     TableName: TABLE_NAME,
     Key: {
-      id: programBalanceId,
+      id: documentId,
     }
   };
   try {
@@ -32,24 +32,7 @@ export const getProgramBalanceByIdService = async (programBalanceId: string) => 
   }
 }
 
-export const getProgramBalancesByProgramIdService = async (programId: string) => {
-  const params: DocumentClient.QueryInput = {
-    TableName: TABLE_NAME,
-    IndexName: 'benefit_program_id-index',
-    KeyConditionExpression: 'benefit_program_id = :benefit_program_id',
-    ExpressionAttributeValues: {
-      ':benefit_program_id': programId
-    }
-  };
-  try {
-    const result = db.query(params).promise();
-    return result
-  } catch (err) {
-    return err;
-  }
-}
-
-export const getProgramBalancesByCompanyIdService = async (companyId: string) => {
+export const getDocumentsByCompanyIdService = async (companyId: string) => {
   const params: DocumentClient.QueryInput = {
     TableName: TABLE_NAME,
     IndexName: 'company_id-index',
@@ -66,13 +49,29 @@ export const getProgramBalancesByCompanyIdService = async (companyId: string) =>
   }
 }
 
-export const getProgramBalancesByBeneficiaryService = async (beneficiaryId: string) => {
+export const getAllDocumentsService = async () => {
+  const params: DocumentClient.ScanInput = {
+    TableName: TABLE_NAME,
+  };
+  try {
+    const result = db.scan(params).promise();
+    return result
+  } catch (err) {
+    return err;
+  }
+}
+
+
+export const getDocumentsByOwnerIdService = async (ownerId: string) => {
   const params: DocumentClient.QueryInput = {
     TableName: TABLE_NAME,
-    IndexName: 'beneficiary_id-index',
-    KeyConditionExpression: 'beneficiary_id = :beneficiary_id',
+    IndexName: 'owner-index',
+    ExpressionAttributeNames: {
+      '#owner': 'owner'
+    },
+    KeyConditionExpression: '#owner = :owner',
     ExpressionAttributeValues: {
-      ':beneficiary_id': beneficiaryId
+      ':owner': ownerId
     }
   };
   try {
@@ -83,19 +82,7 @@ export const getProgramBalancesByBeneficiaryService = async (beneficiaryId: stri
   }
 }
 
-export const getAllProgramBalancesService = async () => {
-  const params: DocumentClient.ScanInput = {
-    TableName: TABLE_NAME
-  };
-  try {
-    const result = await db.scan(params).promise();
-    return result
-  } catch (err) {
-    return err;
-  }
-}
-
-export const updateProgramBalanceService = async (programBalanceId: string, updates: ProgramBalance) => {
+export const updateDocumentService = async (documentId: string, updates: Partial<Document>) => {
   // Create UpdateExpression and ExpressionAttributeValues based on the updates provided
   const UpdateExpression = 'SET ' + Object.keys(updates).map((key, i) => {
     return `#${key} = :${key}`;
@@ -112,7 +99,7 @@ export const updateProgramBalanceService = async (programBalanceId: string, upda
   const params: DocumentClient.UpdateItemInput = {
     TableName: TABLE_NAME,
     Key: {
-      id: programBalanceId
+      id: documentId,
     },
     UpdateExpression,
     ExpressionAttributeNames,
@@ -127,11 +114,11 @@ export const updateProgramBalanceService = async (programBalanceId: string, upda
   }
 }
 
-export const deleteProgramBalanceService = async (programBalanceId: string) => {
+export const deleteDocumentService = async (documentId: string) => {
   const params: DocumentClient.DeleteItemInput = {
     TableName: TABLE_NAME,
     Key: {
-      id: programBalanceId
+      id: documentId
     }
   };
   try {
