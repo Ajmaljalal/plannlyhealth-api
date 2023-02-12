@@ -1,6 +1,6 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import { Document } from "../models/document";
-import db from "../configs/dynamodb";
+import db from "../configs/aws";
 
 const TABLE_NAME = `documents_${process.env.DYNAMODB_TABLE_ENV}`;
 
