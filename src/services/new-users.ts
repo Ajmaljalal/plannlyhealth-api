@@ -1,14 +1,14 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import db from "../configs/aws";
-import { ClaimStatus } from "../lib/enums";
-import { Claim } from "../models/claim";
+import { User } from "../lib/types/user";
 
-const TABLE_NAME = `claims_${process.env.DYNAMODB_TABLE_ENV}`;
+const TABLE_NAME = `new-users_${process.env.DYNAMODB_TABLE_ENV}`;
 
-export const createClaimService = async (claim: Claim) => {
+
+export const createNewUserService = async (user: User) => {
   const params: DocumentClient.PutItemInput = {
     TableName: TABLE_NAME,
-    Item: claim
+    Item: user
   };
   try {
     const result = await db.put(params).promise();
@@ -18,11 +18,11 @@ export const createClaimService = async (claim: Claim) => {
   }
 }
 
-export const getClaimByIdService = async (claimId: string) => {
+export const getNewUserByIdService = async (userId: string) => {
   const params: DocumentClient.GetItemInput = {
     TableName: TABLE_NAME,
     Key: {
-      id: claimId,
+      id: userId,
     }
   };
   try {
@@ -33,13 +33,13 @@ export const getClaimByIdService = async (claimId: string) => {
   }
 }
 
-export const getClaimByStatusService = async (claimStatus: ClaimStatus) => {
+export const getNewUserByEmailService = async (email: string) => {
   const params: DocumentClient.QueryInput = {
     TableName: TABLE_NAME,
-    IndexName: 'claim_status-index',
-    KeyConditionExpression: 'claim_status = :claim_status',
+    IndexName: 'email-index',
+    KeyConditionExpression: 'email = :email',
     ExpressionAttributeValues: {
-      ':claim_status': claimStatus
+      ':email': email
     }
   };
   try {
@@ -50,27 +50,7 @@ export const getClaimByStatusService = async (claimStatus: ClaimStatus) => {
   }
 }
 
-export const getClaimsByOwnerService = async (ownerId: string) => {
-  const params: DocumentClient.QueryInput = {
-    TableName: TABLE_NAME,
-    IndexName: 'owner-index',
-    ExpressionAttributeNames: {
-      '#owner': 'owner'
-    },
-    KeyConditionExpression: '#owner = :owner',
-    ExpressionAttributeValues: {
-      ':owner': ownerId
-    }
-  };
-  try {
-    const result = db.query(params).promise();
-    return result
-  } catch (err) {
-    return err;
-  }
-}
-
-export const getClaimByCompanyIdService = async (companyId: string) => {
+export const getNewUsersByCompanyIdService = async (companyId: string) => {
   const params: DocumentClient.QueryInput = {
     TableName: TABLE_NAME,
     IndexName: 'company_id-index',
@@ -87,19 +67,41 @@ export const getClaimByCompanyIdService = async (companyId: string) => {
   }
 }
 
-export const getAllClaimService = async () => {
-  const params: DocumentClient.ScanInput = {
-    TableName: TABLE_NAME
+export const getNewUserByFirstNameService = async (firstName: string) => {
+  const params: DocumentClient.QueryInput = {
+    TableName: TABLE_NAME,
+    IndexName: 'first_name-index',
+    KeyConditionExpression: 'first_name = :first_name',
+    ExpressionAttributeValues: {
+      ':first_name': firstName
+    }
   };
   try {
-    const result = db.scan(params).promise();
+    const result = db.query(params).promise();
     return result
   } catch (err) {
     return err;
   }
 }
 
-export const updateClaimService = async (claimId: string, updates: Claim) => {
+export const getNewUserByLastNameService = async (lastName: string) => {
+  const params: DocumentClient.QueryInput = {
+    TableName: TABLE_NAME,
+    IndexName: 'last_name-index',
+    KeyConditionExpression: 'last_name = :last_name',
+    ExpressionAttributeValues: {
+      ':last_name': lastName
+    }
+  };
+  try {
+    const result = db.query(params).promise();
+    return result
+  } catch (err) {
+    return err;
+  }
+}
+
+export const updateNewUserService = async (userId: string, updates: User) => {
   // Create UpdateExpression and ExpressionAttributeValues based on the updates provided
   const UpdateExpression = 'SET ' + Object.keys(updates).map((key, i) => {
     return `#${key} = :${key}`;
@@ -116,7 +118,7 @@ export const updateClaimService = async (claimId: string, updates: Claim) => {
   const params: DocumentClient.UpdateItemInput = {
     TableName: TABLE_NAME,
     Key: {
-      id: claimId
+      id: userId
     },
     UpdateExpression,
     ExpressionAttributeNames,
@@ -131,11 +133,11 @@ export const updateClaimService = async (claimId: string, updates: Claim) => {
   }
 }
 
-export const deleteClaimService = async (claimId: string) => {
+export const deleteNewUserService = async (userId: string) => {
   const params: DocumentClient.DeleteItemInput = {
     TableName: TABLE_NAME,
     Key: {
-      id: claimId
+      id: userId
     }
   };
   try {

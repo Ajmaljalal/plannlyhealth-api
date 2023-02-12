@@ -1,6 +1,6 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import { ProgramBalance } from "../models/program-balance";
-import db from "../configs/dynamodb";
+import db from "../configs/aws";
 
 const TABLE_NAME = `program-balances_${process.env.DYNAMODB_TABLE_ENV}`;
 

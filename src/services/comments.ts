@@ -1,5 +1,5 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
-import db from "../configs/dynamodb";
+import db from "../configs/aws";
 import { Comment } from "../models/comment";
 
 const TABLE_NAME = `comments_${process.env.DYNAMODB_TABLE_ENV}`;
@@ -124,3 +124,4 @@ export const deleteCommentService = async (commentId: string) => {
     return err;
   }
 }
+

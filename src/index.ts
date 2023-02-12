@@ -9,6 +9,7 @@ import claimsRoutes from './routes/claims';
 import commentsRoutes from './routes/comments';
 import dealsRoutes from './routes/deals';
 import documentsRoutes from './routes/documents';
+import newUsersRoutes from './routes/new-users';
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/api/claims', claimsRoutes);
 app.use('/api/comments', commentsRoutes);
 app.use('/api/deals', dealsRoutes);
 app.use('/api/documents', documentsRoutes);
+app.use('/api/new-users', newUsersRoutes)
 
 // Error handling for any other routes that are not defined
 app.use((req, res, next) => {
