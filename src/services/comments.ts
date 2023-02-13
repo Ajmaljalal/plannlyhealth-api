@@ -12,7 +12,7 @@ export const createCommentService = async (comment: Comment) => {
   try {
     const result = await db.put(params).promise();
     return result
-  } catch (err) {
+  } catch (err: any) {
     return err;
   }
 }
