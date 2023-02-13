@@ -13,7 +13,7 @@ import {
   getAllCommentsService,
 } from '../services/comments';
 
-export const createComment = async (req: Request, res: Response) => {
+export const createComment = async (req: any, res: Response) => {
   const comment = req.body;
 
   // 1. check if the request body is empty

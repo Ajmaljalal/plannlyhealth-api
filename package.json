@@ -13,6 +13,7 @@
   "author": "Ajmal jalal",
   "license": "ISC",
   "dependencies": {
+    "amazon-cognito-identity-js": "^6.1.2",
     "aws-sdk": "^2.1299.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",

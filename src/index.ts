@@ -1,6 +1,7 @@
 import express from 'express';
 import morgan from 'morgan';
 import config from './configs/base';
+import { authenticationMiddleware } from './middlewares/authenticate';
 import companyRoutes from './routes/company';
 import userRoutes from './routes/user';
 import benefitsProgramsRoutes from './routes/benefits-programs';
@@ -10,6 +11,7 @@ import commentsRoutes from './routes/comments';
 import dealsRoutes from './routes/deals';
 import documentsRoutes from './routes/documents';
 import newUsersRoutes from './routes/new-users';
+import authRoutes from './routes/auth';
 
 const app = express();
 
@@ -30,7 +32,12 @@ app.use((req, res, next) => {
   next();
 });
 
+// Routes that do not require authentication
+app.use('/api/auth', authRoutes)
 
+
+// Middleware for authentication
+app.use(authenticationMiddleware);
 // Routes go here 
 app.use('/api/users', userRoutes);
 app.use('/api/companies', companyRoutes);
