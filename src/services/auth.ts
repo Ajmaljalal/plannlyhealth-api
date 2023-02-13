@@ -12,6 +12,8 @@ export const signUpService = (userData: any) => {
     email: userData.email,
     given_name: userData.first_name,
     family_name: userData.last_name,
+    'custom:role': userData.role,
+    'custom:company_id': userData.company_id
   }
   try {
     return new Promise((resolve) => {
@@ -61,32 +63,31 @@ export const signInService = async (username: string, password: string) => {
   });
 
   try {
-    await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: (result) => {
           const session = result.getIdToken().payload;
-          const role = session['custom:role'];
-          const company_id = session['custom:company_id'];
           const user_id = session['sub'];
           const first_name = session['given_name'];
           const last_name = session['family_name'];
           const email = session['email'];
+          const role = session['custom:role'];
+          const company_id = session['custom:company_id'];
           const refreshToken = result.getRefreshToken().getToken();
           const accessToken = result.getAccessToken().getJwtToken();
           const idToken = result.getIdToken().getJwtToken();
-          const response = {
+          const response: any = {
             username,
             email,
             first_name,
             last_name,
+            user_id,
             role,
             company_id,
-            user_id,
             refreshToken,
             accessToken,
             idToken
           }
-
           resolve(response);
         },
         onFailure: (err) => {
@@ -107,8 +108,12 @@ export const authenticateUserService = async (accessToken: any) => {
     if (user) {
       const userData: any = {}
       user.UserAttributes.forEach((attribute: any) => {
+        if (attribute.Name.includes('custom:')) {
+          attribute.Name = attribute.Name.replace('custom:', '');
+        }
         userData[attribute.Name] = attribute.Value;
       });
+      console.log(userData)
       return userData;
     } else {
       return null;

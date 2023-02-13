@@ -52,9 +52,9 @@ export const registerUser = async (req: Request, res: Response) => {
     }
     return res.status(201).send(result);
   }
-  catch (error) {
+  catch (error: any) {
     return res.status(500).send({
-      message: 'Something went wrong!',
+      message: error.message,
       code: 'INTERNAL_SERVER_ERROR'
     });
   }
@@ -83,7 +83,7 @@ export const loginUser = async (req: Request, res: Response) => {
     const result: any = await signInService(email, password);
 
     // check if email or password is incorrect
-    if (result.message) {
+    if (result.code || result.message) {
       return res.status(401).send({
         message: result.message,
         code: result.code
@@ -98,9 +98,9 @@ export const loginUser = async (req: Request, res: Response) => {
     }
     return res.status(201).send(result);
   }
-  catch (error) {
+  catch (error: any) {
     return res.status(500).send({
-      message: 'Something went wrong!',
+      message: error.message,
       code: 'INTERNAL_SERVER_ERROR'
     });
   }
@@ -143,9 +143,9 @@ export const logoutUser = async (req: any, res: Response) => {
     }
     return res.status(201).send(result);
   }
-  catch (error) {
+  catch (error: any) {
     return res.status(500).send({
-      message: 'Something went wrong!',
+      message: error.message,
       code: 'INTERNAL_SERVER_ERROR'
     });
   }
