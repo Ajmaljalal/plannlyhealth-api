@@ -1,19 +1,20 @@
+import Joi from "joi";
 import { Department, Role } from "../enums";
 
 export interface User {
-  type: 'User';
+  type?: 'User';
   id: string;
   first_name: string;
   last_name: string;
   email: string;
   address: string;
   connected_accounts: string
-  birthday: Date;
+  birth_date: Date;
   card_delivery_approved: boolean;
   company_id: string;
   department: Department;
   issuing_card_id: string;
-  issuing_car_holder: string;
+  issuing_card_holder_id: string;
   location: string;
   onboarded: boolean;
   new_user: boolean;

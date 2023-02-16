@@ -28,6 +28,8 @@ export const createComment = async (req: any, res: Response) => {
   comment.id = uuid(); // dynamodb does not have an auto generated id
   comment.created_date = comment.created_date || Date();
   comment.modified_date = comment.modified_date || Date();
+  comment.author = comment.author || req.user.id;
+  comment.owner = comment.owner || req.user.id;
 
   // 3. validate the request body before creating a new comment using the commentSchema
   const { error } = CreateCommentSchema.validate(comment);
@@ -218,20 +220,23 @@ export const updateComment = async (req: Request, res: Response) => {
 
     // 4. check if the current user is the owner of the comment
     // @ts-ignore
-    // const authorizedUser: any = req?.user;
-    // if (authorizedUser?.id !== commentExists.Item.owner && (authorizedUser?.role !== Role.Admin || authorizedUser?.role !== Role.Owner)) {
-    //   return res.status(403).json({
-    //     message: 'You are not authorized to perform this action',
-    //     code: "UNAUTHORIZED"
-    //   });
-    // }
+    const currentUser = req.user;
+    const isOwner = currentUser && currentUser.id === commentExists.Item.owner;
+    const isAdmin = currentUser && currentUser.role === Role.Admin;
+    const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
+    const isAuthorized = isOwner || isAdmin || isSuperAdmin;
+    if (!isAuthorized) {
+      return res.status(403).json({
+        message: 'You are not authorized to perform this action',
+        code: "UNAUTHORIZED"
+      });
+    }
 
     // 4. add the required modifications to the comment
     delete comment.id; // this is because the id is not allowed to be updated
     delete commentExists.Item?.id; // this is because the id is not allowed to be updated
-    comment.modified_date = comment.modified_date || Date();
-    const commentToUpdate = { ...commentExists.Item, ...comment };
     comment.modified_date = Date();
+    const commentToUpdate = { ...commentExists.Item, ...comment };
 
     // 5. validate the request body before updating the comment using the UpdateCommentSchema
     const { error } = UpdateCommentSchema.validate(commentToUpdate);
@@ -288,13 +293,17 @@ export const deleteComment = async (req: Request, res: Response) => {
 
     // 3. check if the current user is the owner of the comment
     // @ts-ignore
-    // const authorizedUser: any = req.user;
-    // if (authorizedUser?.id !== commentExists.Item.owner && (authorizedUser?.role !== Role.Admin || authorizedUser?.role !== Role.Owner)) {
-    //   return res.status(403).json({
-    //     message: 'You are not authorized to perform this action',
-    //     code: "UNAUTHORIZED"
-    //   });
-    // }
+    const currentUser = req.user;
+    const isOwner = currentUser && currentUser.id === commentExists.Item.owner;
+    const isAdmin = currentUser && currentUser.role === Role.Admin;
+    const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
+    const isAuthorized = isOwner || isAdmin || isSuperAdmin;
+    if (!isAuthorized) {
+      return res.status(403).json({
+        message: 'You are not authorized to perform this action',
+        code: "UNAUTHORIZED"
+      });
+    }
 
     // 4. call the deleteCommentService to delete the comment
     const response: any = await deleteCommentService(commentId);
@@ -317,3 +326,4 @@ export const deleteComment = async (req: Request, res: Response) => {
     });
   }
 }
+

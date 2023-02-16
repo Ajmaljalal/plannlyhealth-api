@@ -18,7 +18,7 @@ export const CreateDealSchema = Joi.object({
   relates_to_program: Joi.string().required(),
   tags: Joi.array().items(Joi.string()),
   title: Joi.string().required(),
-  owner: Joi.string(),
+  owner: Joi.string().required(),
   created_date: Joi.date().required(),
   modified_date: Joi.date().required(),
   slug: Joi.string(),

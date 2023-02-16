@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 import { ClaimStatus, Role } from '../lib/enums';
-import { Claim, CreateClaimSchema, UpdateClaimSchema } from '../models/claim';
+import { CreateClaimSchema, UpdateClaimSchema } from '../models/claim';
 import { v4 as uuid } from 'uuid';
 import { createClaimService, deleteClaimService, getAllClaimService, getClaimByCompanyIdService, getClaimByIdService, getClaimByStatusService, getClaimsByOwnerService, updateClaimService } from '../services/claims';
 
-export const createClaim = async (req: Request, res: Response) => {
-  const claim: Claim = req.body;
+export const createClaim = async (req: any, res: Response) => {
+  const claim = req.body;
 
   // 1. check if the claim is empty
-  if (!claim) {
+  if (!Object.keys(claim).length) {
     return res.status(400).json({
       message: 'Claim cannot be empty',
       code: 'EMPTY_REQUEST_BODY'
@@ -21,6 +21,7 @@ export const createClaim = async (req: Request, res: Response) => {
   claim.modified_date = claim.modified_date || Date();
   claim.date = claim.date || Date();
   claim.claim_status = claim.claim_status || ClaimStatus.requested;
+  claim.owner = claim.owner || req.user?.id;
 
   // 3. validate the request body before creating a new company using the programBalanceSchema
   const { error } = CreateClaimSchema.validate(claim);
@@ -250,18 +251,22 @@ export const updateClaim = async (req: Request, res: Response) => {
 
     // 5. check if current user is the owner of the program
     // @ts-ignore
-    // const authorizedUser: User = req?.user;
-    // if (authorizedUser?.id !== claimExists.Item.owner && (authorizedUser?.role !== Role.Admin || authorizedUser?.role !== Role.Owner)) {
-    //   return res.status(403).json({
-    //     message: 'You are not authorized to perform this action',
-    //     code: 'UNAUTHORIZED'
-    //   });
-    // }
+    const currentUser = req.user;
+    const isOwner = currentUser && currentUser.id === claimExists.Item.owner;
+    const isAdmin = currentUser && currentUser.role === Role.Admin;
+    const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
+    const isAuthorized = isOwner || isAdmin || isSuperAdmin;
+    if (!isAuthorized) {
+      return res.status(403).json({
+        message: 'You are not authorized to perform this action',
+        code: "UNAUTHORIZED"
+      });
+    }
 
     // 6. add required modifications to the claim object
     delete claim.id; // this is because the id is not allowed to be updated
     delete claimExists.Item.id; // this is because the id is not allowed to be updated
-    claim.modified_date = claim.modified_date || Date();
+    claim.modified_date = Date();
     const claimToUpdate = { ...claimExists.Item, ...claim };
 
     // 7. validate the request body before updating the claim using the updateClaimSchema
@@ -319,13 +324,17 @@ export const deleteClaim = async (req: Request, res: Response) => {
 
     // 4. check if current user is the owner of the program
     // @ts-ignore
-    // const authorizedUser: User = req?.user;
-    // if (authorizedUser?.id !== claimExists.Item.owner && (authorizedUser?.role !== Role.Admin || authorizedUser?.role !== Role.Owner)) {
-    //   return res.status(403).json({
-    //     message: 'You are not authorized to perform this action',
-    //     code: 'UNAUTHORIZED'
-    //   });
-    // }
+    const currentUser = req.user;
+    const isOwner = currentUser && currentUser.id === claimExists.Item.owner;
+    const isAdmin = currentUser && currentUser.role === Role.Admin;
+    const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
+    const isAuthorized = isOwner || isAdmin || isSuperAdmin;
+    if (!isAuthorized) {
+      return res.status(403).json({
+        message: 'You are not authorized to perform this action',
+        code: "UNAUTHORIZED"
+      });
+    }
 
     // 5. call the deleteClaimService to delete the claim
     const response: any = await deleteClaimService(claimId);

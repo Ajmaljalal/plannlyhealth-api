@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { v4 as uuid } from "uuid";
 import { Role } from "../lib/enums";
-import { CreateDealSchema, UpdateDealSchema } from "../models/deal";
+import { CreateDealSchema, Deal, UpdateDealSchema } from "../models/deal";
 import {
   createDealService,
   deleteDealService,
@@ -10,7 +10,7 @@ import {
   updateDealService
 } from "../services/deals";
 
-export const createDeal = async (req: Request, res: Response) => {
+export const createDeal = async (req: any, res: Response) => {
   const deal = req.body;
 
   // 1. check if the request body is empty
@@ -26,6 +26,7 @@ export const createDeal = async (req: Request, res: Response) => {
     deal.id = uuid();
     deal.created_date = deal.created_date || Date();
     deal.modified_date = deal.modified_date || Date();
+    deal.owner = deal.owner || req?.user?.id;
 
     // 3. validate the request body before creating the deal using the CreateDealSchema
     const { error } = CreateDealSchema.validate(deal);
@@ -116,7 +117,7 @@ export const getAllDeals = async (req: Request, res: Response) => {
   }
 };
 
-export const updateDeal = async (req: Request, res: Response) => {
+export const updateDeal = async (req: any, res: Response) => {
   const dealId: string = req.params.id;
   const deal = req.body;
 
@@ -147,21 +148,23 @@ export const updateDeal = async (req: Request, res: Response) => {
     }
 
     // 4. check if the current user is the owner of the deal
-    // @ts-ignore
-    // const authorizedUser: any = req?.user;
-    // if (authorizedUser?.id !== dealExists.Item.owner && (authorizedUser?.role !== Role.Admin || authorizedUser?.role !== Role.Owner)) {
-    //   return res.status(403).json({
-    //     message: 'You are not authorized to perform this action',
-    //     code: "UNAUTHORIZED"
-    //   });
-    // }
+    const currentUser = req.user;
+    const isOwner = currentUser && currentUser.id === dealExists.Item.owner;
+    const isAdmin = currentUser && currentUser.role === Role.Admin;
+    const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
+    const isAuthorized = isOwner || isAdmin || isSuperAdmin;
+    if (!isAuthorized) {
+      return res.status(403).json({
+        message: 'You are not authorized to perform this action',
+        code: "UNAUTHORIZED"
+      });
+    }
 
     // 4. add the required modifications to the deal
     delete deal.id; // this is because the id is not allowed to be updated
     delete dealExists.Item?.id; // this is because the id is not allowed to be updated
-    deal.modified_date = deal.modified_date || Date();
-    const dealToUpdate = { ...dealExists.Item, ...deal };
     deal.modified_date = Date();
+    const dealToUpdate = { ...dealExists.Item, ...deal };
 
     // 5. validate the request body before updating the deal using the UpdateDealSchema
     const { error } = UpdateDealSchema.validate(dealToUpdate);
@@ -217,13 +220,17 @@ export const deleteDeal = async (req: Request, res: Response) => {
 
     // 3. check if the current user is the owner of the deal
     // @ts-ignore
-    // const authorizedUser: any = req.user;
-    // if (authorizedUser?.id !== dealExists.Item.owner && (authorizedUser?.role !== Role.Admin || authorizedUser?.role !== Role.Owner)) {
-    //   return res.status(403).json({
-    //     message: 'You are not authorized to perform this action',
-    //     code: "UNAUTHORIZED"
-    //   });
-    // }
+    const currentUser = req.user;
+    const isOwner = currentUser && currentUser.id === dealExists.Item.owner;
+    const isAdmin = currentUser && currentUser.role === Role.Admin;
+    const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
+    const isAuthorized = isOwner || isAdmin || isSuperAdmin;
+    if (!isAuthorized) {
+      return res.status(403).json({
+        message: 'You are not authorized to perform this action',
+        code: "UNAUTHORIZED"
+      });
+    }
 
     // 4. call the deleteDealService to delete the deal
     const response: any = await deleteDealService(dealId);

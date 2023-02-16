@@ -27,19 +27,19 @@ export enum ProgramModel {
 }
 
 export enum ClaimStatus {
-  requested,
-  approved,
-  rejected
+  requested = 'requested',
+  approved = 'approved',
+  rejected = 'rejected',
 }
 
 export enum Department {
-  Sales,
-  Marketing,
-  Finance,
-  Operations,
-  'Human Resources',
-  IT,
-  Support,
+  sales = 'sales',
+  marketing = 'marketing',
+  finance = 'finance',
+  operations = 'operations',
+  'human resources' = 'human resources',
+  it = 'IT',
+  support = 'support',
 }
 
 export enum NotificationType {
@@ -72,11 +72,11 @@ export enum RefundStatus {
 }
 
 export enum Role {
-  Admin,
-  Finance,
-  Standard,
-  Owner,
-  'Super Admin',
+  Admin = 'Admin',
+  Finance = 'Finance',
+  Standard = 'Standard',
+  Owner = 'Owner',
+  SuperAdmin = 'Super Admin',
 }
 
 export enum UserAccountStatus {

@@ -111,9 +111,11 @@ export const authenticateUserService = async (accessToken: any) => {
         if (attribute.Name.includes('custom:')) {
           attribute.Name = attribute.Name.replace('custom:', '');
         }
+        if (attribute.Name === 'sub') {
+          attribute.Name = 'id';
+        }
         userData[attribute.Name] = attribute.Value;
       });
-      console.log(userData)
       return userData;
     } else {
       return null;
