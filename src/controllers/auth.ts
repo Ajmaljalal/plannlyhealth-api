@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { signInService, signOutService, signUpService } from '../services/auth';
+import { createUserService } from '../services/user';
 
 export const registerUser = async (req: Request, res: Response) => {
   const userData = { ...req.body }
@@ -36,21 +37,20 @@ export const registerUser = async (req: Request, res: Response) => {
   }
 
   try {
-    const result: any = await signUpService(userData);
+    const cognitoUser: any = await signUpService(userData);
     // check if the user is already registered
-    if (result.code === 422) {
+    if (cognitoUser.code >= 400) {
       return res.status(422).send({
-        message: result.message,
+        message: cognitoUser.message,
         code: 'BAD_REQUEST'
       });
     }
-    if (result.code === 400) {
-      return res.status(400).send({
-        message: result.message,
-        code: 'BAD_REQUEST'
-      });
-    }
-    return res.status(201).send(result);
+
+    // modify user data to match the schema
+    cognitoUser.created_date = Date();
+    delete cognitoUser.username;
+    const dynamoDbUser: any = await createUserService(cognitoUser);
+    return res.status(201).send(dynamoDbUser.Item);
   }
   catch (error: any) {
     return res.status(500).send({

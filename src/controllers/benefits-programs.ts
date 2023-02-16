@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
+import { v4 as uuid } from 'uuid';
 import { Role } from '../lib/enums';
 import { BenefitsProgram } from '../lib/types/benefits-programs';
 import BenefitsProgramsSchema from '../models/benefits-program';
-import { User } from '../models/user';
 
 import {
   createBenefitsProgramService,
@@ -27,6 +27,7 @@ export async function createNewBenefitsProgram(req: any, res: Response) {
   }
 
   // 2. add default values to the benefitsProgram object if they are not present
+  benefitsProgram.id = uuid();
   benefitsProgram.is_active = benefitsProgram.is_active || false;
   benefitsProgram.is_deleted = benefitsProgram.is_deleted || false;
   benefitsProgram.is_template = benefitsProgram.is_template || false;

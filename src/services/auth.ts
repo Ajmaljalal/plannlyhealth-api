@@ -34,17 +34,15 @@ export const signUpService = (userData: any) => {
           }
 
           const response = {
-            username: result.user.getUsername(),
             email: result.user.getUsername(),
-            first_name: result.user.userGivenName,
-            last_name: result.user.userFamilyName,
-            role: result.user.role,
-            company_id: result.user.company_id,
-            user_id: result.userSub,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            role: userData.role,
+            company_id: userData.company_id,
+            id: result.userSub,
           }
           return resolve(response);
         });
-
     })
   } catch (error) {
     return error
@@ -67,7 +65,7 @@ export const signInService = async (username: string, password: string) => {
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: (result) => {
           const session = result.getIdToken().payload;
-          const user_id = session['sub'];
+          const id = session['sub'];
           const first_name = session['given_name'];
           const last_name = session['family_name'];
           const email = session['email'];
@@ -81,7 +79,7 @@ export const signInService = async (username: string, password: string) => {
             email,
             first_name,
             last_name,
-            user_id,
+            id,
             role,
             company_id,
             refreshToken,
