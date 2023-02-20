@@ -1,5 +1,6 @@
 import express from 'express';
 import morgan from 'morgan';
+import helmet from 'helmet';
 import config from './configs/base';
 import { authenticationMiddleware } from './middlewares/authenticate';
 import companyRoutes from './routes/company';
@@ -15,6 +16,8 @@ import authRoutes from './routes/auth';
 
 const app = express();
 
+// Middleware
+app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());

@@ -1,5 +1,4 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
-import { v4 as uuid } from 'uuid';
 import db from "../configs/aws";
 import { User } from "../lib/types/user";
 
@@ -8,10 +7,7 @@ const TABLE_NAME = `users_${process.env.DYNAMODB_TABLE_ENV}`;
 export const createUserService = async (user: User) => {
   const params: DocumentClient.PutItemInput = {
     TableName: TABLE_NAME,
-    Item: {
-      ...user,
-      id: uuid()
-    }
+    Item: user
   };
   try {
     const result = await db.put(params).promise();

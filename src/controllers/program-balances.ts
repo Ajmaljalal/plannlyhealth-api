@@ -14,7 +14,7 @@ import {
   updateProgramBalanceService
 } from '../services/program-balances';
 
-export const createProgramBalance = async (req: Request, res: Response) => {
+export const createProgramBalance = async (req: any, res: Response) => {
   const balance = req.body;
 
   // 1. check if the request body is empty
@@ -29,6 +29,7 @@ export const createProgramBalance = async (req: Request, res: Response) => {
   balance.id = uuid(); // dynamodb does not have an auto generated id
   balance.created_date = balance.created_date || Date();
   balance.modified_date = balance.modified_date || Date();
+  balance.owner = balance.owner || req.user.id;
 
   try {
     // 3. validate the request body before creating the balance using the CreateBalanceSchema
@@ -253,20 +254,23 @@ export const updateProgramBalance = async (req: Request, res: Response) => {
 
     // 4. check if the current user is the owner of the program
     // @ts-ignore
-    // const authorizedUser: any = req?.user;
-    // if (authorizedUser?.id !== programExists.Item.owner && (authorizedUser?.role !== Role.Admin || authorizedUser?.role !== Role.Owner)) {
-    //   return res.status(403).json({
-    //     message: 'You are not authorized to perform this action',
-    //     code: "UNAUTHORIZED"
-    //   });
-    // }
+    const currentUser = req.user;
+    const isOwner = currentUser && currentUser.id === programExists.Item?.owner;
+    const isAdmin = currentUser && currentUser.role === Role.Admin;
+    const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
+    const isAuthorized = isOwner || isAdmin || isSuperAdmin;
+    if (!isAuthorized) {
+      return res.status(403).json({
+        message: 'You are not authorized to perform this action',
+        code: "UNAUTHORIZED"
+      });
+    }
 
     // 4. add the required modifications to the program
     delete program.id; // this is because the id is not allowed to be updated
     delete programExists.Item?.id; // this is because the id is not allowed to be updated
-    program.modified_date = program.modified_date || Date();
-    const programToUpdate = { ...programExists.Item, ...program };
     program.modified_date = Date();
+    const programToUpdate = { ...programExists.Item, ...program };
 
     // 5. validate the request body before updating the program using the UpdateProgramSchema
     const { error } = UpdateProgramBalanceSchema.validate(programToUpdate);
@@ -322,13 +326,16 @@ export const deleteProgramBalance = async (req: Request, res: Response) => {
 
     // 3. check if the current user is the owner of the program
     // @ts-ignore
-    // const authorizedUser: any = req.user;
-    // if (authorizedUser?.id !== programExists.Item.owner && (authorizedUser?.role !== Role.Admin || authorizedUser?.role !== Role.Owner)) {
-    //   return res.status(403).json({
-    //     message: 'You are not authorized to perform this action',
-    //     code: "UNAUTHORIZED"
-    //   });
-    // }
+    const currentUser = req.user;
+    const isAdmin = currentUser && currentUser.role === Role.Admin;
+    const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
+    const isAuthorized = isAdmin || isSuperAdmin;
+    if (!isAuthorized) {
+      return res.status(403).json({
+        message: 'You are not authorized to perform this action',
+        code: "UNAUTHORIZED"
+      });
+    }
 
     // 4. call the deleteProgramBalanceService to delete the program balance
     const response: any = await deleteProgramBalanceService(programId);

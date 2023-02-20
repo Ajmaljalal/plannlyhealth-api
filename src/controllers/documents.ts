@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
+import { Role } from '../lib/enums';
 import { CreateDocumentSchema, UpdateDocumentSchema } from '../models/document';
 import { createDocumentService, getAllDocumentsService, getDocumentByIdService, getDocumentsByCompanyIdService, getDocumentsByOwnerIdService, updateDocumentService, deleteDocumentService } from '../services/documents';
 
-export const createDocument = async (req: Request, res: Response) => {
+export const createDocument = async (req: any, res: Response) => {
   const document = req.body;
 
   // 1. check if the request body is empty
@@ -19,6 +20,7 @@ export const createDocument = async (req: Request, res: Response) => {
     document.id = uuid();
     document.created_date = Date();
     document.modified_date = Date();
+    document.owner = req.user.id;
 
     // 3. validate the request body before creating the document using the CreateDocumentSchema
     const { error } = CreateDocumentSchema.validate(document);
@@ -209,18 +211,22 @@ export const updateDocument = async (req: Request, res: Response) => {
 
     // 4. check if the current user is the owner of the document
     // @ts-ignore
-    // const authorizedUser: any = req?.user;
-    // if (authorizedUser?.id !== documentExists.Item.owner && (authorizedUser?.role !== Role.Admin || authorizedUser?.role !== Role.Owner)) {
-    //   return res.status(403).json({
-    //     message: 'You are not authorized to perform this action',
-    //     code: "UNAUTHORIZED"
-    //   });
-    // }
+    const currentUser = req.user;
+    const isOwner = currentUser && currentUser.id === documentExists.Item.owner;
+    const isAdmin = currentUser && currentUser.role === Role.Admin;
+    const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
+    const isAuthorized = isOwner || isAdmin || isSuperAdmin;
+    if (!isAuthorized) {
+      return res.status(403).json({
+        message: 'You are not authorized to perform this action',
+        code: "UNAUTHORIZED"
+      });
+    }
 
     // 4. add the required modifications to the document
     delete document.id; // this is because the id is not allowed to be updated
     delete documentExists.Item?.id; // this is because the id is not allowed to be updated
-    document.modified_date = document.modified_date || Date();
+    document.modified_date = Date();
     const documentToUpdate = { ...documentExists.Item, ...document };
 
     // 5. validate the request body before updating the document using the UpdateDocumentSchema
@@ -276,13 +282,17 @@ export const deleteDocument = async (req: Request, res: Response) => {
 
     // 3. check if the current user is the owner of the document
     // @ts-ignore
-    // const authorizedUser: any = req.user;
-    // if (authorizedUser?.id !== documentExists.Item.owner && (authorizedUser?.role !== Role.Admin || authorizedUser?.role !== Role.Owner)) {
-    //   return res.status(403).json({
-    //     message: 'You are not authorized to perform this action',
-    //     code: "UNAUTHORIZED"
-    //   });
-    // }
+    const currentUser = req.user;
+    const isOwner = currentUser && currentUser.id === documentExists.Item.owner;
+    const isAdmin = currentUser && currentUser.role === Role.Admin;
+    const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
+    const isAuthorized = isOwner || isAdmin || isSuperAdmin;
+    if (!isAuthorized) {
+      return res.status(403).json({
+        message: 'You are not authorized to perform this action',
+        code: "UNAUTHORIZED"
+      });
+    }
 
     // 4. call the deleteDocumentService to delete the document
     const response: any = await deleteDocumentService(documentId);

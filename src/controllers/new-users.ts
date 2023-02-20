@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
+import { Role } from '../lib/enums';
 import { CreateNewUserSchema, UpdateNewUserSchema } from '../models/new-user';
 import {
   createNewUserService,
@@ -13,7 +14,7 @@ import {
 } from '../services/new-users';
 
 
-export const createNewUser = async (req: Request, res: Response) => {
+export const createNewUser = async (req: any, res: Response) => {
   // 1. get the user from the request body
   const user = req.body;
 
@@ -29,6 +30,7 @@ export const createNewUser = async (req: Request, res: Response) => {
   user.created_date = Date();
   user.modified_date = Date();
   user.id = uuid();
+  user.owner = req.user.id
 
   // 4. validate the request body before creating the user using the CreateUserSchema
   const { error } = CreateNewUserSchema.validate(user);
@@ -51,7 +53,7 @@ export const createNewUser = async (req: Request, res: Response) => {
       });
     } else {
       // 7. if the response is not an error, send the user
-      return res.status(201).json(response.Attributes);
+      return res.status(201).json(response.Item);
     }
   }
   catch (err: any) {
@@ -65,6 +67,13 @@ export const createNewUser = async (req: Request, res: Response) => {
 export const getNewUserById = async (req: Request, res: Response) => {
   // 1. get the user id from the request params
   const userId = req.params.id;
+  // 2. check if user id is empty
+  if (!userId) {
+    return res.status(400).json({
+      message: 'User id in the request params cannot be empty',
+      code: 'EMPTY_REQUEST_PARAMS'
+    });
+  }
 
   try {
     // 2. call the getUserByIdService to get the user
@@ -260,18 +269,21 @@ export const updateNewUser = async (req: Request, res: Response) => {
 
     // 4. check if the current user is the owner of the comment
     // @ts-ignore
-    // const authorizedUser: any = req?.user;
-    // if (authorizedUser?.id !== commentExists.Item.owner && (authorizedUser?.role !== Role.Admin || authorizedUser?.role !== Role.Owner)) {
-    //   return res.status(403).json({
-    //     message: 'You are not authorized to perform this action',
-    //     code: "UNAUTHORIZED"
-    //   });
-    // }
+    const currentUser = req.user;
+    const isAdmin = currentUser && currentUser.role === Role.Admin;
+    const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
+    const isAuthorized = isAdmin || isSuperAdmin;
+    if (!isAuthorized) {
+      return res.status(403).json({
+        message: 'You are not authorized to perform this action',
+        code: "UNAUTHORIZED"
+      });
+    }
 
     // 4. add the required modifications to the user
     delete user.id; // this is because the id is not allowed to be updated
     delete userExists.Item?.id; // this is because the id is not allowed to be updated
-    user.modified_date = user.modified_date || Date();
+    user.modified_date = Date();
     const userToUpdate = { ...userExists.Item, ...user };
 
     // 5. validate the request body before updating the user using the UpdateUserSchema
@@ -329,12 +341,16 @@ export const deleteNewUser = async (req: Request, res: Response) => {
     // 3. check if the current user is the owner of the user
     // @ts-ignore
     // const authorizedUser: any = req.user;
-    // if (authorizedUser?.id !== userExists.Item.owner && (authorizedUser?.role !== Role.Admin || authorizedUser?.role !== Role.Owner)) {
-    //   return res.status(403).json({
-    //     message: 'You are not authorized to perform this action',
-    //     code: "UNAUTHORIZED"
-    //   });
-    // }
+    const currentUser = req.user;
+    const isAdmin = currentUser && currentUser.role === Role.Admin;
+    const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
+    const isAuthorized = isAdmin || isSuperAdmin;
+    if (!isAuthorized) {
+      return res.status(403).json({
+        message: 'You are not authorized to perform this action',
+        code: "UNAUTHORIZED"
+      });
+    }
 
     // 4. call the deleteUserService to delete the user
     const response: any = await deleteNewUserService(userId);
