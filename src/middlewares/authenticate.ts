@@ -6,7 +6,7 @@ export const authenticationMiddleware = async (req: any, res: Response, next: Ne
   const authHeader = req.headers['authorization'] as string;
   if (!authHeader) {
     return res.status(401).send({
-      message: 'Authorization header is missing',
+      message: 'You are not authorized to access this resource.',
       code: 'MISSING_AUTHORIZATION_HEADER'
     });
   }
@@ -18,6 +18,15 @@ export const authenticationMiddleware = async (req: any, res: Response, next: Ne
       code: 'INVALID_AUTHORIZATION_HEADER'
     });
   }
+
+  // check if accessToken is provided
+  if (!accessToken?.trim()) {
+    return res.status(400).send({
+      message: 'You are not authorized to access this resource.',
+      code: 'NOT_AUTHORIZED'
+    });
+  }
+
   try {
 
     const authenticatedUser = await authenticateUserService(accessToken.trim());

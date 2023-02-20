@@ -75,7 +75,6 @@ export const signInService = async (username: string, password: string) => {
           const accessToken = result.getAccessToken().getJwtToken();
           const idToken = result.getIdToken().getJwtToken();
           const response: any = {
-            username,
             email,
             first_name,
             last_name,
@@ -89,7 +88,7 @@ export const signInService = async (username: string, password: string) => {
           resolve(response);
         },
         onFailure: (err) => {
-          reject(err);
+          return resolve(err);
         }
       });
     });

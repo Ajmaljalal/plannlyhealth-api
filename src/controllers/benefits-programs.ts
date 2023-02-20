@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 import { Role } from '../lib/enums';
 import { BenefitsProgram } from '../lib/types/benefits-programs';
-import BenefitsProgramsSchema from '../models/benefits-program';
+import { CreateBenefitsProgramsSchema, UpdateBenefitsProgramsSchema } from '../models/benefits-program';
 
 import {
   createBenefitsProgramService,
@@ -36,7 +36,7 @@ export async function createNewBenefitsProgram(req: any, res: Response) {
   benefitsProgram.owner = benefitsProgram.owner || authorizedUser?.id;
 
   // 3. validate the request body before creating a new company using the benefitsProgramsSchema
-  const { error } = BenefitsProgramsSchema.validate(benefitsProgram);
+  const { error } = CreateBenefitsProgramsSchema.validate(benefitsProgram);
   if (error) {
     return res.status(400).json({
       message: error.details[0].message,
@@ -155,12 +155,9 @@ export async function updateBenefitsProgram(req: Request, res: Response) {
     });
   }
   // 4. add is_active, is_deleted, is_template and modified_date to the benefitsProgram object if they are not present
-  benefitsProgram.is_active = benefitsProgram.is_active || false;
-  benefitsProgram.is_deleted = benefitsProgram.is_deleted || false;
-  benefitsProgram.is_template = benefitsProgram.is_template || false;
   benefitsProgram.modified_date = Date();
-  // 5. validate the request body before creating a new company using the benefitsProgramsSchema
-  const { error } = BenefitsProgramsSchema.validate(benefitsProgram, { allowUnknown: true });
+  // 5. validate the request body before creating a new company using the UpdateBenefitsProgramsSchema
+  const { error } = UpdateBenefitsProgramsSchema.validate(benefitsProgram);
   if (error) {
     return res.status(400).json({
       message: error.details[0].message,

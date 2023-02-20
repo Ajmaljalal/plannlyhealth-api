@@ -7,7 +7,7 @@ export interface Company {
   name: string
   logo: string
   website: string
-  company_size: string
+  company_size: number
   monthly_charge_active?: boolean
   restrict_signup_to_domain_only?: boolean
   restrict_domain?: string
@@ -56,7 +56,7 @@ export const CreateCompanySchema = Joi.object({
   name: Joi.string().required(),
   logo: Joi.string().required(),
   website: Joi.string(),
-  company_size: Joi.string().required(),
+  company_size: Joi.number().required(),
   monthly_charge_active: Joi.boolean(),
   restrict_signup_to_domain_only: Joi.boolean(),
   restrict_domain: Joi.string(),
@@ -105,7 +105,7 @@ export const UpdateCompanySchema = Joi.object({
   name: Joi.string(),
   logo: Joi.string(),
   website: Joi.string(),
-  company_size: Joi.string(),
+  company_size: Joi.number(),
   monthly_charge_active: Joi.boolean(),
   restrict_signup_to_domain_only: Joi.boolean(),
   restrict_domain: Joi.string(),
