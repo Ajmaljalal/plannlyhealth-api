@@ -2,83 +2,156 @@ import stripe from "../configs/stripe";
 
 const stripeInstance = stripe();
 
+export const createStripeConnectAccount = async (email: string) => {
+  try {
+    const account = await stripeInstance.accounts.create({
+      type: 'express',
+      country: 'US',
+      capabilities: {
+        card_payments: { requested: true },
+        transfers: { requested: true },
+      },
+      email
+
+    });
+    return account;
+  } catch (error) {
+    return error;
+  }
+}
+
+export const createStripeConnectAccountLink = async (accountId: string) => {
+  try {
+    const accountLink = await stripeInstance.accountLinks.create({
+      account: accountId,
+      refresh_url: 'https://example.com/reauth',
+      return_url: 'https://example.com/return',
+      type: 'account_onboarding',
+    });
+    return accountLink;
+  }
+  catch (error) {
+    return error;
+  }
+}
+
 export const createStripeProduct = async (name: string) => {
-  const product = await stripeInstance.products.create({
-    name,
-  });
-  return product;
+  try {
+    const product = await stripeInstance.products.create({
+      name,
+    });
+    return product;
+  } catch (error) {
+    return error;
+  }
 }
 
 export const createStripePrice = async (productId: string, unitAmount: number, interval: any) => {
-  const price = await stripeInstance.prices.create({
-    product: productId,
-    unit_amount: unitAmount,
-    currency: 'usd',
-    recurring: {
-      interval: interval || 'month',
-    },
-  });
-  return price;
+  try {
+    const price = await stripeInstance.prices.create({
+      product: productId,
+      unit_amount: unitAmount,
+      currency: 'usd',
+      recurring: {
+        interval: interval || 'month',
+      },
+    });
+    return price;
+  } catch (error) {
+    return error;
+  }
 }
 
 export const createStripeSubscription = async (customerId: string, priceId: string) => {
-  const subscription = await stripeInstance.subscriptions.create({
-    customer: customerId,
-    items: [{ price: priceId }],
-    expand: ['latest_invoice.payment_intent'],
-
-  });
-  return subscription;
+  try {
+    const subscription = await stripeInstance.subscriptions.create({
+      customer: customerId,
+      items: [{ price: priceId }],
+      expand: ['latest_invoice.payment_intent'],
+    });
+    return subscription;
+  } catch (error) {
+    return error;
+  }
 }
 
 export const createStripeCustomer = async (email: string) => {
-  const customer = await stripeInstance.customers.create({
-    email,
-  });
-  return customer;
+  try {
+    const customer = await stripeInstance.customers.create({
+      email,
+    });
+    return customer;
+  }
+  catch (error) {
+    return error;
+  }
 }
 
 export const createStripIssuingCard = async (cardHolderId: string, additionalCardData: any) => {
-  const card = await stripeInstance.issuing.cards.create({
-    cardholder: cardHolderId,
-    currency: 'usd',
-    type: 'virtual',
-    ...additionalCardData
-  });
-  return card;
+  try {
+    const card = await stripeInstance.issuing.cards.create({
+      cardholder: cardHolderId,
+      currency: 'usd',
+      type: 'virtual',
+      ...additionalCardData
+    });
+    return card;
+  } catch (error) {
+    return error;
+  }
 }
 
 export const createStripeIssuingCardHolder = async (customerId: string, additionalCardHolderData: any) => {
-  const cardHolder = await stripeInstance.issuing.cardholders.create({
-    type: 'individual',
-    customer: customerId,
-    ...additionalCardHolderData
-  });
-  return cardHolder;
+  try {
+    const cardHolder = await stripeInstance.issuing.cardholders.create({
+      type: 'individual',
+      customer: customerId,
+      ...additionalCardHolderData
+    });
+    return cardHolder;
+  } catch (error) {
+    return error;
+  }
 }
 
 export const updateStripeIssuingCard = async (cardId: string, updates: any) => {
-  const card = await stripeInstance.issuing.cards.update(cardId, {
-    ...updates
-  });
-  return card;
+  try {
+    const card = await stripeInstance.issuing.cards.update(cardId, {
+      ...updates
+    });
+    return card;
+  } catch (error) {
+    return error;
+  }
 }
 
 export const updateStripeIssuingCardHolder = async (cardHolderId: string, updates: any) => {
-  const cardHolder = await stripeInstance.issuing.cardholders.update(cardHolderId, {
-    ...updates
-  });
-  return cardHolder;
+  try {
+    const cardHolder = await stripeInstance.issuing.cardholders.update(cardHolderId, {
+      ...updates
+    });
+    return cardHolder;
+  } catch (error) {
+    return error;
+  }
 }
 
 export const getStripeIssuingCard = async (cardId: string) => {
-  const card = await stripeInstance.issuing.cards.retrieve(cardId);
-  return card;
+  try {
+    const card = await stripeInstance.issuing.cards.retrieve(cardId);
+    return card;
+  } catch (error) {
+    return error;
+  }
 }
 
 export const getStripeIssuingCardHolder = async (cardHolderId: string) => {
-  const cardHolder = await stripeInstance.issuing.cardholders.retrieve(cardHolderId);
-  return cardHolder;
+  try {
+    const cardHolder = await stripeInstance.issuing.cardholders.retrieve(cardHolderId);
+    return cardHolder;
+  } catch (error) {
+    return error;
+  }
 }
 
 
