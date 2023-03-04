@@ -431,11 +431,11 @@ export const updateStripeIssuingCardHolderService = async (cardHolderId: string,
 }
 
 
+
 ////// Stripe Issuing Cards and Operations //////
-export const createStripeIssuingCardService = async (connectedAccountId: string, cardData: any) => {
+export const createStripeIssuingCardService = async ({ cardData, connectedAccountId }: any) => {
   try {
     const card = await stripeInstance.issuing.cards.create({
-      cardholder: cardData.cardholderId,
       currency: 'usd',
       type: 'virtual',
       ...cardData
@@ -450,16 +450,19 @@ export const createStripeIssuingCardService = async (connectedAccountId: string,
   }
 }
 
-export const getStripeIssuingCardService = async (cardId: string) => {
+export const getStripeIssuingCardService = async ({ cardId, connectedAccountId }: any) => {
   try {
-    const card = await stripeInstance.issuing.cards.retrieve(cardId);
+    const card = await stripeInstance.issuing.cards.retrieve(
+      cardId,
+      { stripeAccount: connectedAccountId }
+    );
     return card;
   } catch (error) {
     return error;
   }
 }
 
-export const updateStripeIssuingCardService = async (cardId: string, connectedAccountId: string, updates: any) => {
+export const updateStripeIssuingCardService = async ({ cardId, connectedAccountId, updates }: any) => {
   try {
     const card = await stripeInstance.issuing.cards.update(cardId, {
       ...updates

@@ -7,6 +7,7 @@ import {
   createStripeConnectAccountService,
   createStripeCustomerService,
   createStripeIssuingCardHolderService,
+  createStripeIssuingCardService,
   createStripePriceService,
   createStripeProductService,
   createStripeSubscriptionService,
@@ -18,12 +19,15 @@ import {
   getAllStripeProductsService,
   getStripeCustomerService,
   getStripeIssuingCardHolderService,
+  getStripeIssuingCardService,
   getStripePriceService,
   getStripeProductService,
   getStripeSubscriptionByCustomerService,
   getStripeSubscriptionService,
   transferFundsToConnectAccountService,
   updateStripeCustomerService,
+  updateStripeIssuingCardHolderService,
+  updateStripeIssuingCardService,
   updateStripePriceService,
   updateStripeProductService,
   updateStripeSubscriptionService,
@@ -847,7 +851,7 @@ export const transferFundsToConnectAccount = async (req: Request, res: Response)
   }
 }
 
-// issuing card holder controller
+// issuing cardholder controller
 
 export const createCardHolder = async (req: Request, res: Response) => {
   const { cardHolderData, connectedAccountId } = req.body;
@@ -910,6 +914,161 @@ export const getCardHolder = async (req: Request, res: Response) => {
     }
     // 3. return card holder
     return res.status(201).json(cardHolder);
+  }
+  // 4. catch error
+  catch (error: any) {
+    return res.status(500).json({
+      message: error.message,
+      code: error.code
+    });
+  }
+}
+
+export const updateCardHolder = async (req: Request, res: Response) => {
+  const { cardholderData, connectedAccountId } = req.body;
+  const { cardholderId } = req.params;
+
+  // 1. check if cardHolderData is empty
+  if (!cardholderId || !connectedAccountId || Object.keys(cardholderData).length === 0) {
+    return res.status(400).json({
+      message: 'Cannot update card holder, cardHolderId, card holder data and connectedAccountId is required',
+      code: 'BAD_REQUEST'
+    });
+  }
+
+  try {
+    // 2. update card holder
+    const cardHolder: any = await updateStripeIssuingCardHolderService(cardholderId, connectedAccountId, cardholderData);
+    if (cardHolder.statusCode) {
+      return res.status(cardHolder.statusCode).json({
+        message: cardHolder.message,
+        code: cardHolder.code
+      })
+    }
+
+    if (cardHolder.message) {
+      return res.status(500).json({
+        message: cardHolder.message,
+        code: 'CARD_HOLDER_UPDATE_FAILED'
+      })
+    }
+
+    // 3. return card holder
+    return res.status(201).json(cardHolder);
+  }
+  // 4. catch error
+  catch (error: any) {
+    return res.status(500).json({
+      message: error.message,
+      code: error.code
+    });
+  }
+}
+
+// issuing card controller
+
+export const createCard = async (req: Request, res: Response) => {
+  const { cardData, connectedAccountId } = req.body;
+
+  // 1. check if cardData is empty
+  if (!connectedAccountId || Object.keys(cardData).length === 0) {
+    return res.status(400).json({
+      message: 'Cannot create card, card data and connectedAccountId is required',
+      code: 'BAD_REQUEST'
+    });
+  }
+
+  try {
+    // 2. create card
+    const card: any = await createStripeIssuingCardService({ connectedAccountId, cardData });
+    if (card.statusCode) {
+      return res.status(card.statusCode).json({
+        message: card.message,
+        code: card.code
+      })
+    }
+
+    if (card.message) {
+      return res.status(500).json({
+        message: card.message,
+        code: 'CARD_CREATION_FAILED'
+      })
+    }
+    // 3. return card
+    return res.status(201).json(card);
+  }
+  // 4. catch error
+  catch (error: any) {
+    return res.status(500).json({
+      message: error.message,
+      code: error.code
+    });
+  }
+}
+
+export const getCard = async (req: Request, res: Response) => {
+  const { cardId, connectedAccountId } = req.params;
+  console.log(cardId, connectedAccountId)
+
+  // 1. check if cardId is empty
+  if (!cardId || !connectedAccountId) {
+    return res.status(400).json({
+      message: 'Cannot get card, cardId and connectedAccountId is required',
+      code: 'BAD_REQUEST'
+    });
+  }
+
+  try {
+    // 2. get card
+    const card: any = await getStripeIssuingCardService({ cardId, connectedAccountId });
+    if (card.statusCode) {
+      return res.status(card.statusCode).json({
+        message: card.message,
+        code: card.code
+      })
+    }
+    // 3. return card
+    return res.status(201).json(card);
+  }
+  // 4. catch error
+  catch (error: any) {
+    return res.status(500).json({
+      message: error.message,
+      code: error.code
+    });
+  }
+}
+
+export const updateCard = async (req: Request, res: Response) => {
+  const { cardData, connectedAccountId } = req.body;
+  const { cardId } = req.params;
+
+  // 1. check if cardData is empty
+  if (!cardId || !connectedAccountId || Object.keys(cardData).length === 0) {
+    return res.status(400).json({
+      message: 'Cannot update card, cardId, card data and connectedAccountId is required',
+      code: 'BAD_REQUEST'
+    });
+  }
+
+  try {
+    // 2. update card
+    const card: any = await updateStripeIssuingCardService({ cardId, connectedAccountId, updates: cardData });
+    if (card.statusCode) {
+      return res.status(card.statusCode).json({
+        message: card.message,
+        code: card.code
+      })
+    }
+
+    if (card.message) {
+      return res.status(500).json({
+        message: card.message,
+        code: 'CARD_UPDATE_FAILED'
+      })
+    }
+    // 3. return card
+    return res.status(201).json(card);
   }
   // 4. catch error
   catch (error: any) {
