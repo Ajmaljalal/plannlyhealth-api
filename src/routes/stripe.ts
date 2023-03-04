@@ -3,6 +3,8 @@ import {
   attachPaymentMethodToCustomer,
   cancelSubscription,
   chargePaymentMethod,
+  createCardHolder,
+  createConnectAccount,
   createCustomer,
   createPaymentMethod,
   createPrice,
@@ -10,14 +12,17 @@ import {
   createSubscription,
   deleteProduct,
   detachPaymentMethodFromCustomer,
+  generateStripeConnectAccountLink,
   getAllPrices,
   getAllProducts,
+  getCardHolder,
   getCustomer,
   getPriceById,
   getProductById,
   getSubscriptionByCustomerId,
   getSubscriptionById,
   setCustomerDefaultPaymentMethod,
+  transferFundsToConnectAccount,
   updatePrice,
   updateProduct,
   updateSubscription
@@ -55,6 +60,16 @@ router.get('/subscriptions/:subscriptionId', getSubscriptionById);
 router.get('/subscriptions/customer/:customerId', getSubscriptionByCustomerId);
 router.put('/subscriptions/:subscriptionId', updateSubscription);
 router.get('/subscriptions/cancel/:subscriptionId', cancelSubscription);
+
+// connect accounts
+router.post('/accounts', createConnectAccount);
+router.get('/accounts/onboarding/:accountId', generateStripeConnectAccountLink)
+router.get('/accounts/update/:accountId', generateStripeConnectAccountLink)
+router.post('/accounts/transfer', transferFundsToConnectAccount)
+
+// issuing card holders
+router.post('/issuing/cardholders', createCardHolder);
+router.get('/issuing/cardholders/:cardholderId/:connectedAccountId', getCardHolder);
 
 
 export default router;

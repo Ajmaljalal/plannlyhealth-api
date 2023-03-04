@@ -1,4 +1,5 @@
 import stripe from "../configs/stripe";
+import { AccountDataType, TransferDataType } from "../lib/types/stripe";
 
 const stripeInstance = stripe();
 
@@ -272,18 +273,59 @@ export const cancelStripeSubscriptionService = async (subscriptionId: string) =>
 
 ////// Stripe Connect Accounts and Operations //////
 
-export const createStripeConnectAccountService = async (email: string) => {
+export const createStripeConnectAccountService = async (accountData: AccountDataType) => {
   try {
     const account = await stripeInstance.accounts.create({
-      type: 'standard',
+      type: 'custom',
       country: 'US',
-      email: email,
+      business_type: 'company',
+      email: accountData.email,
+      // business_profile: {
+      //   ...accountData.business_profile
+      // },
       capabilities: {
         card_payments: { requested: true },
         transfers: { requested: true },
         card_issuing: { requested: true }
       },
+      company: {
+        ...accountData.company
+      },
+      settings: {
+        payouts: {
+          schedule: {
+            interval: 'manual',
+          },
+        },
+        //   payments: {
+        //     ...accountData.settings?.payments
+        // }
+      },
+      // tos_acceptance: {
+      //   date: Math.floor(Date.now() / 1000),
+      //   ip: accountData.tos_acceptance.ip,
+      // },
+    });
+    return account;
 
+  } catch (error) {
+    return error;
+  }
+}
+
+export const getStripeConnectAccountService = async (accountId: string) => {
+  try {
+    const account = await stripeInstance.accounts.retrieve(accountId);
+    return account;
+  } catch (error) {
+    return error;
+  }
+}
+
+export const updateStripeConnectAccountService = async (accountId: string, updates: any) => {
+  try {
+    const account = await stripeInstance.accounts.update(accountId, {
+      ...updates
     });
     return account;
   } catch (error) {
@@ -291,7 +333,7 @@ export const createStripeConnectAccountService = async (email: string) => {
   }
 }
 
-export const createStripeConnectAccountLinkService = async (accountId: string) => {
+export const generateStripeConnectAccountLinkService = async (accountId: string) => {
   try {
     const accountLink = await stripeInstance.accountLinks.create({
       account: accountId,
@@ -300,20 +342,57 @@ export const createStripeConnectAccountLinkService = async (accountId: string) =
       type: 'account_onboarding',
     });
     return accountLink;
-  }
-  catch (error) {
+  } catch (error) {
     return error;
   }
 }
 
+export const generateStripeConnectAccountUpdateLinkService = async (accountId: string) => {
+  try {
+    const accountLink = await stripeInstance.accountLinks.create({
+      account: accountId,
+      refresh_url: 'https://example.com/reauth',
+      return_url: 'https://example.com/return',
+      type: 'account_update',
+    });
+    return accountLink;
+  } catch (error) {
+    return error;
+  }
+}
 
-////// Stripe Issuing Cards and Operations //////
-export const createStripeIssuingCardHolderService = async (customerId: string, connectedAccountId: string, additionalCardHolderData: any) => {
+export const transferFundsToConnectAccountService = async (transferData: TransferDataType) => {
+  try {
+    const transfer = await stripeInstance.transfers.create({
+      amount: transferData.amount,
+      currency: 'usd',
+      destination: transferData.destinationConnectAccountId,
+    });
+    return transfer;
+  } catch (error) {
+    return error;
+  }
+}
+
+////// Stripe Issuing Cardholders and Operations //////
+export const createStripeIssuingCardHolderService = async (cardHolderData: any, connectedAccountId: string) => {
   try {
     const cardHolder = await stripeInstance.issuing.cardholders.create({
       type: 'individual',
-      customer: customerId,
-      ...additionalCardHolderData
+      name: cardHolderData.name,
+      email: cardHolderData.email,
+      phone_number: cardHolderData.phone_number,
+      status: 'active',
+      billing: {
+        address: {
+          city: cardHolderData.city,
+          country: cardHolderData.country,
+          line1: cardHolderData.line1,
+          line2: cardHolderData.line2,
+          postal_code: cardHolderData.postal_code,
+          state: cardHolderData.state,
+        }
+      }
     },
       {
         stripeAccount: connectedAccountId
@@ -325,9 +404,11 @@ export const createStripeIssuingCardHolderService = async (customerId: string, c
   }
 }
 
-export const getStripeIssuingCardHolderService = async (cardHolderId: string) => {
+export const getStripeIssuingCardHolderService = async (cardHolderId: string, connectedAccountId: string) => {
   try {
-    const cardHolder = await stripeInstance.issuing.cardholders.retrieve(cardHolderId);
+    const cardHolder = await stripeInstance.issuing.cardholders.retrieve(cardHolderId, {
+      stripeAccount: connectedAccountId
+    });
     return cardHolder;
   } catch (error) {
     return error;
@@ -349,13 +430,15 @@ export const updateStripeIssuingCardHolderService = async (cardHolderId: string,
   }
 }
 
-export const createStripeIssuingCardService = async (cardHolderId: string, connectedAccountId: string, additionalCardData: any) => {
+
+////// Stripe Issuing Cards and Operations //////
+export const createStripeIssuingCardService = async (connectedAccountId: string, cardData: any) => {
   try {
     const card = await stripeInstance.issuing.cards.create({
-      cardholder: cardHolderId,
+      cardholder: cardData.cardholderId,
       currency: 'usd',
       type: 'virtual',
-      ...additionalCardData
+      ...cardData
     },
       {
         stripeAccount: connectedAccountId

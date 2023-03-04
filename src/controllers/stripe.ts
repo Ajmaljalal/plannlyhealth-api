@@ -4,19 +4,25 @@ import {
   cancelStripeSubscriptionService,
   chargePaymentMethodService,
   createPaymentMethodService,
+  createStripeConnectAccountService,
   createStripeCustomerService,
+  createStripeIssuingCardHolderService,
   createStripePriceService,
   createStripeProductService,
   createStripeSubscriptionService,
   deleteStripeProductService,
   detachPaymentMethodService,
+  generateStripeConnectAccountLinkService,
+  generateStripeConnectAccountUpdateLinkService,
   getAllStripePricesService,
   getAllStripeProductsService,
   getStripeCustomerService,
+  getStripeIssuingCardHolderService,
   getStripePriceService,
   getStripeProductService,
   getStripeSubscriptionByCustomerService,
   getStripeSubscriptionService,
+  transferFundsToConnectAccountService,
   updateStripeCustomerService,
   updateStripePriceService,
   updateStripeProductService,
@@ -695,6 +701,215 @@ export const cancelSubscription = async (req: Request, res: Response) => {
     }
     // 3. return subscription
     return res.status(201).json(subscription);
+  }
+  // 4. catch error
+  catch (error: any) {
+    return res.status(500).json({
+      message: error.message,
+      code: error.code
+    });
+  }
+}
+
+// connect accounts controller
+
+export const createConnectAccount = async (req: Request, res: Response) => {
+  const connectAccountData = req.body;
+
+  // 1. check if connectAccountData is empty
+  if (Object.keys(connectAccountData).length === 0) {
+    return res.status(400).json({
+      message: 'Cannot create connect account, account data is required',
+      code: 'BAD_REQUEST'
+    });
+  }
+
+  try {
+    // 2. create connect account
+    const account: any = await createStripeConnectAccountService(connectAccountData);
+    if (account.statusCode) {
+      return res.status(account.statusCode).json({
+        message: account.message,
+        code: account.code
+      })
+    }
+    if (account.message) {
+      return res.status(500).json({
+        message: account.message,
+        code: 'ACCOUNT_CREATION_FAILED'
+      })
+    }
+    // 3. return account
+    return res.status(201).json(account);
+  }
+  // 4. catch error
+  catch (error: any) {
+    return res.status(500).json({
+      message: error.message,
+      code: error.code
+    });
+  }
+}
+
+export const generateStripeConnectAccountLink = async (req: Request, res: Response) => {
+  const { accountId } = req.params;
+
+  // 1. check if accountId is empty
+  if (!accountId) {
+    return res.status(400).json({
+      message: 'Cannot generate account link, accountId is required',
+      code: 'BAD_REQUEST'
+    });
+  }
+
+  try {
+    // 2. generate account link
+    const accountLink: any = await generateStripeConnectAccountLinkService(accountId);
+    if (accountLink.statusCode) {
+      return res.status(accountLink.statusCode).json({
+        message: accountLink.message,
+        code: accountLink.code
+      })
+    }
+    // 3. return account link
+    return res.status(201).json(accountLink);
+  }
+  // 4. catch error
+  catch (error: any) {
+    return res.status(500).json({
+      message: error.message,
+      code: error.code
+    });
+  }
+}
+
+export const generateConnectAccountUpdateLink = async (req: Request, res: Response) => {
+  const { accountId } = req.params;
+
+  // 1. check if accountId is empty
+  if (!accountId) {
+    return res.status(400).json({
+      message: 'Cannot generate account link, accountId is required',
+      code: 'BAD_REQUEST'
+    });
+  }
+
+  try {
+    // 2. generate account link
+    const accountLink: any = await generateStripeConnectAccountUpdateLinkService(accountId);
+    if (accountLink.statusCode) {
+      return res.status(accountLink.statusCode).json({
+        message: accountLink.message,
+        code: accountLink.code
+      })
+    }
+    // 3. return account link
+    return res.status(201).json(accountLink);
+  }
+  // 4. catch error
+  catch (error: any) {
+    return res.status(500).json({
+      message: error.message,
+      code: error.code
+    });
+  }
+}
+
+export const transferFundsToConnectAccount = async (req: Request, res: Response) => {
+  const transferData = req.body;
+
+  // 1. check if accountId and transferData are empty
+  if (Object.keys(transferData).length === 0) {
+    return res.status(400).json({
+      message: 'Cannot transfer funds, transferData is required',
+      code: 'BAD_REQUEST'
+    });
+  }
+
+  try {
+    // 2. transfer funds
+    const transfer: any = await transferFundsToConnectAccountService(transferData);
+    if (transfer.statusCode) {
+      return res.status(transfer.statusCode).json({
+        message: transfer.message,
+        code: transfer.code
+      })
+    }
+    // 3. return transfer
+    return res.status(201).json(transfer);
+  }
+  // 4. catch error
+  catch (error: any) {
+    return res.status(500).json({
+      message: error.message,
+      code: error.code
+    });
+  }
+}
+
+// issuing card holder controller
+
+export const createCardHolder = async (req: Request, res: Response) => {
+  const { cardHolderData, connectedAccountId } = req.body;
+
+  // 1. check if cardHolderData is empty
+  if (!connectedAccountId || Object.keys(cardHolderData).length === 0) {
+    return res.status(400).json({
+      message: 'Cannot create card holder, card holder data and connectedAccountId is required',
+      code: 'BAD_REQUEST'
+    });
+  }
+
+  try {
+    // 2. create card holder
+    const cardHolder: any = await createStripeIssuingCardHolderService(cardHolderData, connectedAccountId);
+    if (cardHolder.statusCode) {
+      return res.status(cardHolder.statusCode).json({
+        message: cardHolder.message,
+        code: cardHolder.code
+      })
+    }
+
+    if (cardHolder.message) {
+      return res.status(500).json({
+        message: cardHolder.message,
+        code: 'CARD_HOLDER_CREATION_FAILED'
+      })
+    }
+    // 3. return card holder
+    return res.status(201).json(cardHolder);
+  }
+  // 4. catch error
+  catch (error: any) {
+    return res.status(500).json({
+      message: error.message,
+      code: error.code
+    });
+  }
+}
+
+export const getCardHolder = async (req: Request, res: Response) => {
+  const { cardholderId, connectedAccountId } = req.params;
+
+  // 1. check if cardHolderId is empty
+  if (!cardholderId || !connectedAccountId) {
+    return res.status(400).json({
+      message: 'Cannot get card holder, cardholderId and connectedAccountId is required',
+      code: 'BAD_REQUEST'
+    });
+  }
+
+  try {
+    // 2. get card holder
+    const cardHolder: any = await getStripeIssuingCardHolderService(cardholderId, connectedAccountId);
+    if (cardHolder.statusCode) {
+      return res.status(cardHolder.statusCode).json({
+        message: cardHolder.message,
+        code: cardHolder.code
+      })
+    }
+    // 3. return card holder
+    return res.status(201).json(cardHolder);
   }
   // 4. catch error
   catch (error: any) {
