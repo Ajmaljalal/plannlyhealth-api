@@ -31,6 +31,7 @@ export interface User {
   title: string;
   verified_email: boolean;
   work_start_date: Date;
+  owner: string;
   modified_date: Date;
   created_date: Date;
   slug: string;
@@ -65,6 +66,7 @@ export const CreateUserSchema = Joi.object({
   title: Joi.string(),
   verified_email: Joi.boolean(),
   work_start_date: Joi.date(),
+  owner: Joi.string().required(),
   modified_date: Joi.date(),
   created_date: Joi.date().required(),
   slug: Joi.string(),
@@ -99,6 +101,7 @@ export const UpdateUserSchema = Joi.object({
   title: Joi.string(),
   verified_email: Joi.boolean(),
   work_start_date: Joi.date(),
+  owner: Joi.string(),
   modified_date: Joi.date(),
   created_date: Joi.date(),
   slug: Joi.string(),
