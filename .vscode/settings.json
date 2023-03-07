@@ -1,7 +1,9 @@
 {
     "cSpell.words": [
         "onboarded",
-        "plannly"
+        "plannly",
+        "sendgrid",
+        "SENDGRID"
     ],
     "editor.defaultFormatter": "vscode.typescript-language-features",
     "editor.bracketPairColorization.enabled": true,
