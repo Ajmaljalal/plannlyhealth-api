@@ -14,6 +14,7 @@ import documentsRoutes from './routes/documents';
 import newUsersRoutes from './routes/new-users';
 import authRoutes from './routes/auth';
 import stripeRoutes from './routes/stripe';
+import sendGridRoutes from './routes/sendgrid';
 
 const app = express();
 
@@ -53,12 +54,14 @@ app.use('/api/deals', dealsRoutes);
 app.use('/api/documents', documentsRoutes);
 app.use('/api/new-users', newUsersRoutes)
 app.use('/api/stripe', stripeRoutes)
+app.use('/api/sendgrid', sendGridRoutes)
 
 // Error handling for any other routes that are not defined
 app.use((req, res, next) => {
-  const error = new Error('Sever is up and running, but the route you are trying to access is not defined.');
+  const error = new Error('This route does not exist');
   res.status(404).json({
-    message: error.message
+    message: error.message,
+    code: 'NOT_FOUND'
   });
 });
 
