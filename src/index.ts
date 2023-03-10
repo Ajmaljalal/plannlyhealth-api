@@ -38,6 +38,10 @@ app.use((req, res, next) => {
 });
 
 // Routes that do not require authentication
+app.use('/', (req, res) => {
+  res.status(200).json();
+});
+
 app.use('/api/auth', authRoutes)
 
 
