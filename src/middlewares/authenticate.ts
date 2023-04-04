@@ -5,7 +5,7 @@ import { authenticateUserService } from '../services/auth';
 export const authenticationMiddleware = async (req: any, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization'] as string;
   if (!authHeader) {
-    return res.status(401).send({
+    return res.status(200).send({
       message: 'You are not authorized to access this resource.',
       code: 'MISSING_AUTHORIZATION_HEADER'
     });
