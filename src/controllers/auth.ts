@@ -1,5 +1,11 @@
-import { Request, Response } from 'express';
-import { signInService, signOutService, signUpService } from '../services/auth';
+import { CookieOptions, Request, Response } from 'express';
+import {
+  forgotPasswordService,
+  resetPasswordService,
+  signInService,
+  signOutService,
+  signUpService
+} from '../services/auth';
 import { createUserService } from '../services/user';
 
 export const registerUser = async (req: Request, res: Response) => {
@@ -65,6 +71,9 @@ export const registerUser = async (req: Request, res: Response) => {
 export const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
+  // const access_token = req.cookies['access_token']
+  // console.dir(req)
+
   // check if email and password are provided
   if (!email.trim() || !password.trim()) {
     return res.status(400).send({
@@ -91,6 +100,14 @@ export const loginUser = async (req: Request, res: Response) => {
         code: result.code
       });
     }
+
+    // set cookie
+    const options: CookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none"
+    }
+    res.cookie('access_token', result.accessToken, options);
 
     return res.status(201).send(result);
   }
@@ -143,6 +160,95 @@ export const logoutUser = async (req: any, res: Response) => {
     return res.status(500).send({
       message: error.message,
       code: 'INTERNAL_SERVER_ERROR'
+    });
+  }
+}
+
+export const forgotPassword = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  // check if email is provided
+  if (!email.trim()) {
+    return res.status(400).send({
+      message: 'Email is required!',
+      code: 'MISSING_EMAIL'
+    });
+  }
+
+  // check if email is valid
+  if (!email.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
+    return res.status(400).send({
+      message: 'Email is invalid!',
+      code: 'INVALID_EMAIL'
+    });
+  }
+
+  try {
+    const result: any = await forgotPasswordService(email);
+    if (result?.code === 200) {
+      return res.status(201).send(result);
+    }
+
+    if (result?.code || result?.message) {
+      return res.status(401).send({
+        message: result.message,
+        code: result?.code
+      });
+    }
+    return res.send(result);
+  }
+  catch (error: any) {
+    return res.status(500).send({
+      message: error?.message,
+      code: error?.code
+    });
+  }
+}
+
+export const resetPassword = async (req: Request, res: Response) => {
+  const { email, password, code } = req.body;
+  // check if email and password are provided
+  if (!email.trim() || !password.trim() || !code.trim()) {
+    return res.status(400).send({
+      message: 'Email, password and code are required!',
+      code: 'MISSING_EMAIL_PASSWORD_OR_CODE'
+    });
+  }
+
+  // check if email is valid
+  if (!email.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
+    return res.status(400).send({
+      message: 'Email is invalid!',
+      code: 'INVALID_EMAIL'
+    });
+  }
+
+  // check if password is valid
+  if (!password.match(/^(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.*[A-Z])(?=.*[a-z]).{8,}$/)) {
+    return res.status(400).send({
+      message: 'Password should be at least 8 characters long and contain at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character!',
+      code: 'INVALID_PASSWORD'
+    });
+  }
+
+  try {
+    const result: any = await resetPasswordService(email, code, password);
+    console.log(result)
+    if (result?.code === 200) {
+      return res.status(201).send(result);
+    }
+    if (result.code || result.message) {
+      return res.status(401).send({
+        message: result.message,
+        code: result.code
+      });
+    }
+
+    return res.status(201).send(result);
+  }
+  catch (error: any) {
+    return res.status(500).send({
+      message: error.message,
+      code: error.code
     });
   }
 }

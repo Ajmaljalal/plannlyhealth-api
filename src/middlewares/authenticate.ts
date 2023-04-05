@@ -28,9 +28,8 @@ export const authenticationMiddleware = async (req: any, res: Response, next: Ne
   }
 
   try {
-
+    // const token = decryptData(accessToken.trim());
     const authenticatedUser = await authenticateUserService(accessToken.trim());
-
     if (authenticatedUser.statusCode >= 400 || authenticatedUser.code === 'NotAuthorizedException') {
       return res.status(401).send({
         message: 'You are not authorized to access this resource.',
@@ -47,5 +46,4 @@ export const authenticationMiddleware = async (req: any, res: Response, next: Ne
       code: 'INTERNAL_SERVER_ERROR'
     });
   }
-
 };

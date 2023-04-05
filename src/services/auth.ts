@@ -135,3 +135,62 @@ export const signOutService = async (accessToken: string) => {
     return error;
   }
 }
+
+export const forgotPasswordService = (email: string) => {
+  const cognitoUser = new CognitoUser({
+    Username: email,
+    Pool: AwsConfig.getUserPool()
+  });
+  try {
+    return new Promise((resolve, reject) => {
+      cognitoUser.forgotPassword({
+        onSuccess: async (data) => {
+          const response = {
+            code: 200,
+            message: 'Password reset link sent successfully',
+            data,
+          }
+          return resolve(response);
+        },
+        onFailure: function (err) {
+          return resolve({
+            code: 422,
+            message: err.message
+          })
+        },
+      });
+    })
+  } catch (error) {
+    return error;
+  }
+}
+
+export const resetPasswordService = async (email: string, code: string, password: string) => {
+  try {
+    const cognitoUser = new CognitoUser({
+      Username: email,
+      Pool: AwsConfig.getUserPool()
+    });
+    return new Promise((resolve, reject) => {
+      cognitoUser.confirmPassword(code, password, {
+        onSuccess: (result) => {
+          const response = {
+            code: 200,
+            message: 'Password reset successfully',
+            data: result,
+          }
+          return resolve(response);
+        },
+        onFailure: (err) => {
+          const response = {
+            code: 422,
+            message: err.message,
+          }
+          return resolve(response);
+        },
+      });
+    })
+  } catch (error) {
+    return error;
+  }
+}

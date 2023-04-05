@@ -1,6 +1,7 @@
 import express from 'express';
 import morgan from 'morgan';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import config from './configs/base';
 import { authenticationMiddleware } from './middlewares/authenticate';
 import companyRoutes from './routes/company';
@@ -23,6 +24,7 @@ app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cookieParser());
 
 
 // Rules for the Plannly API 
