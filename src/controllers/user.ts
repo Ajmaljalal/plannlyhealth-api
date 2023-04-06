@@ -69,19 +69,20 @@ export async function getUserById(req: Request, res: Response) {
   if (!userId) {
     return res.status(400).json({
       message: 'User id in params cannot be empty',
-      code: 'EMPTY_REQUEST_PARAM'
+      error: 'EMPTY_REQUEST_PARAM',
+      code: 400
     });
   }
 
   try {
     // 2. call the getUserByIdService to get the user by id
     const response: any = await getUserByIdService(userId);
-
     // 3. check if the response is an error
     if (response.code) {
       return res.status(response.statusCode).json({
         message: response.message,
-        code: response.code
+        error: response.code,
+        code: response.statusCode
       });
       // 4. if the response is not an error, send the user
     } else {
@@ -91,7 +92,8 @@ export async function getUserById(req: Request, res: Response) {
     // 5. catch any other error and send the error message
     return res.status(500).json({
       message: err.message,
-      code: 'INTERNAL_SERVER_ERROR'
+      error: 'INTERNAL_SERVER_ERROR',
+      code: 500
     });
   }
 }

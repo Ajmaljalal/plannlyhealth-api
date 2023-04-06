@@ -1,5 +1,6 @@
-import { CookieOptions, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import {
+  authenticateUserService,
   forgotPasswordService,
   resetPasswordService,
   signInService,
@@ -71,14 +72,12 @@ export const registerUser = async (req: Request, res: Response) => {
 export const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
-  // const access_token = req.cookies['access_token']
-  // console.dir(req)
-
   // check if email and password are provided
   if (!email.trim() || !password.trim()) {
     return res.status(400).send({
       message: 'Email and password are required!',
-      code: 'MISSING_EMAIL_OR_PASSWORD'
+      error: 'MISSING_EMAIL_OR_PASSWORD',
+      code: 400
     });
   }
 
@@ -86,35 +85,70 @@ export const loginUser = async (req: Request, res: Response) => {
   if (!email.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
     return res.status(400).send({
       message: 'Email is invalid!',
-      code: 'INVALID_EMAIL'
+      error: 'INVALID_EMAIL',
+      code: 400
     });
   }
 
   try {
     const result: any = await signInService(email, password);
-
     // check if email or password is incorrect
     if (result.code || result.message) {
       return res.status(401).send({
         message: result.message,
-        code: result.code
+        error: result.code,
+        code: 400
       });
     }
-
-    // set cookie
-    const options: CookieOptions = {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none"
-    }
-    res.cookie('access_token', result.accessToken, options);
-
     return res.status(201).send(result);
   }
   catch (error: any) {
     return res.status(500).send({
       message: error.message,
-      code: error.code
+      error: error.code,
+      code: 500
+    });
+  }
+}
+
+export const authenticateUser = async (req: any, res: Response) => {
+  const authHeader = req.headers['authorization'] as string;
+
+  if (!authHeader) {
+    return res.status(401).send({
+      message: 'You are not authorized to access this resource.',
+      error: 'NOT_AUTHORIZED',
+      code: 401
+    });
+  }
+
+  let [bearer, accessToken] = authHeader.split(' ');
+
+  if (!accessToken?.trim()) {
+    return res.status(401).send({
+      message: 'You are not authorized to access this resource.',
+      error: 'NOT_AUTHORIZED',
+      code: 401
+    });
+  }
+
+  try {
+    const authenticatedUser = await authenticateUserService(accessToken.trim());
+    if (authenticatedUser.statusCode >= 400 || authenticatedUser.code === 'NotAuthorizedException') {
+      return res.status(401).send({
+        message: 'You are not authorized to access this resource.',
+        error: 'NOT_AUTHORIZED',
+        code: 401
+
+      });
+    }
+    return res.status(200).send(authenticatedUser);
+  }
+  catch (error) {
+    return res.status(500).send({
+      message: 'Something went wrong!',
+      error: 'INTERNAL_SERVER_ERROR',
+      code: 500
     });
   }
 }
