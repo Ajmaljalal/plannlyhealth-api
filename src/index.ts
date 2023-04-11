@@ -44,23 +44,23 @@ app.use('/health', (req, res) => {
   res.status(200).json('OK');
 });
 
-app.use('/api/auth', authRoutes)
+app.use('/auth', authRoutes)
 
 
 // Middleware for authentication
 app.use(authenticationMiddleware);
 // Routes go here 
-app.use('/api/users', userRoutes);
-app.use('/api/companies', companyRoutes);
-app.use('/api/benefits-programs', benefitsProgramsRoutes);
-app.use('/api/program-balances', programBalanceRoutes);
-app.use('/api/claims', claimsRoutes);
-app.use('/api/comments', commentsRoutes);
-app.use('/api/deals', dealsRoutes);
-app.use('/api/documents', documentsRoutes);
-app.use('/api/new-users', newUsersRoutes)
-app.use('/api/stripe', stripeRoutes)
-app.use('/api/sendgrid', sendGridRoutes)
+app.use('/users', userRoutes);
+app.use('/companies', companyRoutes);
+app.use('/benefits-programs', benefitsProgramsRoutes);
+app.use('/program-balances', programBalanceRoutes);
+app.use('/claims', claimsRoutes);
+app.use('/comments', commentsRoutes);
+app.use('/deals', dealsRoutes);
+app.use('/documents', documentsRoutes);
+app.use('/new-users', newUsersRoutes)
+app.use('/stripe', stripeRoutes)
+app.use('/sendgrid', sendGridRoutes)
 
 // Error handling for any other routes that are not defined
 app.use((req, res, next) => {

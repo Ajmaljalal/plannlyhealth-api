@@ -158,7 +158,8 @@ export const logoutUser = async (req: any, res: Response) => {
   if (!authHeader) {
     return res.status(401).send({
       message: 'Authorization header is missing',
-      code: 'MISSING_AUTHORIZATION_HEADER'
+      error: 'MISSING_AUTHORIZATION_HEADER',
+      code: 401
     });
   }
 
@@ -168,7 +169,8 @@ export const logoutUser = async (req: any, res: Response) => {
   if (bearer !== 'Bearer') {
     return res.status(401).send({
       message: 'Authorization header is invalid. Bearer missing.',
-      code: 'INVALID_AUTHORIZATION_HEADER'
+      error: 'INVALID_AUTHORIZATION_HEADER',
+      code: 401
     });
   }
 
@@ -176,7 +178,8 @@ export const logoutUser = async (req: any, res: Response) => {
   if (!accessToken) {
     return res.status(400).send({
       message: 'Provide a valid access token!',
-      code: 'MISSING_ACCESS_TOKEN'
+      error: 'MISSING_ACCESS_TOKEN',
+      code: 400
     });
   }
 
@@ -185,7 +188,8 @@ export const logoutUser = async (req: any, res: Response) => {
     if (result.statusCode >= 400) {
       return res.status(result.statusCode).send({
         message: result.message,
-        code: result.code
+        error: result.code,
+        code: result.statusCode
       });
     }
     return res.status(201).send(result);
@@ -193,7 +197,8 @@ export const logoutUser = async (req: any, res: Response) => {
   catch (error: any) {
     return res.status(500).send({
       message: error.message,
-      code: 'INTERNAL_SERVER_ERROR'
+      error: 'INTERNAL_SERVER_ERROR',
+      code: 500
     });
   }
 }
@@ -204,7 +209,8 @@ export const forgotPassword = async (req: Request, res: Response) => {
   if (!email.trim()) {
     return res.status(400).send({
       message: 'Email is required!',
-      code: 'MISSING_EMAIL'
+      error: 'MISSING_EMAIL',
+      code: 400
     });
   }
 
@@ -212,7 +218,8 @@ export const forgotPassword = async (req: Request, res: Response) => {
   if (!email.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
     return res.status(400).send({
       message: 'Email is invalid!',
-      code: 'INVALID_EMAIL'
+      error: 'INVALID_EMAIL',
+      code: 400
     });
   }
 
@@ -225,7 +232,8 @@ export const forgotPassword = async (req: Request, res: Response) => {
     if (result?.code || result?.message) {
       return res.status(401).send({
         message: result.message,
-        code: result?.code
+        error: result?.code,
+        code: 401
       });
     }
     return res.send(result);
@@ -233,7 +241,8 @@ export const forgotPassword = async (req: Request, res: Response) => {
   catch (error: any) {
     return res.status(500).send({
       message: error?.message,
-      code: error?.code
+      error: error?.code,
+      code: 500
     });
   }
 }
@@ -244,7 +253,8 @@ export const resetPassword = async (req: Request, res: Response) => {
   if (!email.trim() || !password.trim() || !code.trim()) {
     return res.status(400).send({
       message: 'Email, password and code are required!',
-      code: 'MISSING_EMAIL_PASSWORD_OR_CODE'
+      error: 'MISSING_EMAIL_PASSWORD_OR_CODE',
+      code: 400
     });
   }
 
@@ -252,7 +262,8 @@ export const resetPassword = async (req: Request, res: Response) => {
   if (!email.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
     return res.status(400).send({
       message: 'Email is invalid!',
-      code: 'INVALID_EMAIL'
+      error: 'INVALID_EMAIL',
+      code: 400
     });
   }
 
@@ -260,20 +271,21 @@ export const resetPassword = async (req: Request, res: Response) => {
   if (!password.match(/^(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.*[A-Z])(?=.*[a-z]).{8,}$/)) {
     return res.status(400).send({
       message: 'Password should be at least 8 characters long and contain at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character!',
-      code: 'INVALID_PASSWORD'
+      error: 'INVALID_PASSWORD',
+      code: 400
     });
   }
 
   try {
     const result: any = await resetPasswordService(email, code, password);
-    console.log(result)
     if (result?.code === 200) {
       return res.status(201).send(result);
     }
     if (result.code || result.message) {
       return res.status(401).send({
         message: result.message,
-        code: result.code
+        error: result.code,
+        code: 401
       });
     }
 
@@ -282,7 +294,8 @@ export const resetPassword = async (req: Request, res: Response) => {
   catch (error: any) {
     return res.status(500).send({
       message: error.message,
-      code: error.code
+      error: error.code,
+      code: 500
     });
   }
 }
