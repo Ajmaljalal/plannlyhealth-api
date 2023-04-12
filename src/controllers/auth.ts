@@ -47,24 +47,29 @@ export const registerUser = async (req: Request, res: Response) => {
     const cognitoUser: any = await signUpService(userData);
     // check if the user is already registered
     if (cognitoUser.code >= 400) {
-      return res.status(422).send({
+      return res.status(cognitoUser.code).send({
         message: cognitoUser.message,
-        code: 'BAD_REQUEST'
+        error: 'COGNITO_BAD_REQUEST',
+        code: cognitoUser.code
       });
     }
-    // modify user data to match the schema
-    cognitoUser.created_date = Date();
-    delete cognitoUser.username;
-
-    await createUserService(cognitoUser);
-    // TODO: add error handling for the case when user is created but not added to the database
+    userData.id = cognitoUser.userSub;
+    const newUser: any = createUserService(userData);
+    if (newUser.statusCode >= 400) {
+      return res.status(newUser.statusCode).send({
+        message: newUser.message,
+        error: newUser.code,
+        code: newUser.statusCode
+      });
+    }
 
     return res.status(201).send(cognitoUser);
   }
   catch (error: any) {
     return res.status(500).send({
       message: error.message,
-      code: 'INTERNAL_SERVER_ERROR'
+      error: 'INTERNAL_SERVER_ERROR',
+      code: 500
     });
   }
 }

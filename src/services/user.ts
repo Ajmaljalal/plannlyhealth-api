@@ -4,7 +4,7 @@ import { User } from "../lib/types/user";
 
 const TABLE_NAME = `users_${process.env.DYNAMODB_TABLE_ENV}`;
 
-export const createUserService = async (user: User) => {
+export const createUserService = async (user: any) => {
   const params: DocumentClient.PutItemInput = {
     TableName: TABLE_NAME,
     Item: user

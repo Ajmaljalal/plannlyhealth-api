@@ -13,7 +13,8 @@ export const signUpService = (userData: any) => {
     given_name: userData.first_name,
     family_name: userData.last_name,
     'custom:role': userData.role,
-    'custom:company_id': userData.company_id
+    'custom:company_id': userData.company_id,
+    'custom:dynamodb_id': userData.id
   }
   try {
     return new Promise((resolve) => {
@@ -32,13 +33,13 @@ export const signUpService = (userData: any) => {
               message: err.message
             });
           }
-
           const response = {
             email: result.user.getUsername(),
             first_name: userData.first_name,
             last_name: userData.last_name,
             role: userData.role,
             company_id: userData.company_id,
+            dynamodb_id: userData.id,
             id: result.userSub,
           }
           return resolve(response);

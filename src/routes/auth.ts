@@ -5,8 +5,9 @@ import {
   logoutUser,
   forgotPassword,
   resetPassword,
-  authenticateUser
+  authenticateUser,
 } from '../controllers/auth';
+import { uploadBubbleDataToDynamoDb, registerBubbleUser } from '../controllers/data-migration';
 
 const router = Router();
 
@@ -16,5 +17,11 @@ router.get('/logout', logoutUser);
 router.post('/forgot-password', forgotPassword)
 router.post('/reset-password', resetPassword)
 router.get('/authenticateUser', authenticateUser)
+
+
+// data migration
+router.post('/registerBubbleUser', registerBubbleUser)
+router.post('/uploadBubbleDataToDynamoDb', uploadBubbleDataToDynamoDb)
+
 
 export default router;
