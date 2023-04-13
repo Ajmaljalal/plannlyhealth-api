@@ -1,4 +1,5 @@
 import { signUpService } from "../../services/auth";
+import { createBenefitsProgramService } from "../../services/benefits-program";
 import { createClaimService } from "../../services/claims";
 import { createCompanyService } from "../../services/company";
 import { createUserService, deleteUserService } from "../../services/user";
@@ -6,6 +7,8 @@ import { createUserService, deleteUserService } from "../../services/user";
 const services: any = {
   'companies': createCompanyService,
   'claims': createClaimService,
+  'users': createUserService,
+  'benefits-programs': createBenefitsProgramService,
 }
 
 export const uploadBubbleDataToDynamoDb = async (req: any, res: any) => {

@@ -78,7 +78,7 @@ export async function getUserById(req: Request, res: Response) {
     // 2. call the getUserByIdService to get the user by id
     const response: any = await getUserByIdService(userId);
     // 3. check if the response is an error
-    if (response.code) {
+    if (response.code || response.statusCode) {
       return res.status(response.statusCode).json({
         message: response.message,
         error: response.code,

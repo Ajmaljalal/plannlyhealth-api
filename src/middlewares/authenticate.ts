@@ -5,25 +5,28 @@ import { authenticateUserService } from '../services/auth';
 export const authenticationMiddleware = async (req: any, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization'] as string;
   if (!authHeader) {
-    return res.status(200).send({
+    return res.status(400).send({
       message: 'You are not authorized to access this resource.',
-      code: 'MISSING_AUTHORIZATION_HEADER'
+      error: 'NOT_AUTHORIZED',
+      code: 400
     });
   }
 
   let [bearer, accessToken] = authHeader.split(' ');
   if (bearer !== 'Bearer') {
     return res.status(401).send({
-      message: 'Authorization header is invalid. Bearer missing.',
-      code: 'INVALID_AUTHORIZATION_HEADER'
+      message: 'You are not authorized to access this resource.',
+      error: 'NOT_AUTHORIZED',
+      code: 401
     });
   }
 
   // check if accessToken is provided
   if (!accessToken?.trim()) {
-    return res.status(400).send({
+    return res.status(401).send({
       message: 'You are not authorized to access this resource.',
-      code: 'NOT_AUTHORIZED'
+      error: 'NOT_AUTHORIZED',
+      code: 401
     });
   }
 
@@ -33,7 +36,9 @@ export const authenticationMiddleware = async (req: any, res: Response, next: Ne
     if (authenticatedUser.statusCode >= 400 || authenticatedUser.code === 'NotAuthorizedException') {
       return res.status(401).send({
         message: 'You are not authorized to access this resource.',
-        code: 'NOT_AUTHORIZED'
+        error: 'NOT_AUTHORIZED',
+        code: 401
+
       });
     }
 
@@ -43,7 +48,8 @@ export const authenticationMiddleware = async (req: any, res: Response, next: Ne
   catch (error) {
     return res.status(500).send({
       message: 'Something went wrong!',
-      code: 'INTERNAL_SERVER_ERROR'
+      error: 'INTERNAL_SERVER_ERROR',
+      code: 500
     });
   }
 };

@@ -1,10 +1,11 @@
 // create an interface for the benefits programs
 
-import { Frequency, ProgramModel } from "../enums";
+import { Frequency, ProgramAccess, ProgramModel } from "../enums";
 
 export interface BenefitsProgram {
   id: string;
   budget: number;
+  budget_old: number;
   company_id: string;
   description: string;
   end_date: Date;
@@ -15,9 +16,10 @@ export interface BenefitsProgram {
   logo_active: string;
   logo_inactive: string;
   name: string;
-  parent: string;
+  parent: string; // parent benefit program id
   program_model: ProgramModel;
-  owner: string;
+  program_access: ProgramAccess;
+  creator: string;
   modified_date: Date;
   created_date: Date;
   slug: string;

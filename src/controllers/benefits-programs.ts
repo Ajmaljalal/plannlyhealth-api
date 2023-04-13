@@ -33,7 +33,7 @@ export async function createNewBenefitsProgram(req: any, res: Response) {
   benefitsProgram.is_template = benefitsProgram.is_template || false;
   benefitsProgram.created_date = benefitsProgram.created_date || Date();
   benefitsProgram.modified_date = benefitsProgram.modified_date || Date();
-  benefitsProgram.owner = benefitsProgram.owner || authorizedUser?.id;
+  benefitsProgram.creator = benefitsProgram.creator || authorizedUser?.id;
 
   // 3. validate the request body before creating a new company using the benefitsProgramsSchema
   const { error } = CreateBenefitsProgramsSchema.validate(benefitsProgram);
@@ -89,7 +89,8 @@ export async function getBenefitsProgramsByCompanyId(req: Request, res: Response
   if (response.code) {
     return res.status(response.statusCode).json({
       message: response.message,
-      code: response.code
+      error: response.code,
+      code: response.statusCode
     });
   }
   // 3. if the response is not an error, send the benefits program

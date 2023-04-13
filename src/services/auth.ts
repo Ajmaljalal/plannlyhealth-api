@@ -72,6 +72,7 @@ export const signInService = async (username: string, password: string) => {
           const email = session['email'];
           const role = session['custom:role'];
           const company_id = session['custom:company_id'];
+          const dynamodb_id = session['custom:dynamodb_id'];
           const refreshToken = result.getRefreshToken().getToken();
           const accessToken = result.getAccessToken().getJwtToken();
           const idToken = result.getIdToken().getJwtToken();
@@ -84,7 +85,8 @@ export const signInService = async (username: string, password: string) => {
             company_id,
             refreshToken,
             accessToken,
-            idToken
+            idToken,
+            dynamodb_id
           }
           resolve(response);
         },

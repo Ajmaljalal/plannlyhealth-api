@@ -26,6 +26,11 @@ export enum ProgramModel {
   'Both Programs'
 }
 
+export enum ProgramAccess {
+  limited = 'limited',
+  unlimited = 'unlimited',
+}
+
 export enum ClaimStatus {
   requested = 'requested',
   approved = 'approved',
