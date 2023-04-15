@@ -82,6 +82,7 @@ export enum Role {
   Standard = 'Standard',
   Owner = 'Owner',
   SuperAdmin = 'Super Admin',
+  WellnessCoordinator = 'Wellness Coordinator',
 }
 
 export enum UserAccountStatus {

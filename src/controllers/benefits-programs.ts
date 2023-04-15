@@ -122,7 +122,8 @@ export async function updateBenefitsProgram(req: Request, res: Response) {
   if (!Object.keys(benefitsProgram).length) {
     return res.status(400).json({
       message: 'Request body is empty',
-      code: 'EMPTY_REQUEST_BODY'
+      error: 'EMPTY_REQUEST_BODY',
+      code: 400
     });
   }
 
@@ -130,7 +131,8 @@ export async function updateBenefitsProgram(req: Request, res: Response) {
   if (!benefitsProgramId) {
     return res.status(400).json({
       message: 'Benefits program id in params is required',
-      code: 'MISSING_BENEFITS_PROGRAM_ID'
+      error: 'MISSING_BENEFITS_PROGRAM_ID',
+      code: 400
     });
   }
 
@@ -139,46 +141,65 @@ export async function updateBenefitsProgram(req: Request, res: Response) {
   if (!programExist.Item) {
     return res.status(404).json({
       message: 'Program does not exist',
-      code: "PROGRAM_DOES_NOT_EXIST"
+      error: "PROGRAM_DOES_NOT_EXIST",
+      code: 404
     });
   }
   // 3. check if current user is the owner of the program
   // @ts-ignore
   const currentUser = req.user;
-  const isOwner = currentUser && currentUser.id === programExist.Item.owner;
   const isAdmin = currentUser && currentUser.role === Role.Admin;
   const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
-  const isAuthorized = isOwner || isAdmin || isSuperAdmin;
+  const isWellnessCoordinator = currentUser && currentUser.role === Role.WellnessCoordinator;
+  const isAuthorized = isWellnessCoordinator || isAdmin || isSuperAdmin;
+
   if (!isAuthorized) {
     return res.status(403).json({
-      message: 'You are not authorized to perform this action',
-      code: "UNAUTHORIZED"
+      message: 'You are not allowed to perform this action',
+      error: "UNAUTHORIZED",
+      code: 403
     });
   }
   // 4. add is_active, is_deleted, is_template and modified_date to the benefitsProgram object if they are not present
   benefitsProgram.modified_date = Date();
+
+  // remove the id from the benefitsProgram object
+  delete benefitsProgram.id;
   // 5. validate the request body before creating a new company using the UpdateBenefitsProgramsSchema
   const { error } = UpdateBenefitsProgramsSchema.validate(benefitsProgram);
   if (error) {
     return res.status(400).json({
       message: error.details[0].message,
-      code: 'INVALID_REQUEST_BODY'
+      error: 'INVALID_REQUEST_BODY',
+      code: 400
     });
   }
 
-  // 6. call the updateBenefitsProgramService to update the benefits program
-  const response: any = await updateBenefitsProgramService(benefitsProgramId, benefitsProgram);
-  // 7. check if the response is an error
-  if (response.code) {
-    return res.status(response.statusCode).json({
-      message: response.message,
-      code: response.code
+
+  try {
+    // 6. call the updateBenefitsProgramService to update the benefits program
+    const response: any = await updateBenefitsProgramService(benefitsProgramId, benefitsProgram);
+    // 7. check if the response is an error
+    if (response.code || response.statusCode >= 400) {
+      return res.status(response.statusCode).json({
+        message: response.message,
+        error: response.code,
+        code: response.statusCode
+
+      });
+    }
+    // 8. if the response is not an error, send the benefits program
+    else {
+      return res.status(200).json(response.Attributes);
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Internal server error',
+      error: 'INTERNAL_SERVER_ERROR',
+      code: 500
     });
   }
-  // 8. if the response is not an error, send the benefits program
-  else {
-    return res.status(200).json(response.Attributes);
-  }
+
 }
 
 export async function deleteBenefitsProgram(req: Request, res: Response) {

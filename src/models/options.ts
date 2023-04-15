@@ -1,10 +1,12 @@
 import Joi from 'joi';
 
-export const FrequencySchema = Joi.string().valid('one time', 'monthly', 'quarterly', 'yearly')
+export const FrequencySchema = Joi.string().valid('One Time', 'Monthly', 'Quarterly', 'Yearly')
 
 export const OptionsSchema = Joi.string().valid('activate', 'deactivate', 'edit');
 
-export const ProgramModelSchema = Joi.string().valid('allotment', 'allowance', 'both programs');
+export const ProgramModelSchema = Joi.string().valid('Allotment', 'Allowance', 'Both Programs');
+
+export const ProgramAccessSchema = Joi.string().valid('Limited', 'Unlimited');
 
 export const ClaimStatusSchema = Joi.string().valid('requested', 'approved', 'rejected');
 
