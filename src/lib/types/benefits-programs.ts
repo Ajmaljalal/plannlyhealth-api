@@ -21,6 +21,6 @@ export interface BenefitsProgram {
   program_access: ProgramAccess;
   creator: string;
   modified_date: Date;
-  created_date: Date;
+  creation_date: Date;
   slug: string;
 }

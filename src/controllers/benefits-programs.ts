@@ -22,7 +22,8 @@ export async function createNewBenefitsProgram(req: any, res: Response) {
   if (!Object.keys(benefitsProgram).length) {
     return res.status(400).json({
       message: 'Request body is empty',
-      code: 'EMPTY_REQUEST_BODY'
+      error: 'EMPTY_REQUEST_BODY',
+      code: 400
     });
   }
 
@@ -31,7 +32,7 @@ export async function createNewBenefitsProgram(req: any, res: Response) {
   benefitsProgram.is_active = benefitsProgram.is_active || false;
   benefitsProgram.is_deleted = benefitsProgram.is_deleted || false;
   benefitsProgram.is_template = benefitsProgram.is_template || false;
-  benefitsProgram.created_date = benefitsProgram.created_date || Date();
+  benefitsProgram.creation_date = benefitsProgram.creation_date || Date();
   benefitsProgram.modified_date = benefitsProgram.modified_date || Date();
   benefitsProgram.creator = benefitsProgram.creator || authorizedUser?.id;
 
@@ -40,25 +41,34 @@ export async function createNewBenefitsProgram(req: any, res: Response) {
   if (error) {
     return res.status(400).json({
       message: error.details[0].message,
-      code: 'INVALID_REQUEST_BODY'
+      error: 'INVALID_REQUEST_BODY',
+      code: 400
     });
   }
 
-  // 4. call the createBenefitsProgramService to create a new benefits program
-  const response: any = await createBenefitsProgramService(benefitsProgram);
+  try {
+    // 4. call the createBenefitsProgramService to create a new benefits program
+    const response: any = await createBenefitsProgramService(benefitsProgram);
 
-  // 5. check if the response is an error
-  if (response.code) {
-    return res.status(response.statusCode).json({
-      message: response.message,
-      code: response.code
+    // 5. check if the response is an error
+    if (response.code || response.statusCode >= 400) {
+      return res.status(response.statusCode).json({
+        message: response.message,
+        error: response.code,
+        code: response.statusCode
+      });
+    }
+    // 6. if the response is not an error, send the benefits program
+    else {
+      return res.status(201).json(response);
+    }
+  } catch (error: any) {
+    return res.status(500).json({
+      message: error.message,
+      error: 'INTERNAL_SERVER_ERROR',
+      code: 500
     });
   }
-  // 6. if the response is not an error, send the benefits program
-  else {
-    return res.status(201).json(response);
-  }
-
 }
 
 export async function getBenefitsProgramById(req: Request, res: Response) {
@@ -68,7 +78,7 @@ export async function getBenefitsProgramById(req: Request, res: Response) {
   // 2. call the getBenefitsProgramByIdService to get the benefits program by id
   const response: any = await getBenefitsProgramByIdService(benefitsProgramId);
   // 3. check if the response is an error
-  if (response.code) {
+  if (response.code || response.statusCode >= 400) {
     return res.status(response.statusCode).json({
       message: response.message,
       code: response.code
@@ -86,7 +96,7 @@ export async function getBenefitsProgramsByCompanyId(req: Request, res: Response
   // 1. call the getBenefitsProgramsByCompanyIdService to get the benefits programs by company id
   const response: any = await getBenefitsProgramsByCompanyIdService(companyId);
   // 2. check if the response is an error
-  if (response.code) {
+  if (response.code || response.statusCode >= 400) {
     return res.status(response.statusCode).json({
       message: response.message,
       error: response.code,
