@@ -32,6 +32,24 @@ export const getUserByIdService = async (userId: string) => {
   }
 }
 
+export const getUsersByCompanyIdService = async (companyId: string) => {
+  const params: DocumentClient.QueryInput = {
+    TableName: TABLE_NAME,
+    IndexName: 'company_id-index',
+    KeyConditionExpression: 'company_id = :company_id',
+    ExpressionAttributeValues: {
+      ':company_id': companyId
+    }
+  };
+  try {
+    const result = await db.query(params).promise();
+    return result.Items
+  } catch (err) {
+    return err;
+  }
+}
+
+
 export const getAllUsersService = async () => {
   const params: DocumentClient.ScanInput = {
     TableName: TABLE_NAME

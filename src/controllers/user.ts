@@ -6,6 +6,7 @@ import {
   getAllUsersService,
   updateUserService,
   deleteUserService,
+  getUsersByCompanyIdService,
 } from '../services/user';
 import { User } from '../lib/types/user';
 import { Role } from '../lib/enums';
@@ -97,6 +98,43 @@ export async function getUserById(req: Request, res: Response) {
     });
   }
 }
+
+export async function getUsersByCompanyId(req: Request, res: Response) {
+  const companyId: string = req.params.id;
+
+  // 1. check if company id is empty
+  if (!companyId) {
+    return res.status(400).json({
+      message: 'Company id in params cannot be empty',
+      error: 'EMPTY_REQUEST_PARAM',
+      code: 400
+    });
+  }
+
+  try {
+    // 2. call the getUsersByCompanyIdService to get the user by companyId
+    const response: any = await getUsersByCompanyIdService(companyId);
+    // 3. check if the response is an error
+    if (response.code || response.statusCode) {
+      return res.status(response.statusCode).json({
+        message: response.message,
+        error: response.code,
+        code: response.statusCode
+      });
+      // 4. if the response is not an error, send the users
+    } else {
+      return res.status(200).json(response);
+    }
+  } catch (err: any) {
+    // 5. catch any other error and send the error message
+    return res.status(500).json({
+      message: err.message,
+      error: 'INTERNAL_SERVER_ERROR',
+      code: 500
+    });
+  }
+}
+
 
 export async function getAllUsers(req: Request, res: Response) {
   try {
