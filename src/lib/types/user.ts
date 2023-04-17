@@ -1,15 +1,13 @@
-import Joi from "joi";
 import { Department, Role } from "../enums";
 
 export interface User {
-  type?: 'User';
   id: string;
   first_name: string;
   last_name: string;
   email: string;
   address: string;
   connected_accounts: string
-  birth_date: Date;
+  birthday: string;
   card_delivery_approved: boolean;
   company_id: string;
   department: Department;
@@ -30,8 +28,9 @@ export interface User {
   stripe_subitem_id: string;
   title: string;
   verified_email: boolean;
-  work_start_date: Date;
-  modified_date: Date;
-  created_date: Date;
+  work_start_date: string;
+  owner: string;
+  modified_date: string;
+  created_date: string;
   slug: string;
 }

@@ -476,3 +476,39 @@ export const updateStripeIssuingCardService = async ({ cardId, connectedAccountI
     return error;
   }
 }
+
+export const getStripeIssuingCardTransactionsService = async ({ cardHolderId, connectedAccountId }: any) => {
+  try {
+    const transactions = await stripeInstance.issuing.transactions.list(
+      { cardholder: cardHolderId },
+      { stripeAccount: connectedAccountId }
+    );
+    return transactions;
+  } catch (error) {
+    return error;
+  }
+}
+
+export const getStripeIssuingCardSingleTransactionService = async ({ transactionId, connectedAccountId }: any) => {
+  try {
+    const transaction = await stripeInstance.issuing.transactions.retrieve(
+      transactionId,
+      { stripeAccount: connectedAccountId }
+    );
+    return transaction;
+  } catch (error) {
+    return error;
+  }
+}
+
+export const getStripeIssuingCardAuthorizationsService = async ({ cardHolderId, connectedAccountId }: any) => {
+  try {
+    const authorizations = await stripeInstance.issuing.authorizations.list(
+      { cardholder: cardHolderId },
+      { stripeAccount: connectedAccountId }
+    );
+    return authorizations;
+  } catch (error) {
+    return error;
+  }
+}

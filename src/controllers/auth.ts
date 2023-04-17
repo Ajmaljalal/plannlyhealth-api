@@ -78,7 +78,7 @@ export const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   // check if email and password are provided
-  if (!email.trim() || !password.trim()) {
+  if (!email?.trim() || !password?.trim()) {
     return res.status(400).send({
       message: 'Email and password are required!',
       error: 'MISSING_EMAIL_OR_PASSWORD',
