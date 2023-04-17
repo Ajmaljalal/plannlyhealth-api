@@ -1,6 +1,6 @@
 import Joi from "joi";
 import { ClaimStatus, Frequency, ProgramModel, RefundStatus } from "../lib/enums";
-import { ClaimStatusSchema, FrequencySchema, ProgramModelSchema, RefundStatusSchema } from "./options";
+import { ClaimStatusSchema, FrequencySchema, ProgramModelSchema, RefundStatusSchema } from "../lib/options";
 
 export const CreateClaimSchema = Joi.object({
   id: Joi.string().required(),

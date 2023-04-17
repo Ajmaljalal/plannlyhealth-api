@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { FrequencySchema, ProgramAccessSchema, ProgramModelSchema } from './options';
+import { FrequencySchema, ProgramAccessSchema, ProgramModelSchema } from '../lib/options';
 
 export const CreateBenefitsProgramsSchema = Joi.object({
   id: Joi.string().required(),

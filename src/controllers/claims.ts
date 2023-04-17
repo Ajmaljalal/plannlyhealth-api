@@ -20,7 +20,7 @@ export const createClaim = async (req: any, res: Response) => {
   claim.created_date = claim.created_date || Date();
   claim.modified_date = claim.modified_date || Date();
   claim.date = claim.date || Date();
-  claim.claim_status = claim.claim_status || ClaimStatus.requested;
+  claim.claim_status = claim.claim_status || ClaimStatus.Requested;
   claim.owner = claim.owner || req.user?.id;
 
   // 3. validate the request body before creating a new company using the programBalanceSchema

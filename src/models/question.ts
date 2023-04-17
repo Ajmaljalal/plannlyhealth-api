@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { QuestionTypeSchema } from "./options";
+import { QuestionTypeSchema } from "../lib/options";
 
 export const QuestionSchema = Joi.object({
   id: Joi.string().required(),

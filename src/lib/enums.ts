@@ -1,79 +1,80 @@
 export enum AddOns {
-  'HRIS Integration',
-  'Slack Integration',
-  'Single Sign-On (SSO)',
-  'Domain Whitelisting',
-  'Dedicated Wellness Coordinator',
-  'Broker (partner) Portal',
+  HRISIntegration = 'HRIS Integration',
+  SlackIntegration = 'Slack Integration',
+  SingleSignOnSSO = 'Single Sign-On (SSO)',
+  DomainWhitelisting = 'Domain Whitelisting',
+  DedicatedWellnessCoordinator = 'Dedicated Wellness Coordinator',
+  BrokerPortal = 'Broker (partner) Portal',
 }
 
 export enum Frequency {
-  'One Time',
-  Monthly,
-  Quarterly,
-  Yearly
+  OneTime = 'One Time',
+  Monthly = 'Monthly',
+  Quarterly = 'Quarterly',
+  Yearly = 'Yearly',
 }
 
 export enum Options {
-  Activate,
-  Deactivate,
-  Edit
+  Activate = 'Activate',
+  Deactivate = 'Deactivate',
+  Edit = 'Edit',
 }
 
 export enum ProgramModel {
-  Allotment,
-  Allowance,
-  'Both Programs'
+  Allotment = 'Allotment',
+  Allowance = 'Allowance',
+  BothPrograms = 'Both Programs',
 }
 
 export enum ProgramAccess {
-  limited = 'limited',
-  unlimited = 'unlimited',
+  Limited = 'limited',
+  Unlimited = 'unlimited',
 }
 
 export enum ClaimStatus {
-  requested = 'requested',
-  approved = 'approved',
-  rejected = 'rejected',
+  Requested = 'requested',
+  Approved = 'approved',
+  Rejected = 'rejected',
 }
 
 export enum Department {
-  sales = 'sales',
-  marketing = 'marketing',
-  finance = 'finance',
-  operations = 'operations',
-  'human resources' = 'human resources',
-  it = 'IT',
-  support = 'support',
+  Sales = 'sales',
+  Marketing = 'marketing',
+  Finance = 'finance',
+  Operations = 'operations',
+  HumanResources = 'human resources',
+  IT = 'IT',
+  Support = 'support',
+  None = 'none',
 }
 
 export enum NotificationType {
-  'Claim Status',
-  Comment,
+  ClaimStatus = 'Claim Status',
+  Comment = 'Comment',
 }
 
 export enum OptionsClaim {
-  Approve,
-  'Approve All',
-  Decline,
-  Delete,
-  Details,
-  Edit
+  Approve = 'Approve',
+  ApproveAll = 'Approve All',
+  Decline = 'Decline',
+  Delete = 'Delete',
+  Details = 'Details',
+  Edit = 'Edit',
 }
 
 export enum OptionsComment {
-  Delete,
-  Edit
+  Delete = 'Delete',
+  Edit = 'Edit',
 }
 
 export enum PaymentSchedule {
-  Annually,
-  Monthly,
+  Annually = 'Annually',
+  Monthly = 'Monthly',
 }
 
 export enum RefundStatus {
-  Failed,
-  Success,
+  Failed = 'Failed',
+  Success = 'Success',
 }
 
 export enum Role {
@@ -83,19 +84,20 @@ export enum Role {
   Owner = 'Owner',
   SuperAdmin = 'Super Admin',
   WellnessCoordinator = 'Wellness Coordinator',
+  CustomerSuccess = 'Customer Success',
 }
 
 export enum UserAccountStatus {
-  Active,
-  Invited,
-  Deactivated,
+  Active = 'Active',
+  Invited = 'Invited',
+  Deactivated = 'Deactivated',
 }
 
 
 export enum SubscriptionStatus {
-  Pending,
-  Approved,
-  Rejected
+  Pending = 'Pending',
+  Approved = 'Approved',
+  Rejected = 'Rejected',
 }
 
 // An enum list of all aws dynamodb error codes

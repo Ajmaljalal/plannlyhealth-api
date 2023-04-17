@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { NotificationTypeSchema } from "./options";
+import { NotificationTypeSchema } from "../lib/options";
 
 export const NotificationSchema = Joi.object({
   id: Joi.string().required(),

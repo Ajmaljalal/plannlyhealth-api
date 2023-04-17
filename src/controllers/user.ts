@@ -11,6 +11,7 @@ import {
 import { User } from '../lib/types/user';
 import { Role } from '../lib/enums';
 import { CreateUserSchema, UpdateUserSchema } from '../models/user';
+import { updateUserCognitoAttributesService } from '../services/auth';
 
 
 export async function createUser(req: any, res: Response) {
@@ -135,7 +136,6 @@ export async function getUsersByCompanyId(req: Request, res: Response) {
   }
 }
 
-
 export async function getAllUsers(req: Request, res: Response) {
   try {
     // 1. call the getAllUsersService to get all users
@@ -161,13 +161,14 @@ export async function getAllUsers(req: Request, res: Response) {
 
 export async function updateUser(req: any, res: Response) {
   const userId: string = req.params.id;
-  const user = req.body;
+  const user: User = req.body;
 
   // 1. check if user id is empty
   if (!userId) {
     return res.status(400).json({
       message: 'User id in params cannot be empty',
-      code: 'EMPTY_REQUEST_PARAM'
+      error: 'EMPTY_REQUEST_PARAM',
+      code: 400
     });
   }
 
@@ -175,7 +176,8 @@ export async function updateUser(req: any, res: Response) {
   if (!Object.keys(user).length) {
     return res.status(400).json({
       message: 'Request body is empty',
-      code: 'EMPTY_REQUEST_BODY'
+      error: 'EMPTY_REQUEST_BODY',
+      code: 400
     });
   }
 
@@ -185,7 +187,8 @@ export async function updateUser(req: any, res: Response) {
     if (!userExists.Item) {
       return res.status(404).json({
         message: 'User not found',
-        code: 'USER_NOT_FOUND'
+        error: 'USER_NOT_FOUND',
+        code: 404
       });
     }
 
@@ -195,11 +198,14 @@ export async function updateUser(req: any, res: Response) {
     const isOwner = currentUser && currentUser.id === userExists.Item.id;
     const isAdmin = currentUser && currentUser.role === Role.Admin;
     const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
-    const isAuthorized = isOwner || isAdmin || isSuperAdmin;
+    const isWellnessCoordinator = currentUser && currentUser.role === Role.WellnessCoordinator
+    const isCustomerSuccess = currentUser && currentUser.role === Role.CustomerSuccess
+    const isAuthorized = isOwner || isAdmin || isSuperAdmin || isWellnessCoordinator || isCustomerSuccess;
     if (!isAuthorized) {
       return res.status(403).json({
         message: 'You are not authorized to perform this action',
-        code: "UNAUTHORIZED"
+        error: "UNAUTHORIZED",
+        code: 403
       });
     }
 
@@ -207,6 +213,7 @@ export async function updateUser(req: any, res: Response) {
     delete user.id; // this is because the id is not allowed to be updated
     delete userExists.Item?.id; // this is because the id is not allowed to be updated
     user.modified_date = Date();
+    user.creator = user.creator || currentUser.id
     const userToUpdate = { ...userExists.Item, ...user };
 
     // 5. validate the request body before updating the user using the UpdateUserSchema
@@ -214,7 +221,8 @@ export async function updateUser(req: any, res: Response) {
     if (error) {
       return res.status(400).json({
         message: error.details[0].message,
-        code: 'INVALID_REQUEST_BODY'
+        error: 'INVALID_REQUEST_BODY',
+        code: 400
       });
     }
 
@@ -225,8 +233,22 @@ export async function updateUser(req: any, res: Response) {
     if (response.code) {
       return res.status(response.statusCode).json({
         message: response.message,
-        code: response.code
+        error: response.code,
+        code: response.statusCode
       });
+    }
+
+    if (user.role !== userExists.Item.role) {
+      const userRole = user.role
+      const updatedCognitoUser: any = await updateUserCognitoAttributesService(user.email, [{ 'Name': 'custom:role', 'Value': userRole }])
+      if (updatedCognitoUser && updatedCognitoUser.code) {
+        await updateUserService(userId, userExists.Item);
+        return res.status(updatedCognitoUser.statusCode).json({
+          message: updatedCognitoUser.message,
+          error: updatedCognitoUser.code,
+          code: updatedCognitoUser.statusCode
+        });
+      }
     }
 
     // 8. if the response is not an error, send the user
@@ -235,7 +257,8 @@ export async function updateUser(req: any, res: Response) {
     // 9. catch any other error and send the error message
     return res.status(500).json({
       message: err.message,
-      code: 'INTERNAL_SERVER_ERROR'
+      error: 'INTERNAL_SERVER_ERROR',
+      code: 500
     });
   }
 }

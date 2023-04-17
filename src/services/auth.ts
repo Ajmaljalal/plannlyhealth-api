@@ -197,3 +197,21 @@ export const resetPasswordService = async (email: string, code: string, password
     return error;
   }
 }
+
+export const updateUserCognitoAttributesService = async (userName: string, attributes: any) => {
+  try {
+    return await cognitoIdentityServiceProvider.adminUpdateUserAttributes({
+      UserAttributes: attributes,
+      UserPoolId: process.env.AWS_USER_POOL_ID as string,
+      Username: userName
+    }, (err, data) => {
+      if (err) {
+        return err;
+      } else {
+        return data
+      }
+    }).promise();
+  } catch (error) {
+    return error;
+  }
+}

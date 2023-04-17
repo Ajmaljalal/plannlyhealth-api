@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { DepartmentSchema } from "./options";
+import { DepartmentSchema } from "../lib/options";
 
 export const CreateNewUserSchema = Joi.object({
   id: Joi.string().required(),
