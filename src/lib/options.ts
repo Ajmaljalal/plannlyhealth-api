@@ -25,3 +25,5 @@ export const RefundStatusSchema = Joi.string().valid('Failed', 'Success');
 export const QuestionTypeSchema = Joi.string().valid('Single Select', 'Multi Select');
 
 export const RoleSchema = Joi.string().valid('Admin', 'Program Admin', 'Super Admin', 'Wellness Coordinator', 'Customer Success', 'Finance', 'Standard',);
+
+export const UserAccountStatusSchema = Joi.string().valid('Active', 'Invited', 'Deactivated');

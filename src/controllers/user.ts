@@ -11,7 +11,8 @@ import {
 import { User } from '../lib/types/user';
 import { Role } from '../lib/enums';
 import { CreateUserSchema, UpdateUserSchema } from '../models/user';
-import { updateUserCognitoAttributesService } from '../services/auth';
+import { activateUserCognitoService, deactivateUserCognitoService, updateUserCognitoAttributesService } from '../services/auth';
+import { UserAccountStatus } from '../lib/enums';
 
 
 export async function createUser(req: any, res: Response) {
@@ -163,20 +164,12 @@ export async function updateUser(req: any, res: Response) {
   const userId: string = req.params.id;
   const user: User = req.body;
 
-  // 1. check if user id is empty
-  if (!userId) {
-    return res.status(400).json({
-      message: 'User id in params cannot be empty',
-      error: 'EMPTY_REQUEST_PARAM',
-      code: 400
-    });
-  }
-
   // 2. check if the request body is empty
-  if (!Object.keys(user).length) {
+  const { error: validationError } = UpdateUserSchema.validate(user);
+  if (validationError) {
     return res.status(400).json({
-      message: 'Request body is empty',
-      error: 'EMPTY_REQUEST_BODY',
+      message: validationError.details[0].message,
+      error: 'INVALID_REQUEST_BODY',
       code: 400
     });
   }
@@ -195,12 +188,18 @@ export async function updateUser(req: any, res: Response) {
     // 4. check if the current user is the owner of the user
     // @ts-ignore
     const currentUser = req.user;
-    const isOwner = currentUser && currentUser.id === userExists.Item.id;
-    const isAdmin = currentUser && currentUser.role === Role.Admin;
-    const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
-    const isWellnessCoordinator = currentUser && currentUser.role === Role.WellnessCoordinator
-    const isCustomerSuccess = currentUser && currentUser.role === Role.CustomerSuccess
-    const isAuthorized = isOwner || isAdmin || isSuperAdmin || isWellnessCoordinator || isCustomerSuccess;
+    let isAuthorized = false;
+    switch (currentUser?.role) {
+      case Role.Admin:
+      case Role.SuperAdmin:
+      case Role.WellnessCoordinator:
+      case Role.CustomerSuccess:
+        isAuthorized = true;
+        break;
+      default:
+        isAuthorized = currentUser?.id === userExists.Item?.id;
+        break;
+    }
     if (!isAuthorized) {
       return res.status(403).json({
         message: 'You are not authorized to perform this action',
@@ -212,22 +211,10 @@ export async function updateUser(req: any, res: Response) {
     // 4. add the required modifications to the user
     delete user.id; // this is because the id is not allowed to be updated
     delete userExists.Item?.id; // this is because the id is not allowed to be updated
-    user.modified_date = Date();
     user.creator = user.creator || currentUser.id
-    const userToUpdate = { ...userExists.Item, ...user };
-
-    // 5. validate the request body before updating the user using the UpdateUserSchema
-    const { error } = UpdateUserSchema.validate(userToUpdate);
-    if (error) {
-      return res.status(400).json({
-        message: error.details[0].message,
-        error: 'INVALID_REQUEST_BODY',
-        code: 400
-      });
-    }
 
     // 6. call the updateUserService to update the user
-    const response: any = await updateUserService(userId, userToUpdate);
+    const response: any = await updateUserService(userId, { ...userExists.Item, ...user, modified_date: Date() });
 
     // 7. check if the response is an error
     if (response.code) {
@@ -238,6 +225,7 @@ export async function updateUser(req: any, res: Response) {
       });
     }
 
+    // 8. update the user in cognito
     if (user.role !== userExists.Item.role) {
       const userRole = user.role
       const updatedCognitoUser: any = await updateUserCognitoAttributesService(user.email, [{ 'Name': 'custom:role', 'Value': userRole }])
@@ -251,10 +239,37 @@ export async function updateUser(req: any, res: Response) {
       }
     }
 
-    // 8. if the response is not an error, send the user
+
+    // 9. deactivate the user in cognito
+    if (user.status !== userExists.Item.status && user.status === UserAccountStatus.Deactivated) {
+      const updatedCognitoUser: any = await deactivateUserCognitoService(user.email)
+      if (updatedCognitoUser && updatedCognitoUser.code) {
+        await updateUserService(userId, userExists.Item);
+        return res.status(updatedCognitoUser.statusCode).json({
+          message: updatedCognitoUser.message,
+          error: updatedCognitoUser.code,
+          code: updatedCognitoUser.statusCode
+        });
+      }
+    }
+
+    // 10. activate the user in cognito
+    if (user.status !== userExists.Item.status && user.status === UserAccountStatus.Active) {
+      const updatedCognitoUser: any = await activateUserCognitoService(user.email)
+      if (updatedCognitoUser && updatedCognitoUser.code) {
+        await updateUserService(userId, userExists.Item);
+        return res.status(updatedCognitoUser.statusCode).json({
+          message: updatedCognitoUser.message,
+          error: updatedCognitoUser.code,
+          code: updatedCognitoUser.statusCode
+        });
+      }
+    }
+
+    // 11. if the response is not an error, send the user
     return res.status(200).json(response.Attributes);
   } catch (err: any) {
-    // 9. catch any other error and send the error message
+    // 12. catch any other error and send the error message
     return res.status(500).json({
       message: err.message,
       error: 'INTERNAL_SERVER_ERROR',

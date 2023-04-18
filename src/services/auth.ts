@@ -215,3 +215,37 @@ export const updateUserCognitoAttributesService = async (userName: string, attri
     return error;
   }
 }
+
+export const deactivateUserCognitoService = async (userName: string) => {
+  try {
+    return await cognitoIdentityServiceProvider.adminDisableUser({
+      UserPoolId: process.env.AWS_USER_POOL_ID as string,
+      Username: userName
+    }, (err, data) => {
+      if (err) {
+        return err;
+      } else {
+        return data
+      }
+    }).promise();
+  } catch (error) {
+    return error;
+  }
+}
+
+export const activateUserCognitoService = async (userName: string) => {
+  try {
+    return await cognitoIdentityServiceProvider.adminEnableUser({
+      UserPoolId: process.env.AWS_USER_POOL_ID as string,
+      Username: userName
+    }, (err, data) => {
+      if (err) {
+        return err;
+      } else {
+        return data
+      }
+    }).promise();
+  } catch (error) {
+    return error;
+  }
+}
