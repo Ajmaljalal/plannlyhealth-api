@@ -164,116 +164,92 @@ export async function updateUser(req: any, res: Response) {
   const userId: string = req.params.id;
   const user: User = req.body;
 
-  // 2. check if the request body is empty
   const { error: validationError } = UpdateUserSchema.validate(user);
   if (validationError) {
     return res.status(400).json({
       message: validationError.details[0].message,
       error: 'INVALID_REQUEST_BODY',
-      code: 400
+      code: 400,
     });
   }
 
   try {
-    // 3. check if the user exists in db
-    const userExists: any = await getUserByIdService(userId);
-    if (!userExists.Item) {
+    const existingUser = await getUserByIdService(userId) as any;
+    if (!existingUser.Item) {
       return res.status(404).json({
         message: 'User not found',
         error: 'USER_NOT_FOUND',
-        code: 404
+        code: 404,
       });
     }
 
-    // 4. check if the current user is the owner of the user
-    // @ts-ignore
     const currentUser = req.user;
-    let isAuthorized = false;
-    switch (currentUser?.role) {
-      case Role.Admin:
-      case Role.SuperAdmin:
-      case Role.WellnessCoordinator:
-      case Role.CustomerSuccess:
-        isAuthorized = true;
-        break;
-      default:
-        isAuthorized = currentUser?.id === userExists.Item?.id;
-        break;
-    }
+    const isAuthorized =
+      [Role.Admin, Role.SuperAdmin, Role.WellnessCoordinator, Role.CustomerSuccess].includes(currentUser?.role) ||
+      currentUser?.id === existingUser.Item?.id;
+
     if (!isAuthorized) {
       return res.status(403).json({
         message: 'You are not authorized to perform this action',
-        error: "UNAUTHORIZED",
-        code: 403
+        error: 'UNAUTHORIZED',
+        code: 403,
       });
     }
 
-    // 4. add the required modifications to the user
-    delete user.id; // this is because the id is not allowed to be updated
-    delete userExists.Item?.id; // this is because the id is not allowed to be updated
-    user.creator = user.creator || currentUser.id
+    delete user.id;
+    delete existingUser.Item?.id;
+    user.creator = user.creator || currentUser.id;
 
-    // 6. call the updateUserService to update the user
-    const response: any = await updateUserService(userId, { ...userExists.Item, ...user, modified_date: Date() });
+    const updatedUser = { ...existingUser.Item, ...user, modified_date: Date() };
+    const response = await updateUserService(userId, updatedUser) as any
 
-    // 7. check if the response is an error
-    if (response.code) {
+    if (response?.code || response?.statusCode >= 400) {
       return res.status(response.statusCode).json({
         message: response.message,
         error: response.code,
-        code: response.statusCode
+        code: response.statusCode,
       });
     }
 
-    // 8. update the user in cognito
-    if (user.role !== userExists.Item.role) {
-      const userRole = user.role
-      const updatedCognitoUser: any = await updateUserCognitoAttributesService(user.email, [{ 'Name': 'custom:role', 'Value': userRole }])
+    if (user.role !== existingUser.Item.role) {
+      const userRole = user.role;
+      const updatedCognitoUser = await updateUserCognitoAttributesService(user.email, [
+        { Name: 'custom:role', Value: userRole },
+      ]) as any
+
       if (updatedCognitoUser && updatedCognitoUser.code) {
-        await updateUserService(userId, userExists.Item);
+        await updateUserService(userId, existingUser.Item);
         return res.status(updatedCognitoUser.statusCode).json({
           message: updatedCognitoUser.message,
           error: updatedCognitoUser.code,
-          code: updatedCognitoUser.statusCode
+          code: updatedCognitoUser.statusCode,
         });
       }
     }
 
+    if (user.status !== existingUser.Item.status) {
+      const cognitoService =
+        user.status === UserAccountStatus.Deactivated
+          ? deactivateUserCognitoService
+          : activateUserCognitoService;
+      const updatedCognitoUser = await cognitoService(user.email) as any
 
-    // 9. deactivate the user in cognito
-    if (user.status !== userExists.Item.status && user.status === UserAccountStatus.Deactivated) {
-      const updatedCognitoUser: any = await deactivateUserCognitoService(user.email)
       if (updatedCognitoUser && updatedCognitoUser.code) {
-        await updateUserService(userId, userExists.Item);
+        await updateUserService(userId, existingUser.Item);
         return res.status(updatedCognitoUser.statusCode).json({
           message: updatedCognitoUser.message,
           error: updatedCognitoUser.code,
-          code: updatedCognitoUser.statusCode
+          code: updatedCognitoUser.statusCode,
         });
       }
     }
 
-    // 10. activate the user in cognito
-    if (user.status !== userExists.Item.status && user.status === UserAccountStatus.Active) {
-      const updatedCognitoUser: any = await activateUserCognitoService(user.email)
-      if (updatedCognitoUser && updatedCognitoUser.code) {
-        await updateUserService(userId, userExists.Item);
-        return res.status(updatedCognitoUser.statusCode).json({
-          message: updatedCognitoUser.message,
-          error: updatedCognitoUser.code,
-          code: updatedCognitoUser.statusCode
-        });
-      }
-    }
-
-    // 11. if the response is not an error, send the user
     return res.status(200).json(response.Attributes);
   } catch (err: any) {
-    // 12. catch any other error and send the error message
     return res.status(500).json({
       message: err.message,
       error: 'INTERNAL_SERVER_ERROR',
-      code: 500
+      code: 500,
     });
   }
 }
