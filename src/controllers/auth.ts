@@ -2,12 +2,15 @@ import { Request, Response } from 'express';
 import {
   authenticateUserService,
   forgotPasswordService,
+  inviteNewUserService,
+  resendInvitationService,
   resetPasswordService,
   signInService,
   signOutService,
   signUpService
 } from '../services/auth';
 import { createUserService } from '../services/user';
+import { Role } from '../lib/enums';
 
 export const registerUser = async (req: Request, res: Response) => {
   const userData = { ...req.body }
@@ -291,6 +294,93 @@ export const resetPassword = async (req: Request, res: Response) => {
         message: result.message,
         error: result.code,
         code: 401
+      });
+    }
+
+    return res.status(201).send(result);
+  }
+  catch (error: any) {
+    return res.status(500).send({
+      message: error.message,
+      error: error.code,
+      code: 500
+    });
+  }
+}
+
+export const inviteNewUser = async (req: any, res: Response) => {
+  const { email } = req.body;
+  const authenticatedUser = req.user
+  const isAuthorized = [Role.Admin, Role.SuperAdmin, Role.WellnessCoordinator].includes(authenticatedUser?.role)
+
+  if (!isAuthorized) {
+    return res.status(403).json({
+      message: 'You are not authorized to perform this action',
+      error: 'UNAUTHORIZED',
+      code: 403,
+    });
+  }
+
+  // check if email is valid
+  if (!email?.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
+    return res.status(400).send({
+      message: 'Email is invalid!',
+      error: 'INVALID_EMAIL',
+      code: 400
+    });
+  }
+
+  try {
+    const result: any = await inviteNewUserService(email);
+    if (result.message) {
+      return res.status(400).send({
+        message: result.message,
+        error: result.code,
+        code: 400
+      });
+    }
+
+
+    return res.status(201).send(result);
+  }
+  catch (error: any) {
+    return res.status(500).send({
+      message: error.message,
+      error: error.code,
+      code: 500
+    });
+  }
+}
+
+export const resendInvitation = async (req: any, res: Response) => {
+  const { email } = req.body;
+  const authenticatedUser = req.user
+  const isAuthorized = [Role.Admin, Role.SuperAdmin, Role.WellnessCoordinator].includes(authenticatedUser?.role)
+
+  if (!isAuthorized) {
+    return res.status(403).json({
+      message: 'You are not authorized to perform this action',
+      error: 'UNAUTHORIZED',
+      code: 403,
+    });
+  }
+
+  // check if email is valid
+  if (!email?.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
+    return res.status(400).send({
+      message: 'Email is invalid!',
+      error: 'INVALID_EMAIL',
+      code: 400
+    });
+  }
+
+  try {
+    const result: any = await resendInvitationService(email);
+    if (result.message) {
+      return res.status(400).send({
+        message: result.message,
+        error: result.code,
+        code: 400
       });
     }
 

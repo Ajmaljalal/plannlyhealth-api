@@ -249,3 +249,61 @@ export const activateUserCognitoService = async (userName: string) => {
     return error;
   }
 }
+
+export const inviteNewUserService = async (email: string) => {
+  try {
+    return await cognitoIdentityServiceProvider.adminCreateUser({
+      UserPoolId: process.env.AWS_USER_POOL_ID as string,
+      Username: email,
+      TemporaryPassword: 'Password@123',
+      DesiredDeliveryMediums: ['EMAIL'],
+      UserAttributes: [
+        {
+          Name: 'email',
+          Value: email
+        },
+        {
+          Name: 'email_verified',
+          Value: 'true'
+        }
+      ]
+    }, (err, data) => {
+      if (err) {
+        return err;
+      } else {
+        return data
+      }
+    }).promise();
+  } catch (error) {
+    return error;
+  }
+}
+
+export const resendInvitationService = async (email: string) => {
+  try {
+    return await cognitoIdentityServiceProvider.adminCreateUser({
+      UserPoolId: process.env.AWS_USER_POOL_ID as string,
+      Username: email,
+      MessageAction: 'RESEND',
+      DesiredDeliveryMediums: ['EMAIL'],
+      UserAttributes: [
+        {
+          Name: 'email',
+          Value: email
+        },
+        {
+          Name: 'email_verified',
+          Value: 'true'
+        }
+      ]
+    }, (err, data) => {
+      if (err) {
+        return err;
+      } else {
+        return data
+      }
+    }).promise();
+  } catch (error) {
+    return error;
+  }
+}
