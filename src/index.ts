@@ -40,12 +40,7 @@ app.use((req, res, next) => {
 });
 
 // Routes that do not require authentication
-app.use('/health', (req, res) => {
-  res.status(200).json('OK');
-});
-
 app.use('/auth', authRoutes)
-
 
 // Middleware for authentication
 app.use(authenticationMiddleware);
@@ -61,6 +56,9 @@ app.use('/documents', documentsRoutes);
 app.use('/new-users', newUsersRoutes)
 app.use('/stripe', stripeRoutes)
 app.use('/sendgrid', sendGridRoutes)
+app.use('/', (req, res) => {
+  res.status(200).json('OK');
+});
 
 // Error handling for any other routes that are not defined
 app.use((req, res, next) => {

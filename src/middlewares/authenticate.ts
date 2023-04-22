@@ -3,6 +3,9 @@ import { authenticateUserService } from '../services/auth';
 
 
 export const authenticationMiddleware = async (req: any, res: Response, next: NextFunction) => {
+  if (req.url === '/') {
+    return next();
+  }
   const authHeader = req.headers['authorization'] as string;
   if (!authHeader) {
     return res.status(400).send({
