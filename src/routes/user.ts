@@ -1,6 +1,6 @@
 // create a post route for company
 import { Router } from 'express';
-import { createUser, deleteUser, getAllUsers, getUserById, updateUser, getUsersByCompanyId } from '../controllers/user';
+import { createUser, deleteUser, getAllUsers, getUserById, updateUser, getUsersByCompanyId, inviteNewUser } from '../controllers/user';
 
 const router = Router();
 
@@ -10,5 +10,6 @@ router.get('/company/:id', getUsersByCompanyId)
 router.post('/', createUser)
 router.put('/:id', updateUser)
 router.delete('/:id', deleteUser)
+router.post('/inviteNewUser', inviteNewUser)
 
 export default router;

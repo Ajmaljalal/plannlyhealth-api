@@ -4,9 +4,8 @@ import {
 } from 'amazon-cognito-identity-js';
 import { cognitoIdentityServiceProvider } from '../configs/aws';
 import { AwsConfig } from '../configs/cognito';
+import { User } from '../models/user';
 
-
-// TODO: Add email confirmation flow
 export const signUpService = (userData: any) => {
   const userAttributes = {
     email: userData.email,
@@ -184,10 +183,11 @@ export const resetPasswordService = async (email: string, code: string, password
           }
           return resolve(response);
         },
-        onFailure: (err) => {
+        onFailure: (err: any) => {
           const response = {
-            code: 422,
+            code: err.code,
             message: err.message,
+            error: 'PASSWORD_RESET_FAILED'
           }
           return resolve(response);
         },
@@ -198,12 +198,12 @@ export const resetPasswordService = async (email: string, code: string, password
   }
 }
 
-export const updateUserCognitoAttributesService = async (userName: string, attributes: any) => {
+export const updateUserCognitoAttributesService = async (email: string, attributes: any) => {
   try {
     return await cognitoIdentityServiceProvider.adminUpdateUserAttributes({
       UserAttributes: attributes,
       UserPoolId: process.env.AWS_USER_POOL_ID as string,
-      Username: userName
+      Username: email
     }, (err, data) => {
       if (err) {
         return err;
@@ -216,11 +216,11 @@ export const updateUserCognitoAttributesService = async (userName: string, attri
   }
 }
 
-export const deactivateUserCognitoService = async (userName: string) => {
+export const deactivateUserCognitoService = async (email: string) => {
   try {
     return await cognitoIdentityServiceProvider.adminDisableUser({
       UserPoolId: process.env.AWS_USER_POOL_ID as string,
-      Username: userName
+      Username: email
     }, (err, data) => {
       if (err) {
         return err;
@@ -233,11 +233,11 @@ export const deactivateUserCognitoService = async (userName: string) => {
   }
 }
 
-export const activateUserCognitoService = async (userName: string) => {
+export const activateUserCognitoService = async (email: string) => {
   try {
     return await cognitoIdentityServiceProvider.adminEnableUser({
       UserPoolId: process.env.AWS_USER_POOL_ID as string,
-      Username: userName
+      Username: email
     }, (err, data) => {
       if (err) {
         return err;
@@ -250,29 +250,43 @@ export const activateUserCognitoService = async (userName: string) => {
   }
 }
 
-export const inviteNewUserService = async (email: string) => {
+export const inviteNewUserService = async (userData: User, password: string) => {
   try {
     return await cognitoIdentityServiceProvider.adminCreateUser({
       UserPoolId: process.env.AWS_USER_POOL_ID as string,
-      Username: email,
-      TemporaryPassword: 'Password@123',
-      DesiredDeliveryMediums: ['EMAIL'],
+      Username: userData.email,
+      TemporaryPassword: password,
+      MessageAction: 'SUPPRESS',
       UserAttributes: [
         {
           Name: 'email',
-          Value: email
+          Value: userData.email
         },
         {
           Name: 'email_verified',
           Value: 'true'
+        },
+        {
+          Name: 'custom:role',
+          Value: userData.role
+        },
+        {
+          Name: 'custom:company_id',
+          Value: userData.company_id
+        },
+        {
+          Name: 'custom:company_name',
+          Value: userData.company_name
+        },
+        {
+          Name: 'given_name',
+          Value: userData.first_name
+        },
+        {
+          Name: 'family_name',
+          Value: userData.last_name
         }
       ]
-    }, (err, data) => {
-      if (err) {
-        return err;
-      } else {
-        return data
-      }
     }).promise();
   } catch (error) {
     return error;
@@ -296,6 +310,23 @@ export const resendInvitationService = async (email: string) => {
           Value: 'true'
         }
       ]
+    }, (err, data) => {
+      if (err) {
+        return err;
+      } else {
+        return data
+      }
+    }).promise();
+  } catch (error) {
+    return error;
+  }
+}
+
+export const deleteUserCognitoService = async (email: string) => {
+  try {
+    return await cognitoIdentityServiceProvider.adminDeleteUser({
+      UserPoolId: process.env.AWS_USER_POOL_ID as string,
+      Username: email
     }, (err, data) => {
       if (err) {
         return err;

@@ -3,6 +3,7 @@ import SendgridMail from "../../configs/sendgrid";
 
 const templateIds: any = {
   "password-reset": "d-a27fdf6c8ed04873b25c662230c96857",
+  "invite-user": "d-76e3ea4d358f4a58850bc5fa58ad6194",
 }
 
 export const sendRawEmailService = async (requestData: any) => {

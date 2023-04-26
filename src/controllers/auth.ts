@@ -81,7 +81,7 @@ export const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   // check if email and password are provided
-  if (!email?.trim() || !password?.trim()) {
+  if (!email || !password) {
     return res.status(400).send({
       message: 'Email and password are required!',
       error: 'MISSING_EMAIL_OR_PASSWORD',
@@ -214,7 +214,7 @@ export const logoutUser = async (req: any, res: Response) => {
 export const forgotPassword = async (req: Request, res: Response) => {
   const { email } = req.body;
   // check if email is provided
-  if (!email.trim()) {
+  if (!email) {
     return res.status(400).send({
       message: 'Email is required!',
       error: 'MISSING_EMAIL',
@@ -258,7 +258,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 export const resetPassword = async (req: Request, res: Response) => {
   const { email, password, code } = req.body;
   // check if email and password are provided
-  if (!email.trim() || !password.trim() || !code.trim()) {
+  if (!email || !password || !code) {
     return res.status(400).send({
       message: 'Email, password and code are required!',
       error: 'MISSING_EMAIL_PASSWORD_OR_CODE',
@@ -278,7 +278,7 @@ export const resetPassword = async (req: Request, res: Response) => {
   // check if password is valid
   if (!password.match(/^(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.*[A-Z])(?=.*[a-z]).{8,}$/)) {
     return res.status(400).send({
-      message: 'Password should be at least 8 characters long and contain at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character!',
+      message: 'Password should be minimum 8 characters, with 1 uppercase and 1 lowercase letter, 1 number and 1 special character!',
       error: 'INVALID_PASSWORD',
       code: 400
     });
@@ -286,9 +286,6 @@ export const resetPassword = async (req: Request, res: Response) => {
 
   try {
     const result: any = await resetPasswordService(email, code, password);
-    if (result?.code === 200) {
-      return res.status(201).send(result);
-    }
     if (result.code || result.message) {
       return res.status(401).send({
         message: result.message,
@@ -296,50 +293,6 @@ export const resetPassword = async (req: Request, res: Response) => {
         code: 401
       });
     }
-
-    return res.status(201).send(result);
-  }
-  catch (error: any) {
-    return res.status(500).send({
-      message: error.message,
-      error: error.code,
-      code: 500
-    });
-  }
-}
-
-export const inviteNewUser = async (req: any, res: Response) => {
-  const { email } = req.body;
-  const authenticatedUser = req.user
-  const isAuthorized = [Role.Admin, Role.SuperAdmin, Role.WellnessCoordinator].includes(authenticatedUser?.role)
-
-  if (!isAuthorized) {
-    return res.status(403).json({
-      message: 'You are not authorized to perform this action',
-      error: 'UNAUTHORIZED',
-      code: 403,
-    });
-  }
-
-  // check if email is valid
-  if (!email?.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
-    return res.status(400).send({
-      message: 'Email is invalid!',
-      error: 'INVALID_EMAIL',
-      code: 400
-    });
-  }
-
-  try {
-    const result: any = await inviteNewUserService(email);
-    if (result.message) {
-      return res.status(400).send({
-        message: result.message,
-        error: result.code,
-        code: 400
-      });
-    }
-
 
     return res.status(201).send(result);
   }

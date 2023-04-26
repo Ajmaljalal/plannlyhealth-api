@@ -4,6 +4,7 @@ import { Department, Role } from "../lib/enums";
 
 export interface User {
   company_id: string;
+  company_name: string;
   stripe_errors: string;
   photo: string;
   push_notifications_requested: boolean;
@@ -51,6 +52,7 @@ export const CreateUserSchema = Joi.object({
   birthday: Joi.string().allow("").allow(null),
   card_delivery_approved: Joi.boolean(),
   company_id: Joi.string().required(),
+  company_name: Joi.string().allow(null).allow(""),
   department: DepartmentSchema.required(),
   issuing_card_id: Joi.string().allow("").allow(null),
   issuing_cardholder: Joi.string().allow("").allow(null),
@@ -91,6 +93,7 @@ export const UpdateUserSchema = Joi.object({
   birthday: Joi.string().allow("").allow(null),
   card_delivery_approved: Joi.boolean(),
   company_id: Joi.string().required(),
+  company_name: Joi.string().allow(null).allow(""),
   department: DepartmentSchema.required(),
   issuing_card_id: Joi.string().allow("").allow(null),
   issuing_cardholder: Joi.string().allow("").allow(null),
