@@ -8,10 +8,18 @@ import {
   deleteUserService,
   getUsersByCompanyIdService,
 } from '../services/user';
-import { User } from '../lib/types/user';
 import { Role } from '../lib/enums';
-import { CreateUserSchema, UpdateUserSchema } from '../models/user';
-import { activateUserCognitoService, deactivateUserCognitoService, inviteNewUserService, updateUserCognitoAttributesService } from '../services/auth';
+import {
+  CreateUserSchema,
+  UpdateUserSchema,
+  User
+} from '../models/user';
+import {
+  activateUserCognitoService,
+  deactivateUserCognitoService,
+  inviteNewUserService,
+  updateUserCognitoAttributesService
+} from '../services/auth';
 import { UserAccountStatus } from '../lib/enums';
 import { generateRandomPassword } from '../lib/helpers';
 import { sendEmailWithTemplateService } from '../services/sendgrid/email';
@@ -20,7 +28,7 @@ import { sendEmailWithTemplateService } from '../services/sendgrid/email';
 export const inviteNewUser = async (req: any, res: Response) => {
   const { userData } = req.body;
   const authenticatedUser = req.user
-  const isAuthorized = [Role.Admin, Role.SuperAdmin, Role.WellnessCoordinator].includes(authenticatedUser?.role)
+  const isAuthorized = [Role.Admin, Role.SuperAdmin, Role.ProgramAdmin, Role.Owner, Role.WellnessCoordinator].includes(authenticatedUser?.role)
 
   if (!isAuthorized) {
     return res.status(403).json({
@@ -41,7 +49,11 @@ export const inviteNewUser = async (req: any, res: Response) => {
 
   try {
     const password = generateRandomPassword();
-    const cognitoUser: any = await inviteNewUserService(userData, password);
+    const userWithRole: User = {
+      ...userData,
+      role: userData.role || Role.Standard,
+    }
+    const cognitoUser: any = await inviteNewUserService(userWithRole, password);
     if (cognitoUser.code || cognitoUser.message) {
       return res.status(400).send({
         message: cognitoUser.message,
@@ -51,9 +63,11 @@ export const inviteNewUser = async (req: any, res: Response) => {
     }
 
     const newDynamodbUser = {
-      ...userData,
+      ...userWithRole,
       id: cognitoUser.User.Attributes.find((attribute: any) => attribute.Name === 'sub').Value,
-      creation_date: cognitoUser.User.UserCreateDate,
+      creation_date: new Date().toISOString(),
+      modified_date: new Date().toISOString(),
+      creator: authenticatedUser.id,
       status: UserAccountStatus.Invited,
     }
     const newUser: any = createUserService(newDynamodbUser);
@@ -257,13 +271,13 @@ export async function updateUser(req: any, res: Response) {
 
     const currentUser = req.user;
     const isAuthorized =
-      [Role.Admin, Role.SuperAdmin, Role.WellnessCoordinator, Role.CustomerSuccess].includes(currentUser?.role) ||
+      [Role.Admin, Role.SuperAdmin, Role.Owner, Role.WellnessCoordinator, Role.ProgramAdmin].includes(currentUser?.role) ||
       currentUser?.id === existingUser.Item?.id;
 
     if (!isAuthorized) {
       return res.status(403).json({
         message: 'You are not authorized to perform this action',
-        error: 'UNAUTHORIZED',
+        error: 'NOT_AUTHORIZED',
         code: 403,
       });
     }

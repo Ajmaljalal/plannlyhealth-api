@@ -85,6 +85,7 @@ export enum Role {
   SuperAdmin = 'Super Admin',
   WellnessCoordinator = 'Wellness Coordinator',
   CustomerSuccess = 'Customer Success',
+  ProgramAdmin = 'Program Admin',
 }
 
 export enum UserAccountStatus {

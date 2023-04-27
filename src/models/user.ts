@@ -3,6 +3,7 @@ import { DepartmentSchema, RoleSchema } from "../lib/options";
 import { Department, Role } from "../lib/enums";
 
 export interface User {
+  id?: string;
   company_id: string;
   company_name: string;
   stripe_errors: string;
@@ -15,9 +16,9 @@ export interface User {
   signup_true: boolean;
   issuing_cardholder: string;
   connected_card_old: string;
-  id: string;
   phone: string;
   work_start_date: string;
+  creator: string;
   stripe_sub_item_id: string;
   department: Department;
   location: string;
