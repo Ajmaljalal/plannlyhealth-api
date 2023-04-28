@@ -8,7 +8,7 @@ export const decryptData = (data: string) => {
 export const generateRandomPassword = () => {
   const chars = 'abcdefghijklmnopqrstuvwxyz';
   const numbers = '0123456789';
-  const specialChars = '!@#$%^&*()_-+=<>?';
+  const specialChars = '!@#$%^*()_-+=<>';
   const upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
   function getRandom(arr: string) {

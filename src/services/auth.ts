@@ -322,6 +322,58 @@ export const resendInvitationService = async (email: string) => {
   }
 }
 
+export const setupUserAccountService = async (userData: any) => {
+  const authenticationDetails = new AuthenticationDetails({
+    Username: userData.email,
+    Password: userData.sid
+  });
+  const cognitoUser = new CognitoUser({
+    Username: userData.email,
+    Pool: AwsConfig.getUserPool()
+  });
+
+  return new Promise((resolve, reject) => {
+    cognitoUser.authenticateUser(authenticationDetails, {
+      onSuccess: (result) => {
+        const response = {
+          code: 200,
+          message: 'User activated successfully',
+          data: result,
+        };
+        return resolve(response);
+      },
+      onFailure: (err) => {
+        return reject({
+          code: 400,
+          message: 'Cannot setup your account. Please contact support.',
+          error: err.code
+        });
+      },
+      newPasswordRequired: (userAttributes, requiredAttributes) => {
+        // TODO: fix this, sending empty userAttributes object as it throws error
+        cognitoUser.completeNewPasswordChallenge(userData.password, {}, {
+          onSuccess: (result: any) => {
+            const response = {
+              code: 200,
+              message: 'User activated successfully',
+              cognitoId: result.accessToken.payload.sub,
+            };
+            return resolve(response);
+          },
+          onFailure: (err) => {
+            const response = {
+              code: 400,
+              message: err.message,
+              error: err.code
+            };
+            return reject(response);
+          },
+        });
+      }
+    });
+  });
+};
+
 export const deleteUserCognitoService = async (email: string) => {
   try {
     return await cognitoIdentityServiceProvider.adminDeleteUser({

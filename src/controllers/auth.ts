@@ -2,15 +2,15 @@ import { Request, Response } from 'express';
 import {
   authenticateUserService,
   forgotPasswordService,
-  inviteNewUserService,
   resendInvitationService,
   resetPasswordService,
+  setupUserAccountService,
   signInService,
   signOutService,
   signUpService
 } from '../services/auth';
-import { createUserService } from '../services/user';
-import { Role } from '../lib/enums';
+import { createUserService, updateUserService } from '../services/user';
+import { Role, UserAccountStatus } from '../lib/enums';
 
 export const registerUser = async (req: Request, res: Response) => {
   const userData = { ...req.body }
@@ -344,6 +344,41 @@ export const resendInvitation = async (req: any, res: Response) => {
       message: error.message,
       error: error.code,
       code: 500
+    });
+  }
+}
+
+export const setupUserAccount = async (req: any, res: Response) => {
+  const { userData } = req.body;
+
+  // check if email is valid
+  if (!userData?.email?.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
+    return res.status(400).send({
+      message: 'Email is invalid!',
+      error: 'INVALID_EMAIL',
+      code: 400
+    });
+  }
+
+  try {
+    const result: any = await setupUserAccountService(userData);
+
+    if (result.error) {
+      return res.status(400).send({
+        message: result.message,
+        error: result.code,
+        code: 400
+      });
+    }
+
+    await updateUserService(result.cognitoId, { status: UserAccountStatus.Active });
+    return res.status(201).send(result);
+  }
+  catch (error: any) {
+    return res.status(error.code || 500).send({
+      message: error.message,
+      error: error.error,
+      code: error.code || 500
     });
   }
 }
