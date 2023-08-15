@@ -10,6 +10,6 @@ const config = new AWS.Config({
   },
 });
 
-const db = new DocumentClient({ region: 'us-west-2', ...config });
-export const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider({ region: 'us-west-2', ...config });
+const db = new DocumentClient({ region: process.env.AWS_REGION, ...config });
+export const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider({ region: process.env.AWS_REGION, ...config });
 export default db;

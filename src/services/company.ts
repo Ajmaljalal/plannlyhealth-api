@@ -2,7 +2,7 @@ import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import db from "../configs/aws";
 import { Company } from "../lib/types/company";
 
-const TABLE_NAME = `companies_${process.env.DYNAMODB_TABLE_ENV}`;
+const TABLE_NAME = `companies`;
 
 export const createCompanyService = async (company: Company) => {
   const params: DocumentClient.PutItemInput = {
