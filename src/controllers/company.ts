@@ -26,7 +26,6 @@ export async function createNewCompany(req: any, res: Response) {
   company.id = company.id || uuid();
   company.created_date = company.created_date || Date();
   company.modified_date = company.modified_date || Date();
-  company.owner = company.owner || req.user?.id;
 
   // 3. validate the request body before creating the company using the CreateCompanySchema
   const { error } = CreateCompanySchema.validate(company);
@@ -50,7 +49,7 @@ export async function createNewCompany(req: any, res: Response) {
       });
     } else {
       // 6. if the response is not an error, send the company
-      return res.status(201).json(response);
+      return res.status(201).json({ response, company });
     }
   } catch (err: any) {
     // 7. catch any other error and send the error message
