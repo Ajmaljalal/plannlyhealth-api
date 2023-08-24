@@ -1,25 +1,24 @@
 import { Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 import { Role } from '../lib/enums';
-import { BenefitsProgram } from '../lib/types/benefits-programs';
-import { CreateBenefitsProgramsSchema, UpdateBenefitsProgramsSchema } from '../models/benefits-program';
+import { Benefits, CreateBenefitsSchema, UpdateBenefitsSchema } from '../models/benefits';
 
 import {
-  createBenefitsProgramService,
-  deleteBenefitsProgramService,
-  getAllBenefitsProgramsService,
-  getBenefitsProgramByIdService,
-  getBenefitsProgramsByCompanyIdService,
-  updateBenefitsProgramService,
-} from '../services/benefits-program';
+  createBenefitsService,
+  deleteBenefitsService,
+  getAllBenefitsService,
+  getBenefitsByIdService,
+  getBenefitsByCompanyIdService,
+  updateBenefitsService,
+} from '../services/benefits';
 
 
-export async function createNewBenefitsProgram(req: any, res: Response) {
-  const benefitsProgram: BenefitsProgram = req.body;
+export async function createNewBenefits(req: any, res: Response) {
+  const benefit: Benefits = req.body;
   const authorizedUser = req.user;
 
   // 1. check if the request body is empty
-  if (!Object.keys(benefitsProgram).length) {
+  if (!Object.keys(benefit).length) {
     return res.status(400).json({
       message: 'Request body is empty',
       error: 'EMPTY_REQUEST_BODY',
@@ -27,17 +26,18 @@ export async function createNewBenefitsProgram(req: any, res: Response) {
     });
   }
 
-  // 2. add default values to the benefitsProgram object if they are not present
-  benefitsProgram.id = uuid();
-  benefitsProgram.is_active = benefitsProgram.is_active || false;
-  benefitsProgram.is_deleted = benefitsProgram.is_deleted || false;
-  benefitsProgram.is_template = benefitsProgram.is_template || false;
-  benefitsProgram.creation_date = benefitsProgram.creation_date || Date();
-  benefitsProgram.modified_date = benefitsProgram.modified_date || Date();
-  benefitsProgram.creator = benefitsProgram.creator || authorizedUser?.id;
+  // 2. add default values to the benefit object if they are not present
+  benefit.id = uuid();
+  benefit.is_active = false;
+  benefit.archived = false;
+  benefit.created_at = Date();
+  benefit.modified_at = Date();
+  benefit.integration = null;
 
-  // 3. validate the request body before creating a new company using the benefitsProgramsSchema
-  const { error } = CreateBenefitsProgramsSchema.validate(benefitsProgram);
+
+
+  // 3. validate the request body before creating a new company using the benefitsSchema
+  const { error } = CreateBenefitsSchema.validate(benefit);
   if (error) {
     return res.status(400).json({
       message: error.details[0].message,
@@ -47,8 +47,8 @@ export async function createNewBenefitsProgram(req: any, res: Response) {
   }
 
   try {
-    // 4. call the createBenefitsProgramService to create a new benefits program
-    const response: any = await createBenefitsProgramService(benefitsProgram);
+    // 4. call the createbenefitService to create a new benefits program
+    const response: any = await createBenefitsService(benefit);
 
     // 5. check if the response is an error
     if (response.code || response.statusCode >= 400) {
@@ -71,12 +71,12 @@ export async function createNewBenefitsProgram(req: any, res: Response) {
   }
 }
 
-export async function getBenefitsProgramById(req: Request, res: Response) {
+export async function getBenefitsById(req: Request, res: Response) {
   // 1. get the benefits program id from the request params
-  const benefitsProgramId: string = req.params.id;
+  const benefitId: string = req.params.id;
 
-  // 2. call the getBenefitsProgramByIdService to get the benefits program by id
-  const response: any = await getBenefitsProgramByIdService(benefitsProgramId);
+  // 2. call the getbenefitByIdService to get the benefits program by id
+  const response: any = await getBenefitsByIdService(benefitId);
   // 3. check if the response is an error
   if (response.code || response.statusCode >= 400) {
     return res.status(response.statusCode).json({
@@ -90,11 +90,11 @@ export async function getBenefitsProgramById(req: Request, res: Response) {
   }
 }
 
-export async function getBenefitsProgramsByCompanyId(req: Request, res: Response) {
+export async function getBenefitsByCompanyId(req: Request, res: Response) {
   const companyId: string = req.params.companyId;
 
-  // 1. call the getBenefitsProgramsByCompanyIdService to get the benefits programs by company id
-  const response: any = await getBenefitsProgramsByCompanyIdService(companyId);
+  // 1. call the getbenefitsByCompanyIdService to get the benefits programs by company id
+  const response: any = await getBenefitsByCompanyIdService(companyId);
   // 2. check if the response is an error
   if (response.code || response.statusCode >= 400) {
     return res.status(response.statusCode).json({
@@ -109,9 +109,9 @@ export async function getBenefitsProgramsByCompanyId(req: Request, res: Response
   }
 }
 
-export async function getAllBenefitsPrograms(req: Request, res: Response) {
-  // 1. call the getAllBenefitsProgramsService to get all the benefits programs
-  const response: any = await getAllBenefitsProgramsService();
+export async function getAllBenefits(req: Request, res: Response) {
+  // 1. call the getAllbenefitsService to get all the benefits programs
+  const response: any = await getAllBenefitsService();
   // 2. check if the response is an error
   if (response.code) {
     return res.status(response.statusCode).json({
@@ -125,11 +125,11 @@ export async function getAllBenefitsPrograms(req: Request, res: Response) {
   }
 }
 
-export async function updateBenefitsProgram(req: Request, res: Response) {
-  const benefitsProgramId: string = req.params.id;
-  const benefitsProgram = req.body;
+export async function updateBenefits(req: Request, res: Response) {
+  const benefitId: string = req.params.id;
+  const benefit = req.body;
   // 1. check if the request body is empty
-  if (!Object.keys(benefitsProgram).length) {
+  if (!Object.keys(benefit).length) {
     return res.status(400).json({
       message: 'Request body is empty',
       error: 'EMPTY_REQUEST_BODY',
@@ -138,7 +138,7 @@ export async function updateBenefitsProgram(req: Request, res: Response) {
   }
 
   // 2. check if the benefits program id is present in the params 
-  if (!benefitsProgramId) {
+  if (!benefitId) {
     return res.status(400).json({
       message: 'Benefits program id in params is required',
       error: 'MISSING_BENEFITS_PROGRAM_ID',
@@ -147,36 +147,38 @@ export async function updateBenefitsProgram(req: Request, res: Response) {
   }
 
   // 2. check if the program exists
-  const programExist: any = await getBenefitsProgramByIdService(benefitsProgramId);
-  if (!programExist.Item) {
+  const benefitExist: any = await getBenefitsByIdService(benefitId);
+  if (!benefitExist.Item) {
     return res.status(404).json({
       message: 'Program does not exist',
       error: "PROGRAM_DOES_NOT_EXIST",
       code: 404
     });
   }
-  // 3. check if current user is the owner of the program
+  // 3. check if current user is the owner of the benefit
   // @ts-ignore
-  const currentUser = req.user;
-  const isAdmin = currentUser && currentUser.role === Role.Admin;
-  const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
-  const isWellnessCoordinator = currentUser && currentUser.role === Role.WellnessCoordinator;
-  const isAuthorized = isWellnessCoordinator || isAdmin || isSuperAdmin;
+  // const currentUser = req.user;
+  // const isAdmin = currentUser && currentUser.role === Role.Admin;
+  // const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
+  // const isWellnessCoordinator = currentUser && currentUser.role === Role.WellnessCoordinator;
+  // const isAuthorized = isWellnessCoordinator || isAdmin || isSuperAdmin;
 
-  if (!isAuthorized) {
-    return res.status(403).json({
-      message: 'You are not allowed to perform this action',
-      error: "UNAUTHORIZED",
-      code: 403
-    });
-  }
-  // 4. add is_active, is_deleted, is_template and modified_date to the benefitsProgram object if they are not present
-  benefitsProgram.modified_date = Date();
+  // if (!isAuthorized) {
+  //   return res.status(403).json({
+  //     message: 'You are not allowed to perform this action',
+  //     error: "UNAUTHORIZED",
+  //     code: 403
+  //   });
+  // }
+  // 4. add is_active, is_deleted, is_template and modified_date to the benefit object if they are not present
+  benefit.modified_at = Date();
 
-  // remove the id from the benefitsProgram object
-  delete benefitsProgram.id;
-  // 5. validate the request body before creating a new company using the UpdateBenefitsProgramsSchema
-  const { error } = UpdateBenefitsProgramsSchema.validate(benefitsProgram);
+  // remove the unchangable fields from the benefit object
+  delete benefit.id;
+  delete benefit.company_id;
+  delete benefit.created_at;
+  // 5. validate the request body before creating a new company using the UpdatebenefitsSchema
+  const { error } = UpdateBenefitsSchema.validate(benefit);
   if (error) {
     return res.status(400).json({
       message: error.details[0].message,
@@ -187,8 +189,8 @@ export async function updateBenefitsProgram(req: Request, res: Response) {
 
 
   try {
-    // 6. call the updateBenefitsProgramService to update the benefits program
-    const response: any = await updateBenefitsProgramService(benefitsProgramId, benefitsProgram);
+    // 6. call the updatebenefitService to update the benefits program
+    const response: any = await updateBenefitsService(benefitId, benefit);
     // 7. check if the response is an error
     if (response.code || response.statusCode >= 400) {
       return res.status(response.statusCode).json({
@@ -212,18 +214,18 @@ export async function updateBenefitsProgram(req: Request, res: Response) {
 
 }
 
-export async function deleteBenefitsProgram(req: Request, res: Response) {
-  const benefitsProgramId: string = req.params.id;
+export async function deleteBenefits(req: Request, res: Response) {
+  const benefitId: string = req.params.id;
 
   // 1. check if the benefits program id is present in the params
-  if (!benefitsProgramId) {
+  if (!benefitId) {
     return res.status(400).json({
       message: 'Benefits program id in params is required',
       code: 'MISSING_BENEFITS_PROGRAM_ID'
     });
   }
   // 2. check if the program exists
-  const programExist: any = await getBenefitsProgramByIdService(benefitsProgramId);
+  const programExist: any = await getBenefitsByIdService(benefitId);
   if (!programExist.Item) {
     return res.status(404).json({
       message: 'Program does not exist',
@@ -242,8 +244,8 @@ export async function deleteBenefitsProgram(req: Request, res: Response) {
       code: "UNAUTHORIZED"
     });
   }
-  // 4. call the deleteBenefitsProgramService to delete the benefits program
-  const response: any = await deleteBenefitsProgramService(benefitsProgramId);
+  // 4. call the deletebenefitService to delete the benefits program
+  const response: any = await deleteBenefitsService(benefitId);
   // 5. check if the response is an error
   if (response.code) {
     return res.status(response.statusCode).json({

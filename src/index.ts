@@ -6,7 +6,7 @@ import config from './configs/base';
 import { authenticationMiddleware } from './middlewares/authenticate';
 import companyRoutes from './routes/company';
 import userRoutes from './routes/user';
-import benefitsProgramsRoutes from './routes/benefits-programs';
+import benefitsProgramsRoutes from './routes/benefits';
 import programBalanceRoutes from './routes/program-balances';
 import claimsRoutes from './routes/claims';
 import commentsRoutes from './routes/comments';
@@ -47,7 +47,7 @@ app.use(authenticationMiddleware);
 // Routes go here 
 app.use('/users', userRoutes);
 app.use('/companies', companyRoutes);
-app.use('/benefits-programs', benefitsProgramsRoutes);
+app.use('/benefits', benefitsProgramsRoutes);
 app.use('/program-balances', programBalanceRoutes);
 app.use('/claims', claimsRoutes);
 app.use('/comments', commentsRoutes);

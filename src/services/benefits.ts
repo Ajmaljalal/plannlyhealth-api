@@ -1,13 +1,13 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import db from "../configs/aws";
-import { BenefitsProgram } from "../lib/types/benefits-programs";
+import { Benefits } from "../models/benefits";
 
-const TABLE_NAME = `benefits-programs_${process.env.DYNAMODB_TABLE_ENV}`;
+const TABLE_NAME = `benefits`;
 
-export const createBenefitsProgramService = async (benefitsProgram: BenefitsProgram) => {
+export const createBenefitsService = async (benefits: Benefits) => {
   const params: DocumentClient.PutItemInput = {
     TableName: TABLE_NAME,
-    Item: benefitsProgram,
+    Item: benefits,
   };
   try {
     const result = await db.put(params).promise();
@@ -17,11 +17,11 @@ export const createBenefitsProgramService = async (benefitsProgram: BenefitsProg
   }
 }
 
-export const getBenefitsProgramByIdService = async (benefitsProgramId: string) => {
+export const getBenefitsByIdService = async (benefitId: string) => {
   const params: DocumentClient.GetItemInput = {
     TableName: TABLE_NAME,
     Key: {
-      id: benefitsProgramId,
+      id: benefitId,
     }
   };
   try {
@@ -32,7 +32,7 @@ export const getBenefitsProgramByIdService = async (benefitsProgramId: string) =
   }
 }
 
-export const getBenefitsProgramsByCompanyIdService = async (companyId: string) => {
+export const getBenefitsByCompanyIdService = async (companyId: string) => {
   const params: DocumentClient.QueryInput = {
     TableName: TABLE_NAME,
     IndexName: 'company_id-index',
@@ -49,7 +49,7 @@ export const getBenefitsProgramsByCompanyIdService = async (companyId: string) =
   }
 }
 
-export const getAllBenefitsProgramsService = async () => {
+export const getAllBenefitsService = async () => {
   const params: DocumentClient.ScanInput = {
     TableName: TABLE_NAME
   };
@@ -61,7 +61,7 @@ export const getAllBenefitsProgramsService = async () => {
   }
 }
 
-export const updateBenefitsProgramService = async (benefitsProgramId: string, updates: BenefitsProgram) => {
+export const updateBenefitsService = async (benefitId: string, updates: Benefits) => {
   // Create UpdateExpression and ExpressionAttributeValues based on the updates provided
   const UpdateExpression = 'SET ' + Object.keys(updates).map((key, i) => {
     return `#${key} = :${key}`;
@@ -78,7 +78,7 @@ export const updateBenefitsProgramService = async (benefitsProgramId: string, up
   const params: DocumentClient.UpdateItemInput = {
     TableName: TABLE_NAME,
     Key: {
-      id: benefitsProgramId
+      id: benefitId
     },
     UpdateExpression,
     ExpressionAttributeNames,
@@ -93,11 +93,11 @@ export const updateBenefitsProgramService = async (benefitsProgramId: string, up
   }
 }
 
-export const deleteBenefitsProgramService = async (benefitsProgramId: string) => {
+export const deleteBenefitsService = async (benefitsId: string) => {
   const params: DocumentClient.DeleteItemInput = {
     TableName: TABLE_NAME,
     Key: {
-      id: benefitsProgramId
+      id: benefitsId
     }
   };
   try {
