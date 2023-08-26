@@ -1,13 +1,13 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import db from "../configs/aws";
-import { User } from "../lib/types/user";
+import { Employee } from "../models/employee";
 
-const TABLE_NAME = `users_${process.env.DYNAMODB_TABLE_ENV}`;
+const TABLE_NAME = `employees`;
 
-export const createUserService = async (user: any) => {
+export const createEmployeeService = async (employee: any) => {
   const params: DocumentClient.PutItemInput = {
     TableName: TABLE_NAME,
-    Item: user
+    Item: employee
   };
   try {
     const result = await db.put(params).promise();
@@ -17,11 +17,11 @@ export const createUserService = async (user: any) => {
   }
 }
 
-export const getUserByIdService = async (userId: string) => {
+export const getEmployeeByIdService = async (employeeId: string) => {
   const params: DocumentClient.GetItemInput = {
     TableName: TABLE_NAME,
     Key: {
-      id: userId
+      id: employeeId
     }
   };
   try {
@@ -32,7 +32,24 @@ export const getUserByIdService = async (userId: string) => {
   }
 }
 
-export const getUsersByCompanyIdService = async (companyId: string) => {
+export const getEmployeeByEmailService = async (email: string) => {
+  const params: DocumentClient.QueryInput = {
+    TableName: TABLE_NAME,
+    IndexName: 'email-index',
+    KeyConditionExpression: 'email = :email',
+    ExpressionAttributeValues: {
+      ':email': email
+    }
+  };
+  try {
+    const result = await db.query(params).promise();
+    return result.Items
+  } catch (err) {
+    return err;
+  }
+}
+
+export const getEmployeesByCompanyIdService = async (companyId: string) => {
   const params: DocumentClient.QueryInput = {
     TableName: TABLE_NAME,
     IndexName: 'company_id-index',
@@ -50,7 +67,7 @@ export const getUsersByCompanyIdService = async (companyId: string) => {
 }
 
 
-export const getAllUsersService = async () => {
+export const getAllEmployeesService = async () => {
   const params: DocumentClient.ScanInput = {
     TableName: TABLE_NAME
   };
@@ -62,7 +79,7 @@ export const getAllUsersService = async () => {
   }
 }
 
-export async function updateUserService(id: string, updates: Partial<User>) {
+export async function updateEmployeeService(id: string, updates: Partial<Employee>) {
   // Create UpdateExpression and ExpressionAttributeValues based on the updates provided
   const UpdateExpression = 'SET ' + Object.keys(updates).map((key, i) => {
     return `#${key} = :${key}`;
@@ -96,7 +113,7 @@ export async function updateUserService(id: string, updates: Partial<User>) {
   }
 }
 
-export async function deleteUserService(id: string) {
+export async function deleteEmployeeService(id: string) {
   const params: DocumentClient.DeleteItemInput = {
     TableName: TABLE_NAME,
     Key: { id: id },

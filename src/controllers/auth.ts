@@ -9,8 +9,8 @@ import {
   signOutService,
   signUpService
 } from '../services/auth';
-import { createUserService, updateUserService } from '../services/user';
-import { Role, UserAccountStatus } from '../lib/enums';
+import { createEmployeeService, updateEmployeeService } from '../services/employees';
+import { Role, EmployeeAccountStatus } from '../lib/enums';
 
 export const registerUser = async (req: Request, res: Response) => {
   const userData = { ...req.body }
@@ -57,7 +57,7 @@ export const registerUser = async (req: Request, res: Response) => {
       });
     }
     userData.id = cognitoUser.userSub;
-    const newUser: any = createUserService(userData);
+    const newUser: any = createEmployeeService(userData);
     if (newUser.statusCode >= 400) {
       return res.status(newUser.statusCode).send({
         message: newUser.message,
@@ -371,7 +371,7 @@ export const setupUserAccount = async (req: any, res: Response) => {
       });
     }
 
-    await updateUserService(result.cognitoId, { status: UserAccountStatus.Active });
+    await updateEmployeeService(result.cognitoId, { status: EmployeeAccountStatus.Active });
     return res.status(201).send(result);
   }
   catch (error: any) {

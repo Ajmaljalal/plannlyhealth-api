@@ -1,11 +1,11 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import db from "../configs/aws";
-import { User } from "../lib/types/user";
+import { Employee } from "../models/employee";
 
 const TABLE_NAME = `new-users_${process.env.DYNAMODB_TABLE_ENV}`;
 
 
-export const createNewUserService = async (user: User) => {
+export const createNewUserService = async (user: Employee) => {
   const params: DocumentClient.PutItemInput = {
     TableName: TABLE_NAME,
     Item: user
@@ -101,7 +101,7 @@ export const getNewUserByLastNameService = async (lastName: string) => {
   }
 }
 
-export const updateNewUserService = async (userId: string, updates: User) => {
+export const updateNewUserService = async (userId: string, updates: Employee) => {
   // Create UpdateExpression and ExpressionAttributeValues based on the updates provided
   const UpdateExpression = 'SET ' + Object.keys(updates).map((key, i) => {
     return `#${key} = :${key}`;

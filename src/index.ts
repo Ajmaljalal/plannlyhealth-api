@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import config from './configs/base';
 import { authenticationMiddleware } from './middlewares/authenticate';
 import companyRoutes from './routes/company';
-import userRoutes from './routes/user';
+import employeeRoutes from './routes/employee';
 import benefitsProgramsRoutes from './routes/benefits';
 import programBalanceRoutes from './routes/program-balances';
 import claimsRoutes from './routes/claims';
@@ -45,7 +45,7 @@ app.use('/auth', authRoutes)
 // Middleware for authentication
 app.use(authenticationMiddleware);
 // Routes go here 
-app.use('/users', userRoutes);
+app.use('/employees', employeeRoutes);
 app.use('/companies', companyRoutes);
 app.use('/benefits', benefitsProgramsRoutes);
 app.use('/program-balances', programBalanceRoutes);

@@ -4,7 +4,7 @@ import {
 } from 'amazon-cognito-identity-js';
 import { cognitoIdentityServiceProvider } from '../configs/aws';
 import { AwsConfig } from '../configs/cognito';
-import { User } from '../models/user';
+import { Employee } from '../models/employee';
 
 export const signUpService = (userData: any) => {
   const userAttributes = {
@@ -250,7 +250,7 @@ export const activateUserCognitoService = async (email: string) => {
   }
 }
 
-export const inviteNewUserService = async (userData: User, password: string) => {
+export const inviteNewUserService = async (userData: Employee, password: string) => {
   try {
     return await cognitoIdentityServiceProvider.adminCreateUser({
       UserPoolId: process.env.AWS_USER_POOL_ID as string,
@@ -273,10 +273,6 @@ export const inviteNewUserService = async (userData: User, password: string) => 
         {
           Name: 'custom:company_id',
           Value: userData.company_id
-        },
-        {
-          Name: 'custom:company_name',
-          Value: userData.company_name
         },
         {
           Name: 'given_name',

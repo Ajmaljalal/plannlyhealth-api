@@ -2,12 +2,12 @@ import { signUpService } from "../../services/auth";
 import { createBenefitsService } from "../../services/benefits";
 import { createClaimService } from "../../services/claims";
 import { createCompanyService } from "../../services/company";
-import { createUserService, deleteUserService } from "../../services/user";
+import { createEmployeeService, deleteEmployeeService } from "../../services/employees";
 
 const services: any = {
   'companies': createCompanyService,
   'claims': createClaimService,
-  'users': createUserService,
+  'employees': createEmployeeService,
   'benefits-programs': createBenefitsService,
 }
 
@@ -75,7 +75,7 @@ export const registerBubbleUser = async (req: any, res: any) => {
   }
 
   try {
-    createUserService(userData).then(async (newUser: any) => {
+    createEmployeeService(userData).then(async (newUser: any) => {
       if (newUser.statusCode >= 400) {
         return res.status(newUser.statusCode).send({
           message: newUser.message,
@@ -97,7 +97,7 @@ export const registerBubbleUser = async (req: any, res: any) => {
       // check if the user is already registered
       if (cognitoUser.code >= 400 && cognitoUser.code < 500) {
         // remove the user from the database
-        await deleteUserService(userData.id as string);
+        await deleteEmployeeService(userData.id as string);
         return res.status(cognitoUser.code).send({
           message: cognitoUser.message,
           error: 'COGNITO_BAD_REQUEST',

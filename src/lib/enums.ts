@@ -81,14 +81,13 @@ export enum Role {
   Admin = 'Admin',
   Finance = 'Finance',
   Standard = 'Standard',
-  Owner = 'Owner',
   SuperAdmin = 'Super Admin',
   WellnessCoordinator = 'Wellness Coordinator',
   CustomerSuccess = 'Customer Success',
   ProgramAdmin = 'Program Admin',
 }
 
-export enum UserAccountStatus {
+export enum EmployeeAccountStatus {
   Active = 'Active',
   Invited = 'Invited',
   Deactivated = 'Deactivated',
