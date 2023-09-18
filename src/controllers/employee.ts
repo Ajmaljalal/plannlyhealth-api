@@ -1,4 +1,4 @@
-import e, { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 import {
   createEmployeeService,
@@ -15,92 +15,8 @@ import {
   UpdateEmployeeSchema,
   Employee
 } from '../models/employee';
-import {
-  // activateUserCognitoService,
-  // deactivateUserCognitoService,
-  inviteNewUserService,
-  // updateUserCognitoAttributesService
-} from '../services/auth';
 import { EmployeeAccountStatus } from '../lib/enums';
-import { generateRandomPassword } from '../lib/helpers';
-import { sendEmailWithTemplateService } from '../services/sendgrid/email';
 
-
-export const inviteNewUser = async (req: any, res: Response) => {
-  const { userData } = req.body;
-  const authenticatedUser = req.user
-  const isAuthorized = [Role.Admin, Role.SuperAdmin, Role.ProgramAdmin, Role.WellnessCoordinator].includes(authenticatedUser?.role)
-
-  if (!isAuthorized) {
-    return res.status(403).json({
-      message: 'You are not authorized to perform this action',
-      error: 'NOT_AUTHORIZED',
-      code: 403,
-    });
-  }
-
-  // check if email is valid
-  if (!userData?.email?.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
-    return res.status(400).send({
-      message: 'Email is invalid!',
-      error: 'INVALID_EMAIL',
-      code: 400
-    });
-  }
-
-  try {
-    const password = generateRandomPassword();
-    const userWithRole: Employee = {
-      ...userData,
-      role: userData.role || Role.Standard,
-    }
-    const cognitoUser: any = await inviteNewUserService(userWithRole, password);
-    if (cognitoUser.code || cognitoUser.message) {
-      return res.status(400).send({
-        message: cognitoUser.message,
-        error: cognitoUser.code,
-        code: 400
-      });
-    }
-
-    const newDynamodbUser = {
-      ...userWithRole,
-      id: cognitoUser.User.Attributes.find((attribute: any) => attribute.Name === 'sub').Value,
-      creation_date: new Date().toISOString(),
-      modified_date: new Date().toISOString(),
-      creator: authenticatedUser.id,
-      status: EmployeeAccountStatus.Invited,
-    }
-    const newUser: any = createEmployeeService(newDynamodbUser);
-    if (newUser.statusCode >= 400) {
-      await deleteEmployeeService(userData.email);
-      return res.status(newUser.statusCode).send({
-        message: newUser.message,
-        error: newUser.code,
-        code: newUser.statusCode
-      });
-    }
-    await sendEmailWithTemplateService({
-      toEmail: userData.email,
-      type: 'invite-user',
-      data: {
-        name: userData.first_name,
-        employer: userData.company_name,
-        companyId: userData.company_id,
-        subject: "Setup your Plannly Account",
-        setup_user_link: `http://localhost:3000/activate-account?email=${userData.email}&sid=${password}&cid=${userData.company_id}`
-      }
-    })
-    return res.status(201).send(newDynamodbUser);
-  }
-  catch (error: any) {
-    return res.status(500).send({
-      message: error.message,
-      error: error.code,
-      code: 500
-    });
-  }
-}
 
 export async function createEmployee(req: any, res: Response) {
   const employee = req.body;

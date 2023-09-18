@@ -49,7 +49,7 @@ export async function createNewCompany(req: any, res: Response) {
       });
     } else {
       // 6. if the response is not an error, send the company
-      return res.status(201).json({ response, company });
+      return res.status(201).json(company);
     }
   } catch (err: any) {
     // 7. catch any other error and send the error message

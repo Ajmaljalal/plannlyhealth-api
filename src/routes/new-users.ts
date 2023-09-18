@@ -9,11 +9,13 @@ import {
   getNewUsersByCompanyId,
   updateNewUser,
   deleteNewUser,
+  inviteNewUser,
 } from '../controllers/new-users';
 
 const router = Router();
 
 router.post('/', createNewUser);
+router.post('/inviteNewUser', inviteNewUser)
 router.get('/:id', getNewUserById);
 router.get('/email/:email', getNewUserByEmail);
 router.get('/fname/:firstName', getNewUserByFirstName);
