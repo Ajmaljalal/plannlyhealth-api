@@ -12,7 +12,7 @@ import claimsRoutes from './routes/claims';
 import commentsRoutes from './routes/comments';
 import dealsRoutes from './routes/deals';
 import documentsRoutes from './routes/documents';
-import newUsersRoutes from './routes/new-users';
+import newUsersRoutes from './routes/invited-user';
 import authRoutes from './routes/auth';
 import stripeRoutes from './routes/stripe';
 import sendGridRoutes from './routes/sendgrid';

@@ -10,7 +10,7 @@ import {
   updateNewUser,
   deleteNewUser,
   inviteNewUser,
-} from '../controllers/new-users';
+} from '../controllers/invited-user';
 
 const router = Router();
 

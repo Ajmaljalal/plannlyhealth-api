@@ -19,7 +19,6 @@ import { createEmployeeService, deleteEmployeeService } from '../services/employ
 import { sendEmailWithTemplateService } from '../services/sendgrid/email';
 
 
-
 export const inviteNewUser = async (req: any, res: Response) => {
   const { userData } = req.body;
   const authenticatedUser = req.user
