@@ -2,7 +2,7 @@ import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import db from "../configs/aws";
 import { Employee } from "../models/employee";
 
-const TABLE_NAME = `new-users_${process.env.DYNAMODB_TABLE_ENV}`;
+const TABLE_NAME = `new-users`;
 
 
 export const createNewUserService = async (user: Employee) => {

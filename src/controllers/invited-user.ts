@@ -22,15 +22,15 @@ import { sendEmailWithTemplateService } from '../services/sendgrid/email';
 export const inviteNewUser = async (req: any, res: Response) => {
   const { userData } = req.body;
   const authenticatedUser = req.user
-  const isAuthorized = [Role.Admin, Role.SuperAdmin, Role.ProgramAdmin, Role.WellnessCoordinator].includes(authenticatedUser?.role)
+  // const isAuthorized = [Role.Admin, Role.SuperAdmin, Role.ProgramAdmin, Role.WellnessCoordinator].includes(authenticatedUser?.role)
 
-  if (!isAuthorized) {
-    return res.status(403).json({
-      message: 'You are not authorized to perform this action',
-      error: 'NOT_AUTHORIZED',
-      code: 403,
-    });
-  }
+  // if (!isAuthorized) {
+  //   return res.status(403).json({
+  //     message: 'You are not authorized to perform this action',
+  //     error: 'NOT_AUTHORIZED',
+  //     code: 403,
+  //   });
+  // }
 
   // check if email is valid
   if (!userData?.email?.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
@@ -111,7 +111,7 @@ export const createNewUser = async (req: any, res: Response) => {
   user.created_date = Date();
   user.modified_date = Date();
   user.id = uuid();
-  user.owner = req.user.id
+  user.role = user.role || Role.Standard;
 
   // 4. validate the request body before creating the user using the CreateUserSchema
   const { error } = CreateNewUserSchema.validate(user);

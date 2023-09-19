@@ -14,8 +14,7 @@ import {
 
 const router = Router();
 
-router.post('/', createNewUser);
-router.post('/inviteNewUser', inviteNewUser)
+router.post('/invite', createNewUser);
 router.get('/:id', getNewUserById);
 router.get('/email/:email', getNewUserByEmail);
 router.get('/fname/:firstName', getNewUserByFirstName);
