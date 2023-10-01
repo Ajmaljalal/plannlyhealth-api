@@ -18,6 +18,31 @@ export const createNewUserService = async (user: Employee) => {
   }
 }
 
+export const createBulkUsersService = async (users: Employee[]) => {
+  // Create the request format for batchWrite
+  const putRequests = users.map(user => {
+    return {
+      PutRequest: {
+        Item: user
+      }
+    };
+  });
+
+  const params: DocumentClient.BatchWriteItemInput = {
+    RequestItems: {
+      [TABLE_NAME]: putRequests
+    }
+  };
+
+  try {
+    const result = await db.batchWrite(params).promise();
+    return result;
+  } catch (err) {
+    return err;
+  }
+}
+
+
 export const getNewUserByIdService = async (userId: string) => {
   const params: DocumentClient.GetItemInput = {
     TableName: TABLE_NAME,

@@ -203,6 +203,10 @@ export async function getAllEmployees(req: Request, res: Response) {
 export async function updateEmployee(req: any, res: Response) {
   const employeeId: string = req.params.id;
   const employee: Employee = req.body;
+  // remove company_id and id and create_at, as it is not allowed to be updated
+  delete employee.company_id;
+  delete employee.id;
+  delete employee.created_at;
 
   const { error: validationError } = UpdateEmployeeSchema.validate(employee);
   if (validationError) {
@@ -236,8 +240,8 @@ export async function updateEmployee(req: any, res: Response) {
     //   });
     // }
 
-    delete employee.id;
     delete existingEmployee.Item?.id;
+    delete existingEmployee.Item?.company_id
 
     const updatedEmployee = { ...existingEmployee.Item, ...employee, modified_at: Date() };
     const response = await updateEmployeeService(employeeId, updatedEmployee) as any

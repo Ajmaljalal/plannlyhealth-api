@@ -9,12 +9,13 @@ import {
   getNewUsersByCompanyId,
   updateNewUser,
   deleteNewUser,
-  inviteNewUser,
+  createBulkUsers
 } from '../controllers/invited-user';
 
 const router = Router();
 
 router.post('/invite', createNewUser);
+router.post('/bulk-invite/:companyId', createBulkUsers);
 router.get('/:id', getNewUserById);
 router.get('/email/:email', getNewUserByEmail);
 router.get('/fname/:firstName', getNewUserByFirstName);

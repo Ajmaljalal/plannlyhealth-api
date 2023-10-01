@@ -90,7 +90,7 @@ export enum Role {
 export enum EmployeeAccountStatus {
   Active = 'Active',
   Invited = 'Invited',
-  Deactivated = 'Deactivated',
+  Inactive = 'Inactive',
 }
 
 

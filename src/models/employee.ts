@@ -1,10 +1,18 @@
 import Joi from "joi";
-import { DepartmentSchema, RoleSchema } from "../lib/options";
+import { AddressSchema, DepartmentSchema, RoleSchema } from "../lib/options";
 import { Department, Role } from "../lib/enums";
+
+export type Address = {
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+};
 
 export interface Employee {
   id?: string;
-  company_id: string;
+  company_id?: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -13,16 +21,12 @@ export interface Employee {
   photo: string;
   status: string;
   department: Department;
-  professional_title: string;
-  location: string;
-  user_agent: string;
-  ip: string;
-  address: string;
+  address: Address;
   role: Role;
-  is_onboarded: boolean;
+  job_title: string;
   push_notifications_id: string;
-  modified_at: string;
-  creation_at: string;
+  modified_at?: string;
+  created_at?: string;
 }
 
 export const CreateEmployeeSchema = Joi.object({
@@ -30,22 +34,19 @@ export const CreateEmployeeSchema = Joi.object({
   company_id: Joi.string().required(),
   first_name: Joi.string().required(),
   last_name: Joi.string().required(),
+  marital_status: Joi.string().allow("").allow(null),
   email: Joi.string().required(),
   phone: Joi.string().allow("").allow(null),
   birthday: Joi.string().allow("").allow(null),
   photo: Joi.string().allow("").allow(null),
   status: Joi.string().required(),
-  department: DepartmentSchema.required(),
-  professional_title: Joi.string().allow("").allow(null),
-  location: Joi.string().allow("").allow(null),
-  user_agent: Joi.string().allow("").allow(null),
-  ip: Joi.string().allow("").allow(null),
-  address: Joi.string().allow("").allow(null),
+  department: DepartmentSchema.allow(null),
+  address: AddressSchema.allow(null),
   role: RoleSchema.required(),
-  is_onboarded: Joi.boolean().required(),
+  job_title: Joi.string().allow("").allow(null),
   push_notifications_id: Joi.string().allow("").allow(null),
   modified_at: Joi.date().required(),
-  creation_at: Joi.date().required(),
+  created_at: Joi.date().required(),
 });
 
 export const UpdateEmployeeSchema = Joi.object({
@@ -57,13 +58,9 @@ export const UpdateEmployeeSchema = Joi.object({
   photo: Joi.string().allow("").allow(null),
   status: Joi.string(),
   department: DepartmentSchema,
-  professional_title: Joi.string().allow("").allow(null),
-  location: Joi.string().allow("").allow(null),
-  user_agent: Joi.string().allow("").allow(null),
-  ip: Joi.string().allow("").allow(null),
-  address: Joi.string().allow("").allow(null),
+  address: AddressSchema.allow(null),
   role: RoleSchema,
-  is_onboarded: Joi.boolean(),
+  job_title: Joi.string().allow("").allow(null),
   push_notifications_id: Joi.string().allow("").allow(null),
-  modified_at: Joi.date().required(),
+  modified_at: Joi.date(),
 });

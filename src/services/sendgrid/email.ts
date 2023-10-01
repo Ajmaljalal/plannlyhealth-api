@@ -11,7 +11,7 @@ export const sendRawEmailService = async (requestData: any) => {
     to: requestData.toEmail,
     from: 'hello@tryplannly.com',
     subject: requestData.subject,
-    html: '<strong>html template content here</strong>',
+    html: requestData.content,
   };
   try {
     const response = await SendgridMail.send(msg);

@@ -27,3 +27,10 @@ export const QuestionTypeSchema = Joi.string().valid('Single Select', 'Multi Sel
 export const RoleSchema = Joi.string().valid('Admin', 'Program Admin', 'Super Admin', 'Wellness Coordinator', 'Customer Success', 'Finance', 'Standard',);
 
 export const UserAccountStatusSchema = Joi.string().valid('Active', 'Invited', 'Deactivated');
+export const AddressSchema = Joi.object({
+  street: Joi.string().required(),
+  city: Joi.string().required(),
+  state: Joi.string().required(),
+  zip: Joi.string().required(),
+  country: Joi.string().required(),
+});

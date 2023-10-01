@@ -15,8 +15,8 @@ export const CreateNewUserSchema = Joi.object({
   phone: Joi.string(),
   job_title: Joi.string(),
   role: RoleSchema.required(),
-  created_date: Joi.date().required(),
-  modified_date: Joi.date().required(),
+  created_at: Joi.date().required(),
+  modified_at: Joi.date().required(),
 
 });
 
@@ -34,8 +34,8 @@ export const UpdateNewUserSchema = Joi.object({
   phone: Joi.string(),
   job_title: Joi.string(),
   role: RoleSchema,
-  created_date: Joi.date(),
-  modified_date: Joi.date().required(),
+  created_at: Joi.date(),
+  modified_at: Joi.date().required(),
 });
 
 export type NewUser = {
@@ -52,6 +52,6 @@ export type NewUser = {
   phone: string;
   job_title: string;
   role: string;
-  created_date: Date;
-  modified_date: Date;
+  created_at: Date;
+  modified_at: Date;
 }

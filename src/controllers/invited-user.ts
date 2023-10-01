@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 import { EmployeeAccountStatus, Role } from '../lib/enums';
-import { CreateNewUserSchema, UpdateNewUserSchema } from '../models/new-user';
 import {
   createNewUserService,
   getNewUserByEmailService,
@@ -10,10 +9,11 @@ import {
   getNewUserByLastNameService,
   getNewUsersByCompanyIdService,
   updateNewUserService,
-  deleteNewUserService
+  deleteNewUserService,
+  createBulkUsersService
 } from '../services/new-users';
 import { generateRandomPassword } from '../lib/helpers';
-import { Employee } from '../models/employee';
+import { CreateEmployeeSchema, Employee, UpdateEmployeeSchema } from '../models/employee';
 import { inviteNewUserService } from '../services/auth';
 import { createEmployeeService, deleteEmployeeService } from '../services/employees';
 import { sendEmailWithTemplateService } from '../services/sendgrid/email';
@@ -108,13 +108,14 @@ export const createNewUser = async (req: any, res: Response) => {
   }
 
   // 3.  add the required modifications to the user
-  user.created_date = Date();
-  user.modified_date = Date();
+  user.created_at = Date();
+  user.modified_at = Date();
   user.id = uuid();
   user.role = user.role || Role.Standard;
+  user.status = EmployeeAccountStatus.Invited;
 
   // 4. validate the request body before creating the user using the CreateUserSchema
-  const { error } = CreateNewUserSchema.validate(user);
+  const { error } = CreateEmployeeSchema.validate(user);
   if (error) {
     return res.status(400).json({
       message: error.details[0].message,
@@ -143,6 +144,69 @@ export const createNewUser = async (req: any, res: Response) => {
       code: 'INTERNAL_SERVER_ERROR'
     });
   }
+}
+
+export const createBulkUsers = async (req: Request, res: Response) => {
+  // 1. get the users from the request body and the company id from the request params
+  const users = req.body;
+  const companyId = req.params.companyId;
+
+  if (!companyId) {
+    return res.status(400).json({
+      message: 'Company id in request params con not be empty',
+      code: 'EMPTY_REQUEST_PARAMS'
+    });
+  }
+
+  // 2. check if the request body is empty
+  if (!Object.keys(users).length) {
+    return res.status(400).json({
+      message: 'Request body is empty',
+      code: 'EMPTY_REQUEST_BODY'
+    });
+  }
+
+  // 3.  add the required modifications to the users
+  users.forEach((user: any) => {
+    user.created_at = Date();
+    user.modified_at = Date();
+    user.id = uuid();
+    user.role = user.role || Role.Standard;
+    user.company_id = companyId;
+    user.status = EmployeeAccountStatus.Invited;
+    // // 4. validate the request body before creating the users using the CreateUserSchema
+    // const { error } = CreateEmployeeSchema.validate(user);
+    // if (error) {
+    //   return res.status(400).json({
+    //     message: error.details[0].message,
+    //     code: 'INVALID_REQUEST_BODY'
+    //   });
+    // }
+  });
+
+
+  try {
+    // 5. call the createBulkUsersService to create the users
+    const response: any = await createBulkUsersService(users);
+
+    // 6. check if the response is an error
+    if (response.code) {
+      return res.status(response.statusCode).json({
+        message: response.message,
+        code: response.code
+      });
+    } else {
+      // 7. if the response is not an error, send the users
+      return res.status(201).json(response);
+    }
+  }
+  catch (err: any) {
+    return res.status(500).json({
+      message: err.message,
+      code: 'INTERNAL_SERVER_ERROR'
+    });
+  }
+
 }
 
 export const getNewUserById = async (req: Request, res: Response) => {
@@ -364,11 +428,11 @@ export const updateNewUser = async (req: Request, res: Response) => {
     // 4. add the required modifications to the user
     delete user.id; // this is because the id is not allowed to be updated
     delete userExists.Item?.id; // this is because the id is not allowed to be updated
-    user.modified_date = Date();
+    user.modified_at = Date();
     const userToUpdate = { ...userExists.Item, ...user };
 
     // 5. validate the request body before updating the user using the UpdateUserSchema
-    const { error } = UpdateNewUserSchema.validate(userToUpdate);
+    const { error } = UpdateEmployeeSchema.validate(userToUpdate);
     if (error) {
       return res.status(400).json({
         message: error.details[0].message,
