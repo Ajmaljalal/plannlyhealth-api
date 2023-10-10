@@ -6,11 +6,6 @@ import config from './configs/base';
 import { authenticationMiddleware } from './middlewares/authenticate';
 import companyRoutes from './routes/company';
 import employeeRoutes from './routes/employee';
-import benefitsProgramsRoutes from './routes/benefits';
-import programBalanceRoutes from './routes/program-balances';
-import claimsRoutes from './routes/claims';
-import commentsRoutes from './routes/comments';
-import dealsRoutes from './routes/deals';
 import documentsRoutes from './routes/documents';
 import newUsersRoutes from './routes/invited-user';
 import authRoutes from './routes/auth';
@@ -47,11 +42,6 @@ app.use(authenticationMiddleware);
 // Routes go here 
 app.use('/employees', employeeRoutes);
 app.use('/companies', companyRoutes);
-app.use('/benefits', benefitsProgramsRoutes);
-app.use('/program-balances', programBalanceRoutes);
-app.use('/claims', claimsRoutes);
-app.use('/comments', commentsRoutes);
-app.use('/deals', dealsRoutes);
 app.use('/documents', documentsRoutes);
 app.use('/new-users', newUsersRoutes)
 app.use('/stripe', stripeRoutes)
