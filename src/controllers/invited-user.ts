@@ -486,16 +486,16 @@ export const deleteNewUser = async (req: Request, res: Response) => {
     // 3. check if the current user is the owner of the user
     // @ts-ignore
     // const authorizedUser: any = req.user;
-    const currentUser = req.user;
-    const isAdmin = currentUser && currentUser.role === Role.Admin;
-    const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
-    const isAuthorized = isAdmin || isSuperAdmin;
-    if (!isAuthorized) {
-      return res.status(403).json({
-        message: 'You are not authorized to perform this action',
-        code: "UNAUTHORIZED"
-      });
-    }
+    // const currentUser = req.user;
+    // const isAdmin = currentUser && currentUser.role === Role.Admin;
+    // const isSuperAdmin = currentUser && currentUser.role === Role.SuperAdmin
+    // const isAuthorized = isAdmin || isSuperAdmin;
+    // if (!isAuthorized) {
+    //   return res.status(403).json({
+    //     message: 'You are not authorized to perform this action',
+    //     code: "UNAUTHORIZED"
+    //   });
+    // }
 
     // 4. call the deleteUserService to delete the user
     const response: any = await deleteNewUserService(userId);
