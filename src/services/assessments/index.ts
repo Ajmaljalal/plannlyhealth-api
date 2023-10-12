@@ -32,7 +32,7 @@ export const getAssessmentByIdService = async (id: string) => {
   }
 }
 
-export const getAssessmentByCompanyIdService = async (companyId: string) => {
+export const getAssessmentsByCompanyIdService = async (companyId: string) => {
   const params: DocumentClient.QueryInput = {
     TableName: TABLE_NAME,
     IndexName: 'company_id-index',
@@ -43,6 +43,23 @@ export const getAssessmentByCompanyIdService = async (companyId: string) => {
   };
   try {
     const result = await db.query(params).promise();
+    return result.Items
+  } catch (err) {
+    return err;
+  }
+}
+
+export const getAssessmentsByUserIdService = async (userId: string) => {
+  const params: DocumentClient.QueryInput = {
+    TableName: TABLE_NAME,
+    IndexName: 'user_id-index',
+    KeyConditionExpression: 'user_id = :user_id',
+    ExpressionAttributeValues: {
+      ':user_id': userId
+    }
+  };
+  try {
+    const result: any = await db.query(params).promise();
     return result.Items
   } catch (err) {
     return err;
