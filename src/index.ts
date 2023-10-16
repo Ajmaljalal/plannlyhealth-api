@@ -11,6 +11,7 @@ import newUsersRoutes from './routes/invited-user';
 import authRoutes from './routes/auth';
 import stripeRoutes from './routes/stripe';
 import sendGridRoutes from './routes/sendgrid';
+import assessmentsRoutes from './routes/assessments';
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use('/documents', documentsRoutes);
 app.use('/new-users', newUsersRoutes)
 app.use('/stripe', stripeRoutes)
 app.use('/sendgrid', sendGridRoutes)
+app.use('/assessments', assessmentsRoutes)
 app.use('/', (req, res) => {
   res.status(200).json('OK');
 });

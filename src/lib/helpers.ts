@@ -34,12 +34,15 @@ export const generateRandomPassword = () => {
 
 export const extractQuestions = () => {
   const questions: Question[] = [];
+  let id = 1;
 
   for (const questionId of baseline_questions) {
     const question = burnout_questions_bank[questionId];
     if (question) {
+      question.id = id;
       question.options = burnout_questions_options[questionId];
       questions.push(question);
+      id++;
     }
   }
 

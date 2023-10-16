@@ -2,6 +2,22 @@ import { Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 import { createAssessmentService, getAssessmentByIdService, getAssessmentsByCompanyIdService, updateAssessmentService } from '../services/assessments';
 import { Assessment, CreateAssessmentSchema, UpdateAssessmentSchema } from '../models/assessments';
+import { extractQuestions } from '../lib/helpers';
+
+export const startBaselineAssessment = async (req: Request, res: Response) => {
+
+  try {
+    const questions = extractQuestions()
+    if (questions.length) {
+      return res.status(200).json(questions);
+    }
+  } catch (err: any) {
+    return res.status(500).json({
+      message: err.message,
+      code: 'INTERNAL_SERVER_ERROR',
+    });
+  }
+}
 
 export async function createAssessment(req: any, res: Response) {
   const assessment = req.body;
@@ -16,7 +32,7 @@ export async function createAssessment(req: any, res: Response) {
 
   // 2. modify the assessment object to add the required fields
   assessment.id = uuid();
-  assessment.is_completed = false;
+  assessment.is_completed = true;
   assessment.created_at = Date();
   assessment.modified_at = Date();
 

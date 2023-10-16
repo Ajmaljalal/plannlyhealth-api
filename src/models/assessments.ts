@@ -3,8 +3,9 @@ import Joi from "joi";
 type AssessmentType = 'monthly' | 'onboarding';
 
 type Answer = {
-  id: string;
+  id: number;
   question_id: string;
+  question: string;
   options: string[];
   selected_option: string;
   score: number;
@@ -27,8 +28,9 @@ export const CreateAssessmentSchema = Joi.object({
   user_id: Joi.string().required(),
   is_completed: Joi.boolean().required(),
   answers: Joi.array().items(Joi.object({
-    id: Joi.string().required(),
+    id: Joi.number().required(),
     question_id: Joi.string().required(),
+    question: Joi.string().required(),
     options: Joi.array().items(Joi.string()).required(),
     selected_option: Joi.string().required(),
     score: Joi.number().allow(null),

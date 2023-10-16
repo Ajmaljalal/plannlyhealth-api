@@ -4,7 +4,7 @@ export const baseline_questions: string[] = [
   'burnout_2',
   'burnout_3',
   'burnout_4',
-  'burnout-6',
+  'burnout_6',
   'burnout_5',
   'burnout_7',
   'burnout_9',
