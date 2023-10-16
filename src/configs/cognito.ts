@@ -41,7 +41,7 @@ function getAuthDetails(email: string, password: string) {
   return new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
 }
 
-function initAWS(region = process.env.AWS_REGION, identityPoolId = process.env.AWS_IDENTITY_POOL_ID) {
+function initAWS(region = process.env.APP_AWS_REGION, identityPoolId = process.env.AWS_IDENTITY_POOL_ID) {
   AWS.config.region = region; // Region
   AWS.config.accessKeyId = process.env.AWS_ACCESS_KEY,
     AWS.config.secretAccessKey = process.env.AWS_SECRET_KEY,
