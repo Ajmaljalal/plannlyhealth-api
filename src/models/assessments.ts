@@ -8,7 +8,8 @@ type Answer = {
   question: string;
   options: string[];
   selected_option: string;
-  score: number;
+  scores: any;
+  category: string;
 };
 export type Assessment = {
   id: string;
@@ -19,6 +20,12 @@ export type Assessment = {
   answers: Answer[]
   created_at: string;
   modified_at: string;
+  risk_scores?: {
+    burnout: any;
+    stress: any;
+    turnover: any;
+    workload: any;
+  }
 };
 
 export const CreateAssessmentSchema = Joi.object({
@@ -33,10 +40,17 @@ export const CreateAssessmentSchema = Joi.object({
     question: Joi.string().required(),
     options: Joi.array().items(Joi.string()).required(),
     selected_option: Joi.string().required(),
-    score: Joi.number().allow(null),
+    scores: Joi.any().allow(null),
+    category: Joi.string().required(),
   })).required(),
   created_at: Joi.string().required(),
   modified_at: Joi.string().required(),
+  risk_scores: Joi.object({
+    burnout: Joi.any().allow(null),
+    stress: Joi.any().allow(null),
+    turnover: Joi.any().allow(null),
+    workload: Joi.any().allow(null),
+  }),
 });
 
 export const UpdateAssessmentSchema = Joi.object({
@@ -46,8 +60,15 @@ export const UpdateAssessmentSchema = Joi.object({
     question_id: Joi.string().required(),
     options: Joi.array().items(Joi.string()).required(),
     selected_option: Joi.string().required(),
-    score: Joi.number().allow(null),
+    scores: Joi.any().allow(null),
+    category: Joi.string().allow(null),
   })).required(),
   modified_at: Joi.string().required(),
+  risk_scores: Joi.object({
+    burnout: Joi.any().allow(null),
+    stress: Joi.any().allow(null),
+    turnover: Joi.any().allow(null),
+    workload: Joi.any().allow(null),
+  }),
 });
 

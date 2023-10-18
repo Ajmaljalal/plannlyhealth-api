@@ -1,5 +1,5 @@
 import CryptoJS from 'crypto-js';
-import { burnout_questions_bank, baseline_questions, burnout_questions_options } from './assessment/questions_bank';
+import { burnout_questions_bank, baseline_questions } from './assessment/questions_bank';
 import { Question } from './types/assessment';
 
 export const decryptData = (data: string) => {
@@ -40,7 +40,6 @@ export const extractQuestions = () => {
     const question = burnout_questions_bank[questionId];
     if (question) {
       question.id = id;
-      question.options = burnout_questions_options[questionId];
       questions.push(question);
       id++;
     }
@@ -48,3 +47,54 @@ export const extractQuestions = () => {
 
   return questions;
 }
+
+
+export const calculateScores = (assessment: any): any => {
+  let scores: any = {
+    burnout: {
+      score: 0,
+      symptoms_count: 0,
+      percentage: 0,
+    },
+    stress: {
+      score: 0,
+      symptoms_count: 0,
+      percentage: 0,
+    },
+    turnover: {
+      score: 0,
+      symptoms_count: 0,
+      percentage: 0,
+    },
+    workload: {
+      score: 0,
+      symptoms_count: 0,
+      percentage: 0,
+    },
+  };
+
+
+  for (const answer of assessment.answers) {
+    const question = burnout_questions_bank[answer.question_id];
+    if (!question) continue; // Skip if question not found in bank
+
+    const scoreValue = question.scores[answer.selected_option];
+
+    const categories = question.category.split(', ');
+
+    for (const category of categories) {
+      if (scores[category] !== undefined) {
+        scores[category].score += scoreValue;
+        scores[category].symptoms_count++;
+      }
+    }
+  }
+
+  // Normalize the scores to ensure they do not exceed 100
+  for (const category in scores) {
+    scores[category].score = scores[category].score > 100 ? 100 : scores[category].score;
+    scores[category].percentage = Math.round((scores[category].score / (scores[category].symptoms_count * 5)) * 100);
+  }
+
+  return scores;
+};

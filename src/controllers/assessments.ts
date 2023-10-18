@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 import { createAssessmentService, getAssessmentByIdService, getAssessmentsByCompanyIdService, updateAssessmentService } from '../services/assessments';
 import { Assessment, CreateAssessmentSchema, UpdateAssessmentSchema } from '../models/assessments';
-import { extractQuestions } from '../lib/helpers';
+import { calculateScores, extractQuestions } from '../lib/helpers';
 
 export const startBaselineAssessment = async (req: Request, res: Response) => {
 
@@ -31,13 +31,18 @@ export async function createAssessment(req: any, res: Response) {
   }
 
   // 2. modify the assessment object to add the required fields
-  assessment.id = uuid();
-  assessment.is_completed = true;
-  assessment.created_at = Date();
-  assessment.modified_at = Date();
+  const risk_scores = calculateScores(assessment);
+  const newAssessment: Assessment = {
+    ...assessment,
+    id: uuid(),
+    is_completed: true,
+    created_at: Date(),
+    modified_at: Date(),
+    risk_scores: risk_scores,
+  };
 
   // 3. validate the request body before creating the assessment using the CreateassessmentSchema
-  const { error } = CreateAssessmentSchema.validate(assessment);
+  const { error } = CreateAssessmentSchema.validate(newAssessment);
   if (error) {
     return res.status(400).json({
       message: error.details[0].message,
@@ -47,11 +52,11 @@ export async function createAssessment(req: any, res: Response) {
 
   // 4. call the createAssessmentService to create the assessment
   try {
-    const response: any = await createAssessmentService(assessment);
+    const response: any = await createAssessmentService(newAssessment);
 
     // 5. check if the response is an error
     if (response.code) {
-      return res.status(response.statusCode).json({
+      return res.status(response.statusCode || 400).json({
         message: response.message,
         code: response.code
       });
