@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { Firestore, getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getAnalytics } from "firebase/analytics";
 
@@ -22,10 +22,8 @@ if (!apps.length) {
   firebaseApp = apps[0];
 }
 
-const analytics = getAnalytics(firebaseApp);
-
 // Initialize Firestore
-const db = getFirestore(firebaseApp);
+const db: Firestore = getFirestore(firebaseApp);
 
 // Initialize Auth
 const auth = getAuth(firebaseApp);

@@ -1,6 +1,6 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
-import db from "../../configs/aws";
-import { Assessment } from "../../models/assessments";
+import db from "../configs/aws";
+import { Assessment } from "../models/assessments";
 
 const TABLE_NAME = `assessments`;
 

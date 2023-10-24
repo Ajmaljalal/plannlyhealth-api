@@ -11,7 +11,7 @@ import {
 const router = Router();
 
 
-router.get('/baseline/', startBaselineAssessment)
+router.get('/baseline', startBaselineAssessment)
 router.get('/:id', getAssessmentById)
 router.get('/user/:userId', getAssessmentyByUserId)
 router.get('/company/:companyId', getAssessmentsByCompanyId)

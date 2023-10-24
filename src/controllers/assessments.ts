@@ -54,7 +54,6 @@ export async function createAssessment(req: any, res: Response) {
   // 4. call the createAssessmentService to create the assessment
   try {
     const response: any = await createAssessmentService(newAssessment);
-
     // 5. check if the response is an error
     if (response.code) {
       return res.status(response.statusCode || 400).json({
