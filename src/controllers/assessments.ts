@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { createAssessmentService, getAssessmentByIdService, getAssessmentsByCompanyIdService, updateAssessmentService } from '../services/assessments';
 import { Assessment, CreateAssessmentSchema, UpdateAssessmentSchema } from '../models/assessments';
 import { calculateScores, extractQuestions } from '../lib/helpers';
+import { updateEmployeeService } from '../services/employees';
 
 export const startBaselineAssessment = async (req: Request, res: Response) => {
 
@@ -62,6 +63,14 @@ export async function createAssessment(req: any, res: Response) {
       });
     } else {
       // 6. if the response is not an error, send the assessment
+      await updateEmployeeService(
+        newAssessment.user_id,
+        {
+          onboarding_assessment_completed: true,
+          modified_at: Date(),
+          last_assessment_date: Date(),
+          last_assessment_type: 'onboarding',
+        })
       return res.status(200).json(response.Item);
     }
   }

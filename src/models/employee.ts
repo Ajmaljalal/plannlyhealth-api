@@ -24,6 +24,9 @@ export interface Employee {
   address: Address;
   role: Role;
   job_title: string;
+  onboarding_assessment_completed: boolean;
+  last_assessment_date?: string;
+  last_assessment_type?: string;
   push_notifications_id: string;
   modified_at?: string;
   created_at?: string;
@@ -44,6 +47,9 @@ export const CreateEmployeeSchema = Joi.object({
   address: AddressSchema.allow(null),
   role: RoleSchema.required(),
   job_title: Joi.string().allow("").allow(null),
+  onboarding_assessment_completed: Joi.boolean().required(),
+  last_assessment_date: Joi.date().allow("").allow(null),
+  last_assessment_type: Joi.string().allow("").allow(null),
   push_notifications_id: Joi.string().allow("").allow(null),
   modified_at: Joi.date().required(),
   created_at: Joi.date().required(),
@@ -61,6 +67,9 @@ export const UpdateEmployeeSchema = Joi.object({
   address: AddressSchema.allow(null),
   role: RoleSchema,
   job_title: Joi.string().allow("").allow(null),
+  onboarding_assessment_completed: Joi.boolean(),
+  last_assessment_date: Joi.date().allow("").allow(null),
+  last_assessment_type: Joi.string().allow("").allow(null),
   push_notifications_id: Joi.string().allow("").allow(null),
   modified_at: Joi.date(),
 });

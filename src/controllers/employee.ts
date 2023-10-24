@@ -35,6 +35,10 @@ export async function createEmployee(req: any, res: Response) {
   employee.modified_at = Date();
   employee.role = employee.role || Role.Standard;
   employee.status = employee.status || EmployeeAccountStatus.Invited;
+  employee.onboarding_assessment_completed = false;
+  employee.last_assessment_date = null;
+  employee.last_assessment_type = null;
+
 
   // 3. validate the request body before creating the employee using the CreateemployeeSchema
   const { error } = CreateEmployeeSchema.validate(employee);
