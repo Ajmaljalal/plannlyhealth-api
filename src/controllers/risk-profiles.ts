@@ -7,9 +7,7 @@ import { Assessment } from "../models/assessments";
 
 export const createRiskProfile = async (req: Request, res: any) => {
   const dynamoDBAssessment: any = req.body;
-  console.log('ASSESSMENT: ', dynamoDBAssessment)
   const assessment = AWS.DynamoDB.Converter.unmarshall(dynamoDBAssessment) as Assessment;
-  console.dir(assessment, { depth: 4 })
 
   if (!assessment) {
     return res.status(400).json({
