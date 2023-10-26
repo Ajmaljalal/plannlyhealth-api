@@ -4,15 +4,15 @@ export const baseline_questions: string[] = [
   'burnout_1',
   'burnout_3',
   'burnout_7',
+  'burnout_50',
   'burnout_9',
+  'burnout_16',
   'burnout_48',
   'burnout_49',
-  'burnout_16',
   'burnout_23',
   'burnout_41',
   'burnout_46',
   'burnout_4',
-  'burnout_6',
   'burnout_45',
   'burnout_47',
 ]
@@ -376,8 +376,14 @@ export const general_questions_bank: any = {
     options: ["Very high", "High", "Neutral", "Low", "Very low"],
     scores: { "Very high": 5, High: 4, Neutral: 3, Low: 2, "Very low": 0 },
     category: "stress, burnout, turnover"
+  },
+  burnout_50: {
+    question_id: 'burnout_50',
+    question: "Do you feel you have sufficient resources and support to handle your workload?",
+    options: ["Always", "Often", "Sometimes", "Rarely", "Never"],
+    scores: { Always: 0, Often: 2, Sometimes: 3, Rarely: 4, Never: 5 },
+    category: "resources"
   }
-
 }
 
 export const workload_questions_bank: any = [
@@ -425,7 +431,7 @@ export const workload_questions_bank: any = [
   },
   {
     question_id: 'workload_7',
-    question: "Do you feel you have sufficient access to up-to-date medical equipment and resources to handle your workload?",
+    question: "Do you feel you have sufficient access to medical equipment and resources to handle your workload?",
     options: ["Always", "Often", "Sometimes", "Rarely", "Never"],
     scores: { Always: 0, Often: 2, Sometimes: 3, Rarely: 4, Never: 5 },
     category: "workload"
