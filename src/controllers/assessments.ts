@@ -274,13 +274,12 @@ export const createAssessmentProgress = async (req: any, res: any) => {
     const assessmentProgress = {
       ...employee,
       last_assessment_date: new Date().toISOString(),
-      assessment_count: 1,
       onboarding_assessment_completed: false,
       monthly_assessments: {
         month: new Date().getMonth() + 1,
         year: new Date().getFullYear(),
-        completed: false,
-        completed_date: null
+        completed: true,
+        completed_date: new Date().toISOString(),
       }
     }
 
