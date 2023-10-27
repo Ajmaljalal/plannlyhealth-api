@@ -1,8 +1,12 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
-import db from "../configs/aws";
+import dynamobDB from "../configs/aws";
 import { Assessment } from "../models/assessments";
+import { addDoc, collection, doc, getDoc } from "firebase/firestore";
+import { db } from "../configs/firebase";
 
-const TABLE_NAME = `assessments`;
+const TABLE_NAME = `assessments`
+const ASSESSMENTS_PROGRESS_TABLE_NAME = `assessments-progress`;
+
 
 export const createAssessmentService = async (assessment: Assessment) => {
   const params: DocumentClient.PutItemInput = {
@@ -10,7 +14,7 @@ export const createAssessmentService = async (assessment: Assessment) => {
     Item: assessment,
   };
   try {
-    const result = await db.put(params).promise();
+    const result = await dynamobDB.put(params).promise();
     return result
   } catch (err) {
     return err;
@@ -25,7 +29,7 @@ export const getAssessmentByIdService = async (id: string) => {
     },
   };
   try {
-    const result = await db.get(params).promise();
+    const result = await dynamobDB.get(params).promise();
     return result.Item;
   } catch (err) {
     return err;
@@ -42,7 +46,7 @@ export const getAssessmentsByCompanyIdService = async (companyId: string) => {
     }
   };
   try {
-    const result = await db.query(params).promise();
+    const result = await dynamobDB.query(params).promise();
     return result.Items
   } catch (err) {
     return err;
@@ -59,14 +63,14 @@ export const getAssessmentsByUserIdService = async (userId: string) => {
     }
   };
   try {
-    const result: any = await db.query(params).promise();
+    const result: any = await dynamobDB.query(params).promise();
     return result.Items
   } catch (err) {
     return err;
   }
 }
 
-export async function updateAssessmentService(id: string, updates: Partial<Assessment>) {
+export const updateAssessmentService = async (id: string, updates: Partial<Assessment>) => {
   // Create UpdateExpression and ExpressionAttributeValues based on the updates provided
   const UpdateExpression = 'SET ' + Object.keys(updates).map((key, i) => {
     return `#${key} = :${key}`;
@@ -93,9 +97,37 @@ export async function updateAssessmentService(id: string, updates: Partial<Asses
   };
 
   try {
-    const result = await db.update(params).promise();
+    const result = await dynamobDB.update(params).promise();
     return result;
   } catch (err) {
     return err;
+  }
+}
+
+
+export const createAssessmentProgressService = async (assessmentProgress: any) => {
+  try {
+    const collectionRef = collection(db, ASSESSMENTS_PROGRESS_TABLE_NAME);
+    const docRef = await addDoc(collectionRef, assessmentProgress);
+    return docRef
+  } catch (error) {
+    console.error('ERROR: ', error)
+    return error
+  }
+}
+
+export const getAssessmentProgressService = async (employeeId: string) => {
+  try {
+    const docRef = doc(db, ASSESSMENTS_PROGRESS_TABLE_NAME, employeeId);
+    const snapshot = await getDoc(docRef);
+    if (!snapshot.exists()) {
+      console.log(`No assessment progress found for employee with ID: ${employeeId}`);
+      return null;
+    } else {
+      return snapshot.data();
+    }
+  } catch (error) {
+    console.error('ERROR: ', error);
+    return error;
   }
 }

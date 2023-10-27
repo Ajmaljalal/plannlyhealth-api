@@ -1,18 +1,44 @@
 import { Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
-import { createAssessmentService, getAssessmentByIdService, getAssessmentsByCompanyIdService, updateAssessmentService } from '../services/assessments';
-import { Assessment, CreateAssessmentSchema, UpdateAssessmentSchema } from '../models/assessments';
-import { calculateScores, extractQuestions } from '../lib/helpers';
+import {
+  createAssessmentProgressService,
+  createAssessmentService,
+  getAssessmentByIdService,
+  getAssessmentProgressService,
+  getAssessmentsByCompanyIdService,
+  getAssessmentsByUserIdService,
+  updateAssessmentService
+} from '../services/assessments';
+import {
+  Assessment,
+  CreateAssessmentSchema,
+  UpdateAssessmentSchema
+} from '../models/assessments';
+import {
+  calculateScores,
+  extractQuestions
+} from '../lib/helpers';
 import { updateEmployeeService } from '../services/employees';
+import {
+  burnout_questions_bank,
+  turnover_questions_bank,
+  workload_questions_bank
+} from '../lib/assessment/questions_bank';
 
-export const startBaselineAssessment = async (req: Request, res: Response) => {
+const questions: any = {
+  burnout: burnout_questions_bank,
+  workload: workload_questions_bank,
+  turnover: turnover_questions_bank
+}
 
+export const generateBaselineAssessment = async (req: Request, res: Response) => {
   try {
     const questions = extractQuestions()
     if (questions.length) {
       return res.status(200).json(questions);
     }
   } catch (err: any) {
+    console.error('ERROR: ', err)
     return res.status(500).json({
       message: err.message,
       code: 'INTERNAL_SERVER_ERROR',
@@ -20,7 +46,23 @@ export const startBaselineAssessment = async (req: Request, res: Response) => {
   }
 }
 
-export async function createAssessment(req: any, res: Response) {
+export const generateMonthlyAssessment = async (req: Request, res: Response) => {
+  const assessmentType = req.params.type;
+  try {
+    const currentAssessmentQuestions = questions[assessmentType]
+    if (currentAssessmentQuestions.length) {
+      return res.status(200).json(currentAssessmentQuestions);
+    }
+  } catch (err: any) {
+    console.error('ERROR: ', err)
+    return res.status(500).json({
+      message: err.message,
+      code: 'INTERNAL_SERVER_ERROR',
+    });
+  }
+}
+
+export const createAssessment = async (req: any, res: Response) => {
   const assessment = req.body;
 
   // 1. check if the request body is empty
@@ -45,6 +87,7 @@ export async function createAssessment(req: any, res: Response) {
   // 3. validate the request body before creating the assessment using the CreateassessmentSchema
   const { error } = CreateAssessmentSchema.validate(newAssessment);
   if (error) {
+    console.log('ERROR: ', error)
     return res.status(400).json({
       message: error.details[0].message,
       code: 'INVALID_REQUEST_BODY'
@@ -56,6 +99,7 @@ export async function createAssessment(req: any, res: Response) {
     const response: any = await createAssessmentService(newAssessment);
     // 5. check if the response is an error
     if (response.code) {
+      console.log('ERROR: ', response)
       return res.status(response.statusCode || 400).json({
         message: response.message,
         code: response.code
@@ -75,6 +119,7 @@ export async function createAssessment(req: any, res: Response) {
   }
   catch (err: any) {
     // 7. catch any other error and send the error message
+    console.log('ERROR: ', err)
     return res.status(500).json({
       message: err.message,
       code: 'INTERNAL_SERVER_ERROR'
@@ -104,11 +149,11 @@ export const getAssessmentById = async (req: Request, res: Response) => {
   }
 }
 
-export const getAssessmentyByUserId = async (req: Request, res: Response) => {
+export const getAssessmentsyByUserId = async (req: Request, res: Response) => {
   const userId: string = req.params.userId;
 
   try {
-    const response: any = await getAssessmentByIdService(userId);
+    const response: any = await getAssessmentsByUserIdService(userId);
 
     if (response.code) {
       return res.status(response.statusCode).json({
@@ -148,7 +193,7 @@ export const getAssessmentsByCompanyId = async (req: Request, res: Response) => 
   }
 }
 
-export async function updateAssessment(req: any, res: Response) {
+export const updateAssessment = async (req: any, res: Response) => {
   const assessmentId: string = req.params.id;
   const assessment: Partial<Assessment> = req.body;
   // remove company_id and id and create_at, as it is not allowed to be updated
@@ -210,6 +255,81 @@ export async function updateAssessment(req: any, res: Response) {
       message: err.message,
       error: 'INTERNAL_SERVER_ERROR',
       code: 500,
+    });
+  }
+}
+
+export const createAssessmentProgress = async (req: any, res: any) => {
+  const employee = req.body;
+
+  if (!employee) {
+    return res.status(400).json({
+      message: 'INVALID_REQUEST_BODY',
+      code: 'BAD_REQUEST',
+    });
+  }
+
+  try {
+
+    const assessmentProgress = {
+      ...employee,
+      last_assessment_date: new Date().toISOString(),
+      assessment_count: 1,
+      onboarding_assessment_completed: false,
+      monthly_assessments: {
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear(),
+        completed: false,
+        completed_date: null
+      }
+    }
+
+    const response: any = await createAssessmentProgressService(assessmentProgress);
+    if (response.code) {
+      console.log('ERROR: ', response)
+      return res.status(response.statusCode || 400).json({
+        message: response.message,
+        code: response.code,
+      });
+    } else {
+      return res.status(201).json(response.Item);
+    }
+  } catch (err: any) {
+    console.log('ERROR: ', err)
+    return res.status(500).json({
+      message: err.message,
+      code: 'INTERNAL_SERVER_ERROR',
+    });
+  }
+}
+
+export const getAssessmentProgress = async (req: any, res: any) => {
+  const employeeId = req.params.employeeId;
+
+  if (!employeeId) {
+    return res.status(400).json({
+      message: 'INVALID_REQUEST_BODY',
+      code: 'BAD_REQUEST',
+    });
+  }
+
+  try {
+    const response: any = await getAssessmentProgressService(employeeId);
+
+    if (response.code) {
+      console.log('ERROR: ', response.message)
+      return res.status(response.statusCode || 400).json({
+        message: response.message,
+        code: response.code,
+      });
+    } else {
+      return res.status(200).json(response);
+    }
+  } catch (err: any) {
+    console.log('ERROR: ', err)
+    return res.status(500).json({
+      message: err.message,
+      code: 'INTERNAL_SERVER_ERROR',
     });
   }
 }

@@ -47,7 +47,7 @@ export const CreateEmployeeSchema = Joi.object({
   address: AddressSchema.allow(null),
   role: RoleSchema.required(),
   job_title: Joi.string().allow("").allow(null),
-  onboarding_assessment_completed: Joi.boolean().required(),
+  onboarding_assessment_completed: Joi.boolean().default(false),
   last_assessment_date: Joi.date().allow("").allow(null),
   last_assessment_type: Joi.string().allow("").allow(null),
   push_notifications_id: Joi.string().allow("").allow(null),

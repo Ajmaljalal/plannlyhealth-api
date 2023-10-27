@@ -52,7 +52,6 @@ export async function createEmployee(req: any, res: Response) {
   // 4. call the createemployeeService to create the user
   try {
     const response: any = await createEmployeeService(employee);
-
     // 5. check if the response is an error
     if (response.code) {
       return res.status(response.statusCode).json({

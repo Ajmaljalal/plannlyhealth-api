@@ -1,11 +1,10 @@
 import AWS from "aws-sdk";
 import { generateRiskProfile } from "../lib/helpers";
 import { RiskProfile } from "../lib/types/assessment";
-import { createRiskProfileService } from "../services/risk-profile";
+import { createRiskProfileService, } from "../services/risk-profile";
 import { Assessment } from "../models/assessments";
 
-
-export const createRiskProfile = async (req: Request, res: any) => {
+export const createRiskProfile = async (req: any, res: any) => {
   const dynamoDBAssessment: any = req.body;
   const assessment = AWS.DynamoDB.Converter.unmarshall(dynamoDBAssessment) as Assessment;
 
@@ -22,7 +21,8 @@ export const createRiskProfile = async (req: Request, res: any) => {
     const response: any = await createRiskProfileService(riskProfile);
 
     if (response.code) {
-      return res.status(response.statusCode).json({
+      console.log('ERROR: ', response)
+      return res.status(response.statusCode || 400).json({
         message: response.message,
         code: response.code,
       });
@@ -30,6 +30,7 @@ export const createRiskProfile = async (req: Request, res: any) => {
       return res.status(201).json(response.Item);
     }
   } catch (err: any) {
+    console.log('ERROR: ', err)
     return res.status(500).json({
       message: err.message,
       code: 'INTERNAL_SERVER_ERROR',
