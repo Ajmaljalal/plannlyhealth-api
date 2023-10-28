@@ -49,7 +49,6 @@ export const extractQuestions = () => {
   return questions;
 }
 
-
 export const calculateScores = (assessment: any): any => {
   let scores: any = {
     burnout: {
@@ -157,3 +156,18 @@ export const generateRiskProfile = (assessment: Assessment): RiskProfile => {
   };
 }
 
+export const getAssessmentProgressStatus = (progress: any) => {
+  const { onboarding_assessment_completed, last_assessment_date } = progress;
+  const lastAssessmentDate = new Date(last_assessment_date);
+  const currentDate = new Date();
+
+  const isSameMonth = lastAssessmentDate.getMonth() === currentDate.getMonth()
+    && lastAssessmentDate.getFullYear() === currentDate.getFullYear();
+
+  let monthly_assessment_completed = isSameMonth;
+
+  return {
+    onboarding_assessment_completed: onboarding_assessment_completed,
+    monthly_assessment_completed: monthly_assessment_completed
+  };
+}

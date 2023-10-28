@@ -1,11 +1,11 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import dynamobDB from "../configs/aws";
 import { Assessment } from "../models/assessments";
-import { addDoc, collection, doc, getDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { db } from "../configs/firebase";
 
-const TABLE_NAME = `assessments`
-const ASSESSMENTS_PROGRESS_TABLE_NAME = `assessments-progress`;
+const TABLE_NAME = 'assessments'
+const ASSESSMENTS_PROGRESS_TABLE_NAME = 'assessments-progress';
 
 
 export const createAssessmentService = async (assessment: Assessment) => {
@@ -104,8 +104,7 @@ export const updateAssessmentService = async (id: string, updates: Partial<Asses
   }
 }
 
-
-export const createAssessmentProgressService = async (assessmentProgress: any) => {
+export const createAssessmentProgressTrackerService = async (assessmentProgress: any) => {
   try {
     const collectionRef = collection(db, ASSESSMENTS_PROGRESS_TABLE_NAME);
     const docRef = await addDoc(collectionRef, assessmentProgress);
@@ -116,15 +115,42 @@ export const createAssessmentProgressService = async (assessmentProgress: any) =
   }
 }
 
-export const getAssessmentProgressService = async (employeeId: string) => {
+export const getAssessmentProgressTrackerService = async (employeeId: string) => {
   try {
-    const docRef = doc(db, ASSESSMENTS_PROGRESS_TABLE_NAME, employeeId);
-    const snapshot = await getDoc(docRef);
-    if (!snapshot.exists()) {
+    const q = query(
+      collection(db, ASSESSMENTS_PROGRESS_TABLE_NAME),
+      where('user_id', '==', employeeId)
+    );
+
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
       console.log(`No assessment progress found for employee with ID: ${employeeId}`);
       return null;
     } else {
-      return snapshot.data();
+      return querySnapshot.docs[0].data();
+    }
+  } catch (error) {
+    console.error('ERROR: ', error);
+    return error;
+  }
+}
+
+export const updateAssessmentProgressTrackerService = async (user_id: string, data: any) => {
+  try {
+    const q = query(
+      collection(db, ASSESSMENTS_PROGRESS_TABLE_NAME),
+      where('user_id', '==', user_id)
+    );
+
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+      console.log(`No assessment progress found for employee with ID: ${user_id}`);
+      return null;
+    } else {
+      const docId = querySnapshot.docs[0].id;
+      const docRef = doc(db, ASSESSMENTS_PROGRESS_TABLE_NAME, docId);
+      await updateDoc(docRef, data);
+      return data;
     }
   } catch (error) {
     console.error('ERROR: ', error);

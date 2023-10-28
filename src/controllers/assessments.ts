@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 import {
-  createAssessmentProgressService,
+  createAssessmentProgressTrackerService,
   createAssessmentService,
   getAssessmentByIdService,
-  getAssessmentProgressService,
+  getAssessmentProgressTrackerService,
   getAssessmentsByCompanyIdService,
   getAssessmentsByUserIdService,
+  updateAssessmentProgressTrackerService,
   updateAssessmentService
 } from '../services/assessments';
 import {
@@ -16,7 +17,8 @@ import {
 } from '../models/assessments';
 import {
   calculateScores,
-  extractQuestions
+  extractQuestions,
+  getAssessmentProgressStatus
 } from '../lib/helpers';
 import { updateEmployeeService } from '../services/employees';
 import {
@@ -259,7 +261,7 @@ export const updateAssessment = async (req: any, res: Response) => {
   }
 }
 
-export const createAssessmentProgress = async (req: any, res: any) => {
+export const createAssessmentProgressTracker = async (req: any, res: any) => {
   const employee = req.body;
 
   if (!employee) {
@@ -270,21 +272,14 @@ export const createAssessmentProgress = async (req: any, res: any) => {
   }
 
   try {
-
     const assessmentProgress = {
       ...employee,
-      last_assessment_date: new Date().toISOString(),
+      last_assessment_date: new Date(),
       onboarding_assessment_completed: false,
-      monthly_assessments: {
-        month: new Date().getMonth() + 1,
-        year: new Date().getFullYear(),
-        completed: true,
-        completed_date: new Date().toISOString(),
-      }
     }
 
-    const response: any = await createAssessmentProgressService(assessmentProgress);
-    if (response.code) {
+    const response: any = await createAssessmentProgressTrackerService(assessmentProgress);
+    if (response && response.code) {
       console.log('ERROR: ', response)
       return res.status(response.statusCode || 400).json({
         message: response.message,
@@ -302,7 +297,7 @@ export const createAssessmentProgress = async (req: any, res: any) => {
   }
 }
 
-export const getAssessmentProgress = async (req: any, res: any) => {
+export const getAssessmentProgressTracker = async (req: any, res: any) => {
   const employeeId = req.params.employeeId;
 
   if (!employeeId) {
@@ -313,19 +308,56 @@ export const getAssessmentProgress = async (req: any, res: any) => {
   }
 
   try {
-    const response: any = await getAssessmentProgressService(employeeId);
+    const response: any = await getAssessmentProgressTrackerService(employeeId);
 
-    if (response.code) {
+    if (response && response.code) {
       console.log('ERROR: ', response.message)
       return res.status(response.statusCode || 400).json({
         message: response.message,
         code: response.code,
       });
     } else {
-      return res.status(200).json(response);
+      const progressStatus = getAssessmentProgressStatus(response);
+      return res.status(200).json(progressStatus);
     }
   } catch (err: any) {
     console.log('ERROR: ', err)
+    return res.status(500).json({
+      message: err.message,
+      code: 'INTERNAL_SERVER_ERROR',
+    });
+  }
+}
+
+export const updateAssessmentProgressTracker = async (req: any, res: any) => {
+  const assessmentData = req.body;
+  const user_id = assessmentData?.user_id;
+
+  if (!assessmentData && !user_id) {
+    return res.status(400).json({
+      message: 'INVALID_REQUEST_BODY',
+      code: 'BAD_REQUEST',
+    });
+  }
+
+  const data = {
+    last_assessment_date: new Date(),
+  }
+
+  try {
+    const response: any = await updateAssessmentProgressTrackerService(user_id, data);
+
+    if (response && response.code) {
+      console.error('ERROR: ', response)
+      return res.status(response.statusCode || 400).json({
+        message: response.message,
+        code: response.code,
+      });
+    } else {
+      return res.status(200).json(response.Attributes);
+    }
+  } catch (err: any) {
+    console.error('ERROR: ', err)
     return res.status(500).json({
       message: err.message,
       code: 'INTERNAL_SERVER_ERROR',

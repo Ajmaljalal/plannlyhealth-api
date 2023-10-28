@@ -7,8 +7,9 @@ import {
   updateAssessment,
   generateBaselineAssessment,
   generateMonthlyAssessment,
-  getAssessmentProgress,
-  createAssessmentProgress
+  getAssessmentProgressTracker,
+  createAssessmentProgressTracker,
+  updateAssessmentProgressTracker
 } from '../controllers/assessments';
 
 const router = Router();
@@ -22,8 +23,9 @@ router.get('/company/:companyId', getAssessmentsByCompanyId)
 router.post('/', createAssessment)
 router.put('/:id', updateAssessment)
 
-router.get('/progress/:employeeId', getAssessmentProgress)
-router.post('/progress', createAssessmentProgress)
+router.get('/progress/:employeeId', getAssessmentProgressTracker)
+router.post('/progress', createAssessmentProgressTracker)
+router.post('/tracker', updateAssessmentProgressTracker)
 
 
 
