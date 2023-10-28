@@ -110,10 +110,10 @@ export const generateRiskProfile = (assessment: Assessment): RiskProfile => {
   const profileOverview = {
     user_id: assessment.user_id,
     company_id: assessment.company_id,
-    user_job_title: assessment.user_job_title,
-    user_department: assessment.user_department,
-    user_birthday: assessment.user_birthday,
-    user_marital_status: assessment.user_marital_status,
+    user_job_title: assessment.user_job_title || null,
+    user_department: assessment.user_department || null,
+    user_birthday: assessment.user_birthday || null,
+    user_marital_status: assessment.user_marital_status || null,
     assessment_date: new Date(assessment.created_at).toLocaleDateString(),
   };
 
