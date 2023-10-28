@@ -264,7 +264,7 @@ export const createAssessmentProgressTracker = async (req: any, res: any) => {
   try {
     const assessmentProgress = {
       ...employee,
-      last_assessment_date: new Date(),
+      last_assessment_date: new Date().toLocaleDateString(),
       onboarding_assessment_completed: false,
     }
 
@@ -331,7 +331,7 @@ export const updateAssessmentProgressTracker = async (req: any, res: any) => {
     });
   }
   let data: any = {
-    last_assessment_date: new Date(),
+    last_assessment_date: new Date().toLocaleDateString()
   };
   if (assessment_type === 'onboarding') {
     data = {
