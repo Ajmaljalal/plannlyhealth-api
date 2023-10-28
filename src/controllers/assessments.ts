@@ -20,7 +20,6 @@ import {
   extractQuestions,
   getAssessmentProgressStatus
 } from '../lib/helpers';
-import { updateEmployeeService } from '../services/employees';
 import {
   burnout_questions_bank,
   turnover_questions_bank,
@@ -107,15 +106,6 @@ export const createAssessment = async (req: any, res: Response) => {
         code: response.code
       });
     } else {
-      // 6. if the response is not an error, send the assessment
-      await updateEmployeeService(
-        newAssessment.user_id,
-        {
-          onboarding_assessment_completed: true,
-          modified_at: Date(),
-          last_assessment_date: Date(),
-          last_assessment_type: 'onboarding',
-        })
       return res.status(200).json(response.Item);
     }
   }
@@ -332,6 +322,7 @@ export const getAssessmentProgressTracker = async (req: any, res: any) => {
 export const updateAssessmentProgressTracker = async (req: any, res: any) => {
   const assessmentData = req.body;
   const user_id = assessmentData?.user_id;
+  const assessment_type = assessmentData?.type;
 
   if (!assessmentData && !user_id) {
     return res.status(400).json({
@@ -339,9 +330,13 @@ export const updateAssessmentProgressTracker = async (req: any, res: any) => {
       code: 'BAD_REQUEST',
     });
   }
-
-  const data = {
+  let data: any = {
     last_assessment_date: new Date(),
+  };
+  if (assessment_type === 'onboarding') {
+    data = {
+      onboarding_assessment_completed: true,
+    }
   }
 
   try {
