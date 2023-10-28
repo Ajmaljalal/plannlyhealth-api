@@ -19,6 +19,7 @@ export type Assessment = {
   user_department: string;
   user_birthday: string;
   user_marital_status: string;
+  user_gender: string;
   user_id: string;
   is_completed: boolean;
   answers: Answer[]
@@ -40,6 +41,7 @@ export const CreateAssessmentSchema = Joi.object({
   user_department: Joi.string().allow(null),
   user_birthday: Joi.string().allow(null),
   user_marital_status: Joi.string().allow(null),
+  user_gender: Joi.string().allow(null),
   user_id: Joi.string().required(),
   is_completed: Joi.boolean().required(),
   answers: Joi.array().items(Joi.object({

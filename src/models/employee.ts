@@ -15,6 +15,8 @@ export interface Employee {
   company_id?: string;
   first_name: string;
   last_name: string;
+  marital_status: string;
+  gender: string;
   email: string;
   phone: string;
   birthday: string;
@@ -38,6 +40,7 @@ export const CreateEmployeeSchema = Joi.object({
   first_name: Joi.string().required(),
   last_name: Joi.string().required(),
   marital_status: Joi.string().allow("").allow(null),
+  gender: Joi.string().allow("").allow(null),
   email: Joi.string().required(),
   phone: Joi.string().allow("").allow(null),
   birthday: Joi.string().allow("").allow(null),

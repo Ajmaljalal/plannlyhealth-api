@@ -114,6 +114,7 @@ export const generateRiskProfile = (assessment: Assessment): RiskProfile => {
     user_department: assessment.user_department || null,
     user_birthday: assessment.user_birthday || null,
     user_marital_status: assessment.user_marital_status || null,
+    user_gender: assessment.user_gender || null,
     assessment_date: new Date(assessment.created_at).toLocaleDateString(),
   };
 
