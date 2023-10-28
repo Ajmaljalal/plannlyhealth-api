@@ -36,6 +36,10 @@ export const CreateAssessmentSchema = Joi.object({
   id: Joi.string().required(),
   company_id: Joi.string().required(),
   type: Joi.string().valid('monthly', 'onboarding').required(),
+  user_job_title: Joi.string().allow(null),
+  user_department: Joi.string().allow(null),
+  user_birthday: Joi.string().allow(null),
+  user_marital_status: Joi.string().allow(null),
   user_id: Joi.string().required(),
   is_completed: Joi.boolean().required(),
   answers: Joi.array().items(Joi.object({
