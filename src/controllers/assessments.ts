@@ -335,6 +335,7 @@ export const updateAssessmentProgressTracker = async (req: any, res: any) => {
   };
   if (assessment_type === 'onboarding') {
     data = {
+      ...data,
       onboarding_assessment_completed: true,
     }
   }
