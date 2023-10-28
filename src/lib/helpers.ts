@@ -73,24 +73,31 @@ export const calculateScores = (assessment: any): any => {
     },
   };
 
-
   for (const answer of assessment.answers) {
-    const question = general_questions_bank[answer.question_id];
-    if (!question) continue; // Skip if question not found in bank
+    const scoreValue = answer.scores[answer.selected_option]; // Retrieve the score for the selected option
+    if (scoreValue === undefined || scoreValue === null) {
+      continue;
+    }
 
-    const scoreValue = question.scores[answer.selected_option];
-
-    const categories = question.category.split(', ');
+    const categories = answer.category.split(',');
 
     for (const category of categories) {
-      if (scores[category] !== undefined) {
-        scores[category].score += scoreValue;
-        scores[category].symptoms_count++;
+      const currentCategory = category.trim();
+      if (scores[currentCategory] !== undefined) {
+        scores[currentCategory].score += scoreValue;
+        scores[currentCategory].symptoms_count++;
       }
     }
   }
 
-  // Normalize the scores to ensure they do not exceed 100
+  // remove scores that have zero score and symptoms count
+  for (const category in scores) {
+    if (scores[category].score === 0 && scores[category].symptoms_count === 0) {
+      delete scores[category];
+    }
+  }
+
+  // Normalize the scores to ensure they do not exceed 100 and calculate the percentage
   for (const category in scores) {
     scores[category].score = scores[category].score > 100 ? 100 : scores[category].score;
     scores[category].percentage = Math.round((scores[category].score / (scores[category].symptoms_count * 5)) * 100);
