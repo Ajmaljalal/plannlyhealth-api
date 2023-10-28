@@ -15,6 +15,10 @@ export type Assessment = {
   id: string;
   company_id: string;
   type: AssessmentType;
+  user_job_title: string;
+  user_department: string;
+  user_birthday: string;
+  user_marital_status: string;
   user_id: string;
   is_completed: boolean;
   answers: Answer[]
