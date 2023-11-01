@@ -1,4 +1,5 @@
 import aiplatform, { helpers } from '@google-cloud/aiplatform';
+import { getRiskProfileService } from '../../services/risk-profile';
 
 const examples = [
   {
@@ -27,15 +28,6 @@ const examples = [
   },
 ]
 
-
-const riskProfileIndicators = {
-  burnout: 0.8,
-  stress: 0.7,
-  workload: 0.9,
-  resources: 0.6,
-  turnover: 0.5,
-};
-const keyAreasOfRisk = ['workload', 'resources'];
 
 const project = 'plannly-health';
 const location = 'plann.ly';
@@ -77,6 +69,29 @@ function constructPrompt(examples: any, riskProfileIndicators: any, keyAreasOfRi
   };
 }
 
+const getRiskProfileIndicators = (riskProfile: any) => {
+  if (!riskProfile) return
+  let riskProfileIndicators: any = {};
+  riskProfileIndicators.burnout = riskProfile.risk_summary.burnout;
+  riskProfileIndicators.stress = riskProfile.risk_summary.stress;
+  riskProfileIndicators.workload = riskProfile.risk_summary.workload;
+  riskProfileIndicators.resources = riskProfile.risk_summary.resources;
+  riskProfileIndicators.turnover = riskProfile.risk_summary.turnover;
+  return riskProfileIndicators;
+}
+
+const getKeyRiskAreas = (riskProfile: any) => {
+  if (!riskProfile) return
+  let keyAreasOfRisk: any = [];
+  let riskSummary = riskProfile.risk_summary;
+  // return the top 3 risk areas
+  let sortedRiskSummary = Object.keys(riskSummary).sort(function (a, b) { return riskSummary[b] - riskSummary[a] });
+  for (let i = 0; i < 3; i++) {
+    keyAreasOfRisk.push(sortedRiskSummary[i]);
+  }
+  return keyAreasOfRisk;
+}
+
 // Helper function to parse and clean the response string
 function cleanAndParseResponse(answer: any) {
   if (!answer) return [];
@@ -92,7 +107,10 @@ function cleanAndParseResponse(answer: any) {
 }
 
 // The main function to call predict
-export async function callPredict() {
+export async function callPredict(userId: string) {
+  const riskProfile = await getRiskProfileService(userId)
+  const riskProfileIndicators = getRiskProfileIndicators(riskProfile);
+  const keyAreasOfRisk = getKeyRiskAreas(riskProfile);
   try {
     // Configure the parent resource
     const endpoint = `projects/${project}/locations/${location}/publishers/${publisher}/models/${model}`;

@@ -16,7 +16,7 @@ const router = Router();
 
 
 router.get('/baseline', generateBaselineAssessment)
-router.get('/monthly/:type', generateMonthlyAssessment)
+router.get('/monthly/:userId', generateMonthlyAssessment)
 router.get('/:id', getAssessmentById)
 router.get('/user/:userId', getAssessmentsyByUserId)
 router.get('/company/:companyId', getAssessmentsByCompanyId)

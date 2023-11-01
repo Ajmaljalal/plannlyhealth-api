@@ -43,10 +43,16 @@ export const generateBaselineAssessment = async (req: Request, res: Response) =>
 export const generateMonthlyAssessment = async (req: Request, res: Response) => {
   process.env.GOOGLE_APPLICATION_CREDENTIALS = keyFilename;
   const userId = req.params.userId;
-  const currentAssessmentQuestions = await callPredict();
+  if (!userId) {
+    return res.status(400).json({
+      message: 'INVALID_REQUEST_PARAMS',
+      code: 'BAD_REQUEST',
+    });
+  }
+
+  const currentAssessmentQuestions = await callPredict(userId);
 
   try {
-    // const currentAssessmentQuestions = questions['burnout']
     if (currentAssessmentQuestions.length) {
       return res.status(200).json(currentAssessmentQuestions);
     }
