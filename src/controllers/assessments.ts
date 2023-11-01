@@ -1,5 +1,8 @@
 import { Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
+
+const keyFilename = 'src/plannly-health-bfac643951a8.json';
+
 import {
   createAssessmentProgressTrackerService,
   createAssessmentService,
@@ -20,17 +23,7 @@ import {
   extractQuestions,
   getAssessmentProgressStatus
 } from '../lib/helpers';
-import {
-  burnout_questions_bank,
-  turnover_questions_bank,
-  workload_questions_bank
-} from '../lib/assessment/questions_bank';
-
-const questions: any = {
-  burnout: burnout_questions_bank,
-  workload: workload_questions_bank,
-  turnover: turnover_questions_bank
-}
+import { callPredict } from '../lib/assessment';
 
 export const generateBaselineAssessment = async (req: Request, res: Response) => {
   try {
@@ -48,9 +41,12 @@ export const generateBaselineAssessment = async (req: Request, res: Response) =>
 }
 
 export const generateMonthlyAssessment = async (req: Request, res: Response) => {
-  const assessmentType = req.params.type;
+  process.env.GOOGLE_APPLICATION_CREDENTIALS = keyFilename;
+  const userId = req.params.userId;
+  const currentAssessmentQuestions = await callPredict();
+
   try {
-    const currentAssessmentQuestions = questions[assessmentType]
+    // const currentAssessmentQuestions = questions['burnout']
     if (currentAssessmentQuestions.length) {
       return res.status(200).json(currentAssessmentQuestions);
     }
