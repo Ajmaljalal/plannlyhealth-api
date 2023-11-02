@@ -273,6 +273,12 @@ function determineRiskLevel(percentage: number): string {
 
 export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
   console.log('generateComprehensiveRiskProfile functions')
+  const historicalData: any = {
+    "burnout": [50, 60],
+    "turnover": [20, 25],
+    "workload": [40, 50],
+    "resources": [10, 15]
+  }
   const riskProfile: any = {
     user_id: assessment.user_id,
     company_id: assessment.company_id,
@@ -299,6 +305,7 @@ export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
     const symptomsCount = responses.length;
     const percentage = calculateRiskPercentage(score, maxScores[category])
     const riskLevel = determineRiskLevel(percentage) || null;
+
     const trend = predictTrend(assessment.user_id, category, historicalData) || null
 
     riskProfile.detailedBreakdown[category] = {
@@ -340,7 +347,7 @@ export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
 function predictTrend(userId: string, category: string, historicalData: Record<string, number[]>): string {
   const categoryData = historicalData[category];
 
-  if (categoryData.length < 2) {
+  if (categoryData?.length < 2) {
     // Not enough data to determine a trend.
     return "Unknown";
   }
@@ -360,7 +367,7 @@ function predictTrend(userId: string, category: string, historicalData: Record<s
 function generateInsight(riskLevel: any, percentage: number, companyAveragePercentage: number, trend: any): string | null {
   // Implement insight generation logic based on risk level, percentage, company averages, and trends.
   // For simplicity, we're returning a placeholder value.
-  return `Your risk of ${riskLevel.toLowerCase()} is ${riskLevel.toLowerCase()} with a ${trend.toLowerCase()} trend.`;
+  return `Your risk of ${riskLevel?.toLowerCase()} is ${riskLevel?.toLowerCase()} with a ${trend?.toLowerCase()} trend.`;
 }
 
 // Sample usage
