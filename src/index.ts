@@ -13,6 +13,7 @@ import stripeRoutes from './routes/stripe';
 import sendGridRoutes from './routes/sendgrid';
 import assessmentsRoutes from './routes/assessments';
 import riskProfileRoutes from './routes/risk-profiles';
+import { generateComprehensiveRiskProfile } from './lib/helpers';
 
 const app = express();
 
@@ -170,9 +171,9 @@ app.use((req, res, next) => {
 //   }
 // }
 
-// const risProfile = generateComprehensiveRiskProfile(assessment)
+// const riskProfile = generateComprehensiveRiskProfile(assessment)
 
-// console.dir(risProfile, { depth: 4 })
+// console.dir(riskProfile, { depth: 4 })
 
 
 app.listen(config.server.port, () => {

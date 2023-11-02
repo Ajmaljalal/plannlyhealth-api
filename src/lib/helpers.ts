@@ -144,8 +144,20 @@ export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
     user_marital_status: assessment.user_marital_status || null,
     user_gender: assessment.user_gender || null,
     assessment_date: new Date().toLocaleDateString(),
-    detailedBreakdown: {},
-    riskSummary: {},
+    detailedBreakdown: {
+      burnout: {},
+      stress: {},
+      turnover: {},
+      workload: {},
+      resources: {}
+    },
+    riskSummary: {
+      burnout: {},
+      stress: {},
+      turnover: {},
+      workload: {},
+      resources: {}
+    },
     keyInsights: [],
     historicalData: {}
   };
@@ -159,7 +171,7 @@ export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
     maxScores[category] = (maxScores[category] || 0) + Math.max(...Object.values(answer.scores) as any);
   });
 
-  categories?.forEach(category => {
+  categories.forEach(category => {
     const responses = assessment.answers.filter(answer => answer.category === category);
     const score = responses.reduce((acc, answer) => acc + answer.scores[answer.selected_option], 0);
     const symptomsCount = responses.length;
@@ -208,7 +220,7 @@ function predictTrend(category: string, historicalData: Record<string, number[]>
 
   if (categoryData?.length < 1) {
     // Not enough data to determine a trend.
-    return "Unknown";
+    return "Stagble";
   }
 
   const latestScore = categoryData[categoryData.length - 1];
@@ -223,7 +235,7 @@ function predictTrend(category: string, historicalData: Record<string, number[]>
 }
 
 function generateInsight(riskLevel: any, percentage: number, trend: any, category: string): string | null {
-  return `Your risk of ${category.toLowerCase()} is ${riskLevel?.toLowerCase()} with a ${trend?.toLowerCase()} trend.`;
+  return `Your risk of ${category.toLowerCase()} is ${riskLevel?.toLowerCase()} with a ${trend?.toLowerCase() || percentage} trend.`;
 }
 
 
@@ -248,6 +260,20 @@ export const updateComprehensiveRiskProfile = (assessment: Assessment, existingP
   const riskProfile: any = existingProfile || {
     ...existingProfile,
     assessment_date: new Date(assessment.created_at).toLocaleDateString(),
+    detailedBreakdown: existingProfile.detailedBreakdown || {
+      burnout: {},
+      stress: {},
+      turnover: {},
+      workload: {},
+      resources: {}
+    },
+    riskSummary: existingProfile.riskSummary || {
+      burnout: {},
+      stress: {},
+      turnover: {},
+      workload: {},
+      resources: {}
+    },
   };
 
   const categories: Set<string> = new Set();
