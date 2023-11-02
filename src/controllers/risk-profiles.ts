@@ -1,8 +1,13 @@
 import AWS from "aws-sdk";
-import { generateComprehensiveRiskProfile, generateRiskProfile } from "../lib/helpers";
+import { generateComprehensiveRiskProfile, updateComprehensiveRiskProfile } from "../lib/helpers";
 import { RiskProfile } from "../lib/types/assessment";
-import { createRiskProfileService, } from "../services/risk-profile";
+import { createRiskProfileService, getRiskProfileService, } from "../services/risk-profile";
 import { Assessment } from "../models/assessments";
+
+const riskProfileGenerators = {
+  update: updateComprehensiveRiskProfile,
+  create: generateComprehensiveRiskProfile,
+}
 
 export const createRiskProfile = async (req: any, res: any) => {
   const dynamoDBAssessment: any = req.body;
@@ -15,11 +20,17 @@ export const createRiskProfile = async (req: any, res: any) => {
     });
   }
 
-  const riskProfile: RiskProfile = generateComprehensiveRiskProfile(assessment)
-  console.dir(riskProfile, { depth: 4 })
+  const oldRiskProfile = await getRiskProfileService(assessment.user_id);
+  let newRiskProfile: RiskProfile;
+
+  if (oldRiskProfile) {
+    newRiskProfile = riskProfileGenerators.update(assessment, oldRiskProfile);
+  } else {
+    newRiskProfile = riskProfileGenerators.create(assessment);
+  }
 
   try {
-    const response: any = await createRiskProfileService(riskProfile);
+    const response: any = await createRiskProfileService(newRiskProfile);
 
     if (response.code) {
       console.log('ERROR: ', response)

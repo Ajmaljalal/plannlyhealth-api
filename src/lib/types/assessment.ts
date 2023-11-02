@@ -19,4 +19,5 @@ export type RiskProfile = {
   risk_summary: Record<string, number>;
   detailed_breakdown: Record<string, { total_score: number; number_of_symptoms: number; key_responses: any[] }>;
   key_insights: string[];
+  historical_data: Record<string, number[]>;
 };

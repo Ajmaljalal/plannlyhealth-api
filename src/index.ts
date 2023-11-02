@@ -64,6 +64,116 @@ app.use((req, res, next) => {
   });
 });
 
+// const assessment: any = {
+//   type: 'monthly',
+//   user_id: 'bcdfe15d-682b-4838-a950-964f1198c5ea',
+//   user_job_title: 'CTO',
+//   company_id: '2b1a967e-2132-4826-a829-843882016b8c',
+//   is_completed: true,
+//   answers: [
+//     {
+//       id: 1,
+//       question_id: 'burnout_1',
+//       question: 'How frequently do you feel exhausted after work?',
+//       options: ['Never', 'Occasionally', 'Sometimes', 'Often', 'Always'],
+//       scores: { Never: 0, Occasionally: 2, Sometimes: 3, Often: 4, Always: 5 },
+//       category: 'burnout',
+//       selected_option: 'Sometimes'
+//     },
+//     {
+//       id: 2,
+//       question_id: 'workload_2',
+//       question: 'Do you have enough time to complete your tasks?',
+//       options: ['Always', 'Often', 'Sometimes', 'Rarely', 'Never'],
+//       scores: { Always: 0, Often: 1, Sometimes: 3, Rarely: 4, Never: 5 },
+//       category: 'workload',
+//       selected_option: 'Rarely'
+//     },
+//     {
+//       id: 3,
+//       question_id: 'turnover_1',
+//       question: 'How likely are you to leave your job in the next 6 months?',
+//       options: [
+//         'Very unlikely',
+//         'Unlikely',
+//         'Neutral',
+//         'Likely',
+//         'Very likely'
+//       ],
+//       scores: {
+//         'Very unlikely': 0,
+//         Unlikely: 1,
+//         Neutral: 3,
+//         Likely: 4,
+//         'Very likely': 5
+//       },
+//       category: 'turnover',
+//       selected_option: 'Very unlikely'
+//     },
+//     {
+//       id: 4,
+//       question_id: 'resources_1',
+//       question: 'Do you have the resources you need to do your job effectively?',
+//       options: ['Always', 'Often', 'Sometimes', 'Rarely', 'Never'],
+//       scores: { Always: 0, Often: 1, Sometimes: 3, Rarely: 4, Never: 5 },
+//       category: 'resources',
+//       selected_option: 'Often'
+//     },
+//     {
+//       id: 5,
+//       question_id: 'burnout_2',
+//       question: 'How frequently do you feel overwhelmed by your work?',
+//       options: ['Never', 'Occasionally', 'Sometimes', 'Often', 'Always'],
+//       scores: { Never: 0, Occasionally: 2, Sometimes: 3, Often: 4, Always: 5 },
+//       category: 'burnout',
+//       selected_option: 'Often'
+//     },
+//     {
+//       id: 6,
+//       question_id: 'workload_3',
+//       question: 'How frequently do you find yourself working overtime?',
+//       options: ['Never', 'Occasionally', 'Sometimes', 'Often', 'Always'],
+//       scores: { Never: 0, Occasionally: 1, Sometimes: 2, Often: 4, Always: 5 },
+//       category: 'workload',
+//       selected_option: 'Sometimes'
+//     },
+//     {
+//       id: 7,
+//       question_id: 'turnover_3',
+//       question: 'Are you satisfied with your current job?',
+//       options: [
+//         'Very satisfied',
+//         'Satisfied',
+//         'Neutral',
+//         'Dissatisfied',
+//         'Very dissatisfied'
+//       ],
+//       scores: {
+//         'Very satisfied': 0,
+//         Satisfied: 1,
+//         Neutral: 3,
+//         Dissatisfied: 4,
+//         'Very dissatisfied': 5
+//       },
+//       category: 'turnover',
+//       selected_option: 'Very satisfied'
+//     }
+//   ],
+//   id: '44b63dbc-2770-4849-81d8-cafd6b4b96fb',
+//   created_at: 'Thu Nov 02 2023 11:25:02 GMT-0700 (Pacific Daylight Time)',
+//   modified_at: 'Thu Nov 02 2023 11:25:02 GMT-0700 (Pacific Daylight Time)',
+//   risk_scores: {
+//     burnout: { score: 7, symptoms_count: 2, percentage: 70 },
+//     turnover: { score: 0, symptoms_count: 2, percentage: 0 },
+//     workload: { score: 6, symptoms_count: 2, percentage: 60 },
+//     resources: { score: 1, symptoms_count: 1, percentage: 20 }
+//   }
+// }
+
+// const risProfile = generateComprehensiveRiskProfile(assessment)
+
+// console.dir(risProfile, { depth: 4 })
+
 
 app.listen(config.server.port, () => {
   console.info(`Server listening on ${config.server.hostname}:${config.server.port}`)
