@@ -159,7 +159,13 @@ export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
       resources: {}
     },
     keyInsights: [],
-    historicalData: {}
+    historicalData: {
+      burnout: [],
+      stress: [],
+      turnover: [],
+      workload: [],
+      resources: []
+    }
   };
 
   const categories: Set<string> = new Set();
@@ -215,46 +221,6 @@ export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
   return riskProfile;
 }
 
-function predictTrend(category: string, historicalData: Record<string, number[]>, currentScorePercentage: number): string {
-  const categoryData = historicalData[category];
-
-  if (categoryData?.length < 1) {
-    // Not enough data to determine a trend.
-    return "Stagble";
-  }
-
-  const latestScore = categoryData[categoryData.length - 1];
-
-  if (currentScorePercentage > latestScore) {
-    return "Increasing";
-  } else if (currentScorePercentage < latestScore) {
-    return "Decreasing";
-  } else {
-    return "Stable";
-  }
-}
-
-function generateInsight(riskLevel: any, percentage: number, trend: any, category: string): string | null {
-  return `Your risk of ${category.toLowerCase()} is ${riskLevel?.toLowerCase()} with a ${trend?.toLowerCase() || percentage} trend.`;
-}
-
-
-function calculateRiskPercentage(score: number, maxScore: number): number {
-  return Math.round((score / maxScore) * 100);
-}
-
-function determineRiskLevel(percentage: number): string {
-  if (percentage > 66) {
-    return "High";
-  } else if (percentage > 33) {
-    return "Medium";
-  } else {
-    return "Low";
-  }
-}
-
-
-
 export const updateComprehensiveRiskProfile = (assessment: Assessment, existingProfile: any) => {
 
   const riskProfile: any = existingProfile || {
@@ -273,6 +239,13 @@ export const updateComprehensiveRiskProfile = (assessment: Assessment, existingP
       turnover: {},
       workload: {},
       resources: {}
+    },
+    historicalData: existingProfile.historicalData || {
+      burnout: [],
+      stress: [],
+      turnover: [],
+      workload: [],
+      resources: []
     },
   };
 
@@ -325,4 +298,42 @@ export const updateComprehensiveRiskProfile = (assessment: Assessment, existingP
   });
 
   return riskProfile;
+}
+
+
+
+function predictTrend(category: string, historicalData: Record<string, number[]>, currentScorePercentage: number): string {
+  const categoryData = historicalData[category];
+  if (!categoryData || categoryData.length < 1) {
+    // Not enough data to determine a trend.
+    return "Stable";
+  }
+
+  const latestScore = categoryData[categoryData.length - 1];
+
+  if (currentScorePercentage > latestScore) {
+    return "Increasing";
+  } else if (currentScorePercentage < latestScore) {
+    return "Decreasing";
+  } else {
+    return "Stable";
+  }
+}
+
+function generateInsight(riskLevel: any, percentage: number, trend: any, category: string): string | null {
+  return `Your risk of ${category.toLowerCase()} is ${riskLevel?.toLowerCase()} with a ${trend?.toLowerCase() || percentage} trend.`;
+}
+
+function calculateRiskPercentage(score: number, maxScore: number): number {
+  return Math.round((score / maxScore) * 100);
+}
+
+function determineRiskLevel(percentage: number): string {
+  if (percentage > 66) {
+    return "High";
+  } else if (percentage > 33) {
+    return "Medium";
+  } else {
+    return "Low";
+  }
 }
