@@ -30,6 +30,7 @@ export type Assessment = {
     stress: any;
     turnover: any;
     workload: any;
+    resources: any;
   }
 };
 
@@ -60,6 +61,7 @@ export const CreateAssessmentSchema = Joi.object({
     stress: Joi.any().allow(null),
     turnover: Joi.any().allow(null),
     workload: Joi.any().allow(null),
+    resources: Joi.any().allow(null),
   }),
 });
 
@@ -79,6 +81,7 @@ export const UpdateAssessmentSchema = Joi.object({
     stress: Joi.any().allow(null),
     turnover: Joi.any().allow(null),
     workload: Joi.any().allow(null),
+    resources: Joi.any().allow(null),
   }),
 });
 

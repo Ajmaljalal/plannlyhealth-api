@@ -86,7 +86,7 @@ const getKeyRiskAreas = (riskProfile: any) => {
   let riskSummary = riskProfile.risk_summary;
   // return the top 3 risk areas
   let sortedRiskSummary = Object.keys(riskSummary).sort(function (a, b) { return riskSummary[b] - riskSummary[a] });
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 5; i++) {
     keyAreasOfRisk.push(sortedRiskSummary[i]);
   }
   return keyAreasOfRisk;

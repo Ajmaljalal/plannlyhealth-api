@@ -1,5 +1,5 @@
 import AWS from "aws-sdk";
-import { generateRiskProfile } from "../lib/helpers";
+import { generateComprehensiveRiskProfile, generateRiskProfile } from "../lib/helpers";
 import { RiskProfile } from "../lib/types/assessment";
 import { createRiskProfileService, } from "../services/risk-profile";
 import { Assessment } from "../models/assessments";
@@ -15,7 +15,8 @@ export const createRiskProfile = async (req: any, res: any) => {
     });
   }
 
-  const riskProfile: RiskProfile = generateRiskProfile(assessment)
+  const riskProfile: RiskProfile = generateComprehensiveRiskProfile(assessment)
+  console.dir(riskProfile, { depth: 4 })
 
   try {
     const response: any = await createRiskProfileService(riskProfile);
