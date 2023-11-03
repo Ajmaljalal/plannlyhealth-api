@@ -180,7 +180,12 @@ export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
   });
 
   categories.forEach(category => {
-    const responses = assessment.answers.filter(answer => answer.category === category);
+    // Filter responses where the category list contains the current category
+    const responses = assessment.answers.filter(answer => {
+      const categoryList = answer.category.split(',').map(cat => cat.trim());
+      return categoryList.includes(category);
+    });
+
     const score = responses.reduce((acc, answer) => acc + answer.scores[answer.selected_option], 0);
     const symptomsCount = responses.length;
     const percentage = calculateRiskPercentage(score, maxScores[category])
@@ -233,21 +238,21 @@ export const updateComprehensiveRiskProfile = (assessment: Assessment, existingP
   const riskProfile: any = existingProfile || {
     ...existingProfile,
     assessment_date: new Date(assessment.created_at).toLocaleDateString(),
-    detailedBreakdown: existingProfile.detailedBreakdown || {
+    detailed_breakdown: existingProfile.detailed_breakdown || {
       burnout: {},
       stress: {},
       turnover: {},
       workload: {},
       resources: {}
     },
-    riskSummary: existingProfile.riskSummary || {
+    risk_summary: existingProfile.risk_summary || {
       burnout: {},
       stress: {},
       turnover: {},
       workload: {},
       resources: {}
     },
-    historicalData: existingProfile.historicalData || {
+    historical_data: existingProfile.historical_data || {
       burnout: [],
       stress: [],
       turnover: [],
@@ -260,9 +265,11 @@ export const updateComprehensiveRiskProfile = (assessment: Assessment, existingP
   const maxScores: { [key: string]: number } = {};
 
   assessment.answers.forEach(answer => {
-    const category = answer.category;
-    categories.add(category);
-    maxScores[category] = (maxScores[category] || 0) + Math.max(...Object.values(answer.scores) as any);
+    const categoryList = answer.category.split(',').map(cat => cat.trim()); // Split the category string and trim any whitespace
+    categoryList.forEach(category => {
+      categories.add(category);
+      maxScores[category] = (maxScores[category] || 0) + Math.max(...Object.values(answer.scores) as any);
+    });
   });
 
   categories.forEach(category => {
@@ -274,7 +281,7 @@ export const updateComprehensiveRiskProfile = (assessment: Assessment, existingP
 
     const trend = predictTrend(category, riskProfile.historicalData, percentage) || null;
 
-    riskProfile.detailedBreakdown[category] = {
+    riskProfile.detailed_breakdown[category] = {
       keyResponses: responses.map(response => ({
         questionId: response.question_id,
         question: response.question,
@@ -287,7 +294,7 @@ export const updateComprehensiveRiskProfile = (assessment: Assessment, existingP
       trend: trend
     };
 
-    riskProfile.riskSummary[category] = {
+    riskProfile.risk_summary[category] = {
       percentage: percentage,
       riskLevel: riskLevel
     };
@@ -301,7 +308,7 @@ export const updateComprehensiveRiskProfile = (assessment: Assessment, existingP
   // Update historical data
   categories.forEach(category => {
     const percentage = riskProfile.riskSummary[category].percentage;
-    riskProfile.historicalData[category] = (riskProfile.historicalData[category] || []).concat(percentage);
+    riskProfile.historical_data[category] = (riskProfile.historicalData[category] || []).concat(percentage);
   });
 
   return riskProfile;
