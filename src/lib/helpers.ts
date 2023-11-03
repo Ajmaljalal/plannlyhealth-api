@@ -172,9 +172,11 @@ export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
   const maxScores: { [key: string]: number } = {};
 
   assessment.answers.forEach(answer => {
-    const category = answer.category;
-    categories.add(category);
-    maxScores[category] = (maxScores[category] || 0) + Math.max(...Object.values(answer.scores) as any);
+    const categoryList = answer.category.split(',').map(cat => cat.trim()); // Split the category string and trim any whitespace
+    categoryList.forEach(category => {
+      categories.add(category);
+      maxScores[category] = (maxScores[category] || 0) + Math.max(...Object.values(answer.scores) as any);
+    });
   });
 
   categories.forEach(category => {
