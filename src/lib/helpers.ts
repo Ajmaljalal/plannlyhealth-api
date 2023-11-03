@@ -218,9 +218,7 @@ export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
   });
 
   // add new values to historical data 
-  console.log('categories', categories);
   categories.forEach(category => {
-    console.log('category', category);
     if (!historicalData[category]) {
       historicalData[category] = [];
     }
@@ -273,13 +271,18 @@ export const updateComprehensiveRiskProfile = (assessment: Assessment, existingP
   });
 
   categories.forEach(category => {
-    const responses = assessment.answers.filter(answer => answer.category === category);
+    // Filter responses where the category list contains the current category
+    const responses = assessment.answers.filter(answer => {
+      const categoryList = answer.category.split(',').map(cat => cat.trim());
+      return categoryList.includes(category);
+    });
+
     const score = responses.reduce((acc, answer) => acc + answer.scores[answer.selected_option], 0);
     const symptomsCount = responses.length;
-    const percentage = calculateRiskPercentage(score, maxScores[category]);
+    const percentage = calculateRiskPercentage(score, maxScores[category])
     const riskLevel = determineRiskLevel(percentage) || null;
 
-    const trend = predictTrend(category, riskProfile.historicalData, percentage) || null;
+    const trend = predictTrend(category, riskProfile.historical_data, percentage) || null
 
     riskProfile.detailed_breakdown[category] = {
       keyResponses: responses.map(response => ({
@@ -301,14 +304,14 @@ export const updateComprehensiveRiskProfile = (assessment: Assessment, existingP
 
     const insight = generateInsight(riskLevel, percentage, trend, category);
     if (insight) {
-      riskProfile.keyInsights.push(insight);
+      riskProfile.key_insights.push(insight);
     }
   });
 
   // Update historical data
   categories.forEach(category => {
-    const percentage = riskProfile.riskSummary[category].percentage;
-    riskProfile.historical_data[category] = (riskProfile.historicalData[category] || []).concat(percentage);
+    const percentage = riskProfile.risk_summary[category].percentage;
+    riskProfile.historical_data[category] = (riskProfile.historical_data[category] || []).concat(percentage);
   });
 
   return riskProfile;
