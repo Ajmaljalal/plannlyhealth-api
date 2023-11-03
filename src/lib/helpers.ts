@@ -233,7 +233,7 @@ export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
 
 export const updateComprehensiveRiskProfile = (assessment: Assessment, existingProfile: any) => {
 
-  const riskProfile: any = existingProfile || {
+  const riskProfile: any = {
     ...existingProfile,
     assessment_date: new Date(assessment.created_at).toLocaleDateString(),
     detailed_breakdown: existingProfile.detailed_breakdown || {

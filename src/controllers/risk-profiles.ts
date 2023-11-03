@@ -1,12 +1,14 @@
 import AWS from "aws-sdk";
 import { generateComprehensiveRiskProfile, updateComprehensiveRiskProfile } from "../lib/helpers";
 import { RiskProfile } from "../lib/types/assessment";
-import { createRiskProfileService, getRiskProfileService, } from "../services/risk-profile";
+import { createRiskProfileService, getRiskProfileService, updateRiskProfileService, } from "../services/risk-profile";
 import { Assessment } from "../models/assessments";
 
 const riskProfileGenerators = {
   update: updateComprehensiveRiskProfile,
   create: generateComprehensiveRiskProfile,
+  updateService: updateRiskProfileService,
+  createService: createRiskProfileService,
 }
 
 export const createRiskProfile = async (req: any, res: any) => {
@@ -20,19 +22,18 @@ export const createRiskProfile = async (req: any, res: any) => {
     });
   }
 
-  const oldRiskProfile = await getRiskProfileService(assessment.user_id);
-  let newRiskProfile: RiskProfile;
-
-  if (oldRiskProfile) {
-    newRiskProfile = riskProfileGenerators.update(assessment, oldRiskProfile);
-    console.log('updated profile: ', newRiskProfile)
-  } else {
-    newRiskProfile = riskProfileGenerators.create(assessment);
-    console.log('created profile: ', newRiskProfile)
-  }
-
   try {
-    const response: any = await createRiskProfileService(newRiskProfile);
+    const oldRiskProfile = await getRiskProfileService(assessment.user_id);
+    let newRiskProfile: RiskProfile;
+    let response: any;
+
+    if (oldRiskProfile) {
+      newRiskProfile = riskProfileGenerators.update(assessment, oldRiskProfile);
+    } else {
+      newRiskProfile = riskProfileGenerators.create(assessment);
+    }
+
+    response = await riskProfileGenerators.createService(newRiskProfile);
 
     if (response.code) {
       console.log('ERROR: ', response)
