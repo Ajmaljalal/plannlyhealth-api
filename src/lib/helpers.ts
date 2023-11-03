@@ -257,6 +257,7 @@ export const updateComprehensiveRiskProfile = (assessment: Assessment, existingP
       workload: [],
       resources: []
     },
+    key_insights: []
   };
 
   const categories: Set<string> = new Set();

@@ -25,8 +25,10 @@ export const createRiskProfile = async (req: any, res: any) => {
 
   if (oldRiskProfile) {
     newRiskProfile = riskProfileGenerators.update(assessment, oldRiskProfile);
+    console.log('updated profile: ', newRiskProfile)
   } else {
     newRiskProfile = riskProfileGenerators.create(assessment);
+    console.log('created profile: ', newRiskProfile)
   }
 
   try {
