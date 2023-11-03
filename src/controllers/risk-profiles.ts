@@ -29,11 +29,13 @@ export const createRiskProfile = async (req: any, res: any) => {
 
     if (oldRiskProfile) {
       newRiskProfile = riskProfileGenerators.update(assessment, oldRiskProfile);
+      response = await riskProfileGenerators.updateService(assessment.user_id, newRiskProfile);
+
     } else {
       newRiskProfile = riskProfileGenerators.create(assessment);
+      response = await riskProfileGenerators.createService(newRiskProfile);
     }
 
-    response = await riskProfileGenerators.createService(newRiskProfile);
 
     if (response.code) {
       console.log('ERROR: ', response)
