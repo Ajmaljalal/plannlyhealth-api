@@ -144,22 +144,22 @@ export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
     user_marital_status: assessment.user_marital_status || null,
     user_gender: assessment.user_gender || null,
     assessment_date: new Date().toLocaleDateString(),
-    detailedBreakdown: {
+    detailed_breakdown: {
       burnout: {},
       stress: {},
       turnover: {},
       workload: {},
       resources: {}
     },
-    riskSummary: {
+    risk_summary: {
       burnout: {},
       stress: {},
       turnover: {},
       workload: {},
       resources: {}
     },
-    keyInsights: [],
-    historicalData: {
+    key_insights: [],
+    historical_data: {
       burnout: [],
       stress: [],
       turnover: [],
@@ -188,7 +188,7 @@ export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
 
     const trend = predictTrend(category, historicalData, percentage) || null
 
-    riskProfile.detailedBreakdown[category] = {
+    riskProfile.detailed_breakdown[category] = {
       keyResponses: responses.map(response => ({
         questionId: response.question_id,
         question: response.question,
@@ -201,14 +201,14 @@ export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
       trend: trend
     };
 
-    riskProfile.riskSummary[category] = {
+    riskProfile.risk_summary[category] = {
       percentage: percentage,
       riskLevel: riskLevel
     };
 
     const insight = generateInsight(riskLevel, percentage, trend, category);
     if (insight) {
-      riskProfile.keyInsights.push(insight);
+      riskProfile.key_insights.push(insight);
     }
   });
 
@@ -219,11 +219,11 @@ export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
     if (!historicalData[category]) {
       historicalData[category] = [];
     }
-    const percentage = riskProfile.riskSummary[category].percentage;
+    const percentage = riskProfile.risk_summary[category].percentage;
     historicalData[category.toLowerCase().trim()].push(percentage);
   });
 
-  riskProfile.historicalData = historicalData;
+  riskProfile.historical_data = historicalData;
 
   return riskProfile;
 }
