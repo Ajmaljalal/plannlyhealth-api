@@ -212,9 +212,12 @@ export const generateComprehensiveRiskProfile = (assessment: Assessment) => {
 
   // add new values to historical data 
   categories.forEach(category => {
+    if (!historicalData[category]) {
+      historicalData[category] = [];
+    }
     const percentage = riskProfile.riskSummary[category].percentage;
-    console.log('Erro might be here', historicalData[category], historicalData, category);
-    historicalData[category].push(percentage);
+    console.log('Erro might be here', historicalData[category.toLowerCase().trim()], historicalData, category);
+    historicalData[category.toLowerCase().trim()].push(percentage);
   });
 
   riskProfile.historicalData = historicalData;
