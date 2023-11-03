@@ -1,6 +1,6 @@
 import AWS from "aws-sdk";
 import { generateComprehensiveRiskProfile, updateComprehensiveRiskProfile } from "../lib/helpers";
-import { RiskProfile } from "../lib/types/assessment";
+import { RiskProfile } from "../lib/types/risk-profile";
 import { createRiskProfileService, getRiskProfileService, updateRiskProfileService, } from "../services/risk-profile";
 import { Assessment } from "../models/assessments";
 

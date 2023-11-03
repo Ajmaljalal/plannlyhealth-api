@@ -1,6 +1,7 @@
 import CryptoJS from 'crypto-js';
 import { general_questions_bank, baseline_questions } from './assessment/questions_bank';
-import { Question, RiskProfile } from './types/assessment';
+import { Question } from './types/assessment';
+import { RiskLevel } from './types/risk-profile';
 import { Assessment } from '../models/assessments';
 
 export const decryptData = (data: string) => {
@@ -346,7 +347,7 @@ function calculateRiskPercentage(score: number, maxScore: number): number {
   return Math.round((score / maxScore) * 100);
 }
 
-function determineRiskLevel(percentage: number): string {
+export function determineRiskLevel(percentage: number): RiskLevel {
   if (percentage > 66) {
     return "High";
   } else if (percentage > 33) {

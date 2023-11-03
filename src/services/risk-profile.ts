@@ -1,6 +1,6 @@
 import { addDoc, collection, getDocs, query, where, updateDoc, doc } from "firebase/firestore";
 import { db } from "../configs/firebase";
-import { RiskProfile } from "../lib/types/assessment";
+import { RiskProfile } from "../lib/types/risk-profile";
 
 
 const RISK_PROFILE_TABLE_NAME = `risk-profiles`;
